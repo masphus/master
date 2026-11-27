@@ -45,70 +45,73 @@ const chat = document.getElementById('chat');
 const input = document.getElementById('pesan');
 const statusEl = document.getElementById('status');
 
-// OTAK CADANGAN: Biar Mona bisa jawab walau Supabase lemot / gagal!
+// OTAK CADANGAN - pake data asli dari SS lu!
 let OTAK = [
-  {keyword:'halo|hai|hi|hello|selamat pagi|selamat siang|selamat malam', answer:'Halo kak, aku Mona 🙏<br>Ada yang bisa aku bantu?'},
-  {keyword:'alamat|rumah|lokasi|dimana|tinggal|braga|bandung|toko|boutique|alamat rumah', answer:'Alamat kita di Jl. Braga No.88, Bandung kak 🙏<br>Buka setiap hari 09.00 - 21.00'},
-  {keyword:'siapa|nama|kamu siapa|mona', answer:'Aku Mona kak, asisten dari Panorama Indonesia 🙏'},
-  {keyword:'harga|berapa|price|biaya', answer:'Untuk harga boleh tau produk yang mana kak? Biar aku cekin.'},
-  {keyword:'jam|buka|tutup|operasional', answer:'Kita buka setiap hari 09.00 - 21.00 kak 🙏'},
-  {keyword:'makasih|terima kasih|thank', answer:'Sama-sama kak 🙏 Senang bisa bantu!'},
+  {pertanyaan:'lokasi dimana?', jawaban:'Kita di Jl. Merdeka No. 10 Bandung, deket Alun-alun kak. Patokannya Indomaret depan gang. Mau aku kirimin shareloc?', penentu:'lokasi|alamat|tempat|dimana', persamaan:'lokasi|alamat|tempat|dimana|daerah|letak|posisi|lokasinya|alamatnya|tempatnya|dimanakah|di mana|address', frasa:'lokasi|dimana|alamat|tempat|daerah|letak|posisi|lokasinya|alamatnya|tempatnya|di mana', skor:10},
+  {pertanyaan:'jam buka jam berapa?', jawaban:'Kita buka tiap hari kak, jam 08.00 - 21.00 WIB. Mau mampir jam berapa? Biar aku siapin tempatnya!', penentu:'jam|buka|tutup', persamaan:'jam|buka|tutup|jadwal|operasional|buka jam|jam buka|jam berapa|open|close', frasa:'jam|buka|tutup|jadwal|operasional|jam berapa|buka jam berapa|jam kerja', skor:10},
+  {pertanyaan:'berapa harga?', jawaban:'Harganya mulai 100rb kak, ada paket 100rb / 175rb / 250rb. Semua udah termasuk pajak. Kakak mau yang mana? Biar aku bantu pilihin!', penentu:'harga|biaya', persamaan:'harga|biaya|ongkos|bayar|tarif|mahar|bandrol|nominal|harganya|berapaan|berapa|price', frasa:'berapa|harga|biaya|ongkos|bayar|tarif|mahar|bandrol|nominal|harganya|berapaan|price', skor:10},
+  {pertanyaan:'ada promo?', jawaban:'Lagi ada promo kak! Diskon 20% semua paket + beli 2 gratis 1. Promonya sampe Minggu aja. Mau aku amankan yang mana?', penentu:'promo|diskon', persamaan:'promo|diskon|potongan|murah|hemat|sale|voucher|kupon|obral|cuci gudang', frasa:'ada|promo|diskon|potongan|murah|hemat|sale|voucher|kupon|obral', skor:10},
 ];
 let otakReady = false;
-
 function timeout(ms){ return new Promise(r=>setTimeout(()=>r(null), ms)); }
 
 async function getOtak(){
   if(otakReady) return OTAK;
   statusEl.textContent = 'Menghubungi Supabase...';
   try{
-    // KASIH BATAS 3 DETIK! Kalo lewat, langsung pake otak cadangan, jangan bengong!
-    let p1 = supabaseClient.from('bot_rules').select('persamaan,jawaban,skor');
-    let r1 = await Promise.race([p1, timeout(3000)]);
-    if(r1 && r1.data){
-      let rules = r1.data.map(x => ({keyword: x.persamaan, answer: x.jawaban}));
-      let p2 = supabaseClient.from('bot_faq').select('keyword,answer,skor');
-      let r2 = await Promise.race([p2, timeout(3000)]);
-      let faq = (r2 && r2.data) ? r2.data : [];
-      if(rules.length || faq.length){
-        OTAK = [...rules, ...faq, ...OTAK]; // Gabungin sama cadangan
-        otakReady = true;
-        statusEl.textContent = 'Otak siap: ' + OTAK.length + ' aturan • Supabase ✅';
-        statusEl.style.background = '#d4edda';
-        return OTAK;
-      }
+    // CUMA AMBIL DARI bot_rules! NGGAK ADA bot_faq / bot_antrian!
+    let p1 = supabaseClient.from('bot_rules').select('pertanyaan,jawaban,penentu,penentu_gender,persamaan,frasa,skor');
+    let r1 = await Promise.race([p1, timeout(4000)]);
+    if(r1 && r1.data && r1.data.length){
+      OTAK = r1.data;
+      otakReady = true;
+      statusEl.textContent = 'Otak siap: ' + OTAK.length + ' aturan • Supabase ✅';
+      statusEl.style.background = '#d4edda';
+      return OTAK;
     }
-    throw new Error('Supabase kosong / timeout');
+    throw new Error('Data kosong: ' + JSON.stringify(r1?.error));
   }catch(e){
     console.log('Supabase gagal:', e);
-    statusEl.textContent = 'Supabase lambat / RLS terkunci, pake otak cadangan ⚠️ • ' + OTAK.length + ' aturan';
+    statusEl.textContent = 'Supabase gagal, pake otak cadangan ⚠️ • ' + OTAK.length + ' aturan • ' + e.message;
     statusEl.style.background = '#f8d7da';
     otakReady = true;
     return OTAK;
   }
 }
-
 function norm(s){ return (s||'').toLowerCase().replace(/[^a-z0-9 ]/g,' ').replace(/\s+/g,' ').trim(); }
 function cariJawaban(q, otak){
   let nq = norm(q);
-  let stop = ['boleh','tau','tahu','dong','kak','ya','kah','sih','nya','apa','dimana','di','mana','berapa','gimana','mau','tanya','tolong','kasih','kasi','info'];
-  let kataUser = nq.split(' ').filter(w => w.length > 2 && !stop.includes(w));
-  if(!kataUser.length) kataUser = nq.split(' ').filter(w=>w.length>2);
-  let best = null, bestScore = 0;
+  // Buang sapaan: kak, bang, mas, mbak, bro, sis, kakak
+  let sapaan = ['kakak','kak','bang','mas','mbak','bro','sis','min','mba'];
+  let kataUser = nq.split(' ').filter(w => w.length > 1 && !sapaan.includes(w));
+  let nqBersih = kataUser.join(' ');
+  let best = null, bestScore = -1;
   for(let r of otak){
-    let frasas = String(r.keyword||'').toLowerCase().split('|').map(x=>norm(x)).filter(Boolean);
-    for(let f of frasas){
-      let kataKunci = f.split(' ').filter(w => w.length > 2);
-      let cocok = 0;
-      for(let k of kataKunci){
-        if(kataUser.some(u => u.includes(k) || k.includes(u))) cocok++;
-      }
-      let skor = kataKunci.length ? (cocok / kataKunci.length) * 100 : 0;
-      if(nq.includes(f)) skor += 20;
-      if(skor > bestScore){ bestScore = skor; best = r; }
+    let skor = 0;
+    // 1. PENENTU = paling penting! Harus ada!
+    let penentuList = String(r.penentu||'').toLowerCase().split('|').map(x=>norm(x)).filter(Boolean);
+    let cocokPenentu = 0;
+    for(let p of penentuList){
+      if(nqBersih.includes(p) || kataUser.some(u => u.includes(p) || p.includes(u))) cocokPenentu++;
     }
+    if(cocokPenentu > 0) skor += cocokPenentu * 50;
+    // 2. PERSAMAAN = sinonim
+    let persamaanList = String(r.persamaan||'').toLowerCase().split('|').map(x=>norm(x)).filter(Boolean);
+    for(let p of persamaanList){
+      if(nqBersih.includes(p)) skor += 10;
+    }
+    // 3. FRASA = kalimat lengkap
+    let frasaList = String(r.frasa||'').toLowerCase().split('|').map(x=>norm(x)).filter(Boolean);
+    for(let f of frasaList){
+      if(nqBersih.includes(f)) skor += 15;
+      if(nqBersih === f) skor += 30;
+    }
+    // 4. Tambah skor dari database (yang 90 lebih diprioritaskan)
+    skor += (r.skor || 0) * 0.1;
+    if(skor > bestScore){ bestScore = skor; best = r; }
   }
-  if(bestScore >= 50) return best.answer;
+  // Harus minimal kena 1 penentu!
+  if(best && bestScore >= 50) return best.jawaban;
   return null;
 }
 function tambah(teks, siapa){
@@ -132,13 +135,11 @@ async function kirim(){
   input.value = '';
   let rowBot = tambah('Mona lagi mikir...', 'bot');
   let botMsg = rowBot.querySelector('.msg');
-  // JANGAN NUNGGU LAMA! Kalo otak belum siap, langsung pake cadangan!
   let otak = OTAK;
   if(!otakReady){ otak = await getOtak(); }
   let jawaban = cariJawaban(teks, otak);
   if(!jawaban){
     jawaban = 'Halo kak, aku Mona 🙏<br><br>Untuk "'+teks+'" aku belum nemu jawabannya. Boleh ceritain lebih detail nggak kak?';
-    try{ await supabaseClient.from('bot_antrian').insert([{pertanyaan: teks, member_name: 'Tamu', status: 'MENUNGGU'}]); }catch(e){}
   }
   botMsg.innerHTML = jawaban;
   chat.scrollTop = chat.scrollHeight;

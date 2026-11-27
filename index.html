@@ -11,7 +11,6 @@ h1{text-align:center;font-family:Georgia;font-size:26px;letter-spacing:4px;color
 .card.bot{border-color:#00E5FF;background:#0a1a20}
 label{display:block;font-size:11px;letter-spacing:1px;color:#E8C97A;margin:10px 0 4px;font-weight:800}
 input{width:100%;background:#0a0a0a;border:1px solid #3a2f14;color:#fff;padding:11px 10px;border-radius:10px;outline:none;font-size:13px}
-input:disabled{background:#1a1a1a;color:#aaa;border-color:#222}
 input.kecil{font-size:12px;padding:9px 8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 textarea{width:100%;height:320px;background:#000;border:1px solid #3a2f14;color:#7CFC00;padding:10px;border-radius:10px;font-family:monospace;font-size:11px;outline:none}
 textarea.botArea{border-color:#00E5FF;color:#7DF9FF;height:220px}
@@ -26,10 +25,6 @@ button{width:100%;background:linear-gradient(180deg,#F5D98A,#C9A86A);border:none
 #status,#sbStatus,#botStatus{font-size:12px;margin-top:8px;text-align:center;color:#8aff8a;line-height:1.4}
 small{color:#888;font-size:11px;line-height:1.4}
 .top3{background:#1a170e;border:1px solid #E8C97A;padding:14px}
-.top3-grid{display:flex;gap:10px}
-.top3-grid>div{flex:1;min-width:0}
-.top3-grid label{font-size:12px;margin:0 0 6px;text-align:center}
-.top3-grid input{font-size:14px;padding:14px 10px;border-radius:12px;border:1px solid #C9A86A}
 .tabs{display:flex;gap:8px;position:sticky;top:0;z-index:99;background:#0a0a0a;padding:8px 0}
 .tabBtn{flex:1;padding:12px;border-radius:12px;font-weight:900;font-size:13px;cursor:pointer;border:1px solid #3a2f14;background:#1a170e;color:#aaa;margin:0}
 .tabBtn.active{background:linear-gradient(180deg,#F5D98A,#C9A86A);color:#000}
@@ -50,7 +45,6 @@ small{color:#888;font-size:11px;line-height:1.4}
 .menu3 button{flex:1;padding:14px 4px;font-size:12px;margin-top:10px}
 .menu3 button small{display:block;font-size:10px;font-weight:400;margin-top:3px;opacity:.8}
 </style></head><body>
-<!-- ===== GERBANG ===== -->
 <div id="gerbang" style="position:fixed;inset:0;background:#0a0a0a;z-index:9999;padding:20px;overflow:auto">
   <div class="card" style="margin-top:80px">
     <input id="loginCode" autocomplete="off">
@@ -58,8 +52,6 @@ small{color:#888;font-size:11px;line-height:1.4}
     <div id="loginMsg" style="font-size:12px;margin-top:8px;text-align:center;color:#8aff8a;line-height:1.4"></div>
   </div>
 </div>
-
-<!-- ===== POP-UP LOCKSCREEN LUXURY + RESET DI DALEM ===== -->
 <div id="lockPopup" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);backdrop-filter:blur(8px);z-index:10000;align-items:center;justify-content:center;padding:20px">
   <div style="width:100%;max-width:340px;background:radial-gradient(circle at 50% 0%,#2a2100 0%,#0a0a0a 60%);border:1px solid #C9A86A;border-radius:28px;padding:28px 20px 20px;text-align:center;box-shadow:0 0 50px rgba(201,168,106,.35)">
     <div style="font-size:40px">👑</div>
@@ -90,7 +82,6 @@ small{color:#888;font-size:11px;line-height:1.4}
     </div>
     <div id="lockMsg" style="font-size:12px;color:#ff6b6b;margin-top:12px;min-height:16px"></div>
     <div onclick="bukaReset()" style="color:#E8C97A;font-size:12px;margin-top:8px;cursor:pointer;text-decoration:underline">Lupa PIN? Reset di sini</div>
-    <!-- BOX RESET - MUNCUL KALO PENCET LUPA PIN -->
     <div id="resetBox" style="display:none;text-align:left;margin-top:14px;background:#0a0a0a;border:1px solid #C9A86A;border-radius:14px;padding:12px">
       <div style="color:#E8C97A;font-size:12px;font-weight:900;text-align:center">🔐 RESET PIN</div>
       <label style="margin-top:10px">KUNCI RAHASIA</label>
@@ -103,17 +94,13 @@ small{color:#888;font-size:11px;line-height:1.4}
     </div>
   </div>
 </div>
-
 <h1>👑 MASTER</h1><div class="sub">D' LUSSO</div>
-
 <div class="tabs">
 <button class="tabBtn active" id="btnHome" onclick="pindahHalaman('home')">🏠 DEPAN</button>
 <button class="tabBtn" id="btnGithub" onclick="pindahHalaman('github')">📂 GITHUB</button>
 <button class="tabBtn" id="btnSupabase" onclick="pindahHalaman('supabase')">🗄️ SUPABASE</button>
 <button class="tabBtn" id="btnBot" onclick="pindahHalaman('bot')">🤖 BOT</button>
 </div>
-
-<!-- ===== HALAMAN DEPAN ===== -->
 <div id="page-home" class="page active">
 <button class="btnPanjang" onclick="toggleDaftarProject()">📂 DAFTAR PROJECT - KLIK UNTUK PILIH ▼</button>
 <div id="dropdownProject" class="dropdown">
@@ -121,16 +108,24 @@ small{color:#888;font-size:11px;line-height:1.4}
 <div class="row" style="padding:0 4px 4px"><input id="newProj" class="kecil" placeholder="Nama project baru"><button class="sec" style="width:90px" onclick="tambahManual()">+ TAMBAH</button></div>
 </div>
 <div class="card top3">
-<div class="top3-grid">
-<div><label>🌐 URL</label><input id="topUrl" placeholder="github.com/..." autocomplete="off"></div>
-<div><label>🗄️ API</label><input id="topApi" placeholder="xxx.supabase.co" autocomplete="off"></div>
-<div><label>🔑 TOKEN</label><input id="topToken" placeholder="ghp_ / sb_ / eyJ..." autocomplete="off"></div>
-</div>
-<div class="row"><button class="sec" id="btnLock" onclick="toggleKunci()">🔒 KUNCI</button><button class="sec" onclick="bukaProjectBaru()">➕ PROJECT BARU</button></div>
-<div class="row"><button onclick="simpanProjectKeDb()">💾 SIMPAN PROJECT INI</button><button class="sec" onclick="salin3Kolom()">📋 SALIN 3 KOLOM</button></div>
+<label>📁 NAMA PROJECT - BISA DIGANTI</label>
+<input id="topNama" placeholder="Fashion-gw" autocomplete="off" oninput="simpanSementara()">
+<label>🌐 URL - URL GITHUB</label>
+<input id="topUrl" placeholder="github.com/masphus/fashion-gw" autocomplete="off" oninput="simpanSementara()">
+<small>Link Github, bukan github.io</small>
+<label>🗄️ API - API SUPABASE</label>
+<input id="topApi" placeholder="https://xxx.supabase.co" autocomplete="off" oninput="simpanSementara()">
+<small>Project URL Supabase, yang ada supabase.co</small>
+<label>🔑 TOKEN GH - TOKEN GITHUB</label>
+<input id="topTokenGH" placeholder="ghp_..." autocomplete="off" oninput="simpanSementara()">
+<small>Cuma buat EDIT FILE Github</small>
+<label>🔑 TOKEN SB - TOKEN SUPABASE</label>
+<input id="topTokenSB" placeholder="sb_publishable_... / eyJ..." autocomplete="off" oninput="simpanSementara()">
+<small>Cuma buat BACKUP Supabase</small>
+<div class="row"><button class="sec" onclick="bukaProjectBaru()">➕ PROJECT BARU</button><button class="sec" onclick="salin5Kolom()">📋 SALIN</button></div>
+<div class="row"><button onclick="simpanProjectKeDb()">💾 SIMPAN PROJECT INI</button></div>
 <div id="topStatus" style="font-size:12px;margin-top:8px;text-align:center;color:#8aff8a"></div>
 </div>
-
 <div class="card"><b style="color:#E8C97A">🚀 MAU KEMANA KO?</b>
 <div class="menu3">
 <button onclick="pindahHalaman('github')">📂<br>GITHUB<small>EDIT FILE</small></button>
@@ -138,7 +133,6 @@ small{color:#888;font-size:11px;line-height:1.4}
 <button class="botBtn" onclick="pindahHalaman('bot')">🤖<br>BOT<small>FAQ</small></button>
 </div>
 <small><br>Pilih project dulu di atas, terus pencet salah satu.</small></div>
-
 <div class="card"><b style="color:#E8C97A">⚡ CEPAT - DI DEPAN AJA</b>
 <button class="sec" onclick="pulihkanDariHP()">♻️ PULIHKAN DARI HP</button>
 <div id="status">Belum load...</div>
@@ -147,13 +141,11 @@ small{color:#888;font-size:11px;line-height:1.4}
 <div id="sbStatus"></div>
 <small><br>Jadi kalo cuma mau pulihin file / backup, gak usah masuk halaman GITHUB / SUPABASE dulu. Langsung dari depan.</small></div>
 </div>
-
-<!-- ===== HALAMAN GITHUB ===== -->
 <div id="page-github" class="page">
 <button class="btnKembali" onclick="pindahHalaman('home')">⬅️ KEMBALI KE DEPAN</button>
 <div class="judulHalaman">📂 GITHUB</div><div class="infoProject" id="infoProjGithub">Belum pilih project</div>
 <div class="card"><b style="color:#E8C97A">📂 GITHUB</b>
-<label>NAMA PROJECT / PEMBELI</label><input id="projName" class="kecil" placeholder="Ammo Travel - Si A">
+<label>NAMA PROJECT / PEMBELI</label><input id="projName" class="kecil" placeholder="Ammo Travel - Si A" oninput="document.getElementById('topNama').value=this.value;simpanSementara()">
 <div class="row"><div><label>NAMA REPO</label><input id="project" class="kecil" placeholder="nama-repo"></div><div><label>BRANCH</label><input id="branch" class="kecil" value="main"></div></div>
 <label>NAMA FILE</label><input id="fileName" class="kecil" value="index.html">
 <button class="sec" onclick="loadFile()">📥 LOAD FILE</button>
@@ -169,8 +161,6 @@ small{color:#888;font-size:11px;line-height:1.4}
 <div class="card"><b style="color:#E8C97A">📱 FILE HP → GITHUB</b><input type="file" id="fileHP" accept=".html,.css,.js,.txt,.json" style="padding:10px"><div id="fileHPInfo" style="font-size:11px;color:#888;margin-top:6px">Belum ada file dipilih</div><button class="sec" onclick="kirimFileHPKeGithub()">📤 KIRIM FILE HP KE GITHUB</button></div>
 <button class="btnKembali" onclick="pindahHalaman('home')">⬅️ KEMBALI KE DEPAN</button>
 </div>
-
-<!-- ===== HALAMAN SUPABASE ===== -->
 <div id="page-supabase" class="page">
 <button class="btnKembali" onclick="pindahHalaman('home')">⬅️ KEMBALI KE DEPAN</button>
 <div class="judulHalaman">🗄️ SUPABASE</div><div class="infoProject" id="infoProjSupabase">Belum pilih project</div>
@@ -182,8 +172,6 @@ small{color:#888;font-size:11px;line-height:1.4}
 <div class="card"><b style="color:#E8C97A">🗄️ RESTORE</b><input type="file" id="backupHP" accept=".json" style="padding:10px"><div id="backupHPInfo" style="font-size:11px;color:#888;margin-top:6px">Belum ada backup dipilih.</div><button onclick="kirimBackupKeSupabase()">🗄️ KIRIM 1 TABEL</button><button class="sec" onclick="kirimBackupSemuaKeSupabase()">🗄️ KIRIM SEMUA TABEL</button></div>
 <button class="btnKembali" onclick="pindahHalaman('home')">⬅️ KEMBALI KE DEPAN</button>
 </div>
-
-<!-- ===== HALAMAN BOT ===== -->
 <div id="page-bot" class="page">
 <button class="btnKembali" onclick="pindahHalaman('home')">⬅️ KEMBALI KE DEPAN</button>
 <div class="judulHalaman" style="color:#7DF9FF">🤖 BOT</div><div class="infoProject" id="infoProjBot">Belum pilih project</div>
@@ -195,34 +183,25 @@ small{color:#888;font-size:11px;line-height:1.4}
 <div class="card bot"><b style="color:#7DF9FF">⚙️ SETTING BOT</b><label>NAMA BOT</label><input id="botNama" class="kecil" value="Admin D'Lusso"><label>PESAN PEMBUKA</label><input id="botSalam" class="kecil" value="Halo kak! Selamat datang di D'Lusso!"><label>NOMOR WA</label><input id="botWa" class="kecil" placeholder="628..."><button class="botBtn" onclick="simpanSettingBot()">💾 SIMPAN SETTING BOT</button></div>
 <button class="btnKembali" onclick="pindahHalaman('home')">⬅️ KEMBALI KE DEPAN</button>
 </div>
-
 <script>
 var MASTER_DB_URL = "https://lrnnosiewovhaoyyvsmc.supabase.co";
 var MASTER_DB_KEY = "sb_publishable_2tzMRe0rQriqi4q3GLYWkQ_8A2scdc5";
-// ===== KUNCI AES - GANTI JADI RAHASIA LU SENDIRI =====
 var KUNCI_AES = "Dlusso-Kunci-Rahasia-123";
-function kunciAES(teks){
-  if(!teks) return "";
-  try{ return CryptoJS.AES.encrypt(String(teks), KUNCI_AES).toString(); }catch(e){ return teks; }
-}
-function bukaAES(teksAcak){
-  if(!teksAcak) return "";
-  if(String(teksAcak).indexOf("U2FsdGVkX1") !== 0) return String(teksAcak);
-  try{ var hasil = CryptoJS.AES.decrypt(String(teksAcak), KUNCI_AES).toString(CryptoJS.enc.Utf8); return hasil || String(teksAcak); }catch(e){ return String(teksAcak); }
-}
-function updateInfoProject(){ var n=document.getElementById('projName').value||document.getElementById('project').value||"Belum pilih project"; var t="✅ Lagi ngerjain: "+n; ['infoProjGithub','infoProjSupabase','infoProjBot'].forEach(function(id){ var el=document.getElementById(id); if(el) el.textContent=t; }); }
+function kunciAES(teks){ if(!teks) return ""; try{ return CryptoJS.AES.encrypt(String(teks), KUNCI_AES).toString(); }catch(e){ return teks; } }
+function bukaAES(teksAcak){ if(!teksAcak) return ""; if(String(teksAcak).indexOf("U2FsdGVkX1") !== 0) return String(teksAcak); try{ var hasil = CryptoJS.AES.decrypt(String(teksAcak), KUNCI_AES).toString(CryptoJS.enc.Utf8); return hasil || String(teksAcak); }catch(e){ return String(teksAcak); } }
+function updateInfoProject(){ var n=document.getElementById('topNama').value||document.getElementById('projName').value||document.getElementById('project').value||"Belum pilih project"; var t="✅ Lagi ngerjain: "+n; ['infoProjGithub','infoProjSupabase','infoProjBot'].forEach(function(id){ var el=document.getElementById(id); if(el) el.textContent=t; }); }
 function pindahHalaman(ke){ ['home','github','supabase','bot'].forEach(function(x){ var el=document.getElementById('page-'+x); if(el) el.style.display=(ke===x?'block':'none'); }); document.getElementById('btnHome').className='tabBtn'+(ke==='home'?' active':''); document.getElementById('btnGithub').className='tabBtn'+(ke==='github'?' active':''); document.getElementById('btnSupabase').className='tabBtn'+(ke==='supabase'?' active':''); document.getElementById('btnBot').className='tabBtn'+(ke==='bot'?' botActive':''); try{ localStorage.setItem('master_halaman',ke); }catch(e){} updateInfoProject(); if(ke==='bot') updateBotInfo(); window.scrollTo(0,0); }
-var sha="",isiFileHP="",isiBackup=null,editorMode='full',cacheFull="",daftarDb=[],_editId=null,terkunci=false,dropdownBuka=false;
+var sha="",isiFileHP="",isiBackup=null,editorMode='full',cacheFull="",daftarDb=[],_editId=null,dropdownBuka=false;
 var CLOSE_SCRIPT="<"+"/"+"script>";
 var labelEditor={style:"🎨 Lagi edit: STYLE",body:"📝 Lagi edit: BODY",script:"🧠 Lagi edit: SCRIPT",head:"🏷️ Lagi edit: HEAD",full:"📄 Lagi edit: FULL"};
 function toggleDaftarProject(){ var d=document.getElementById('dropdownProject'); dropdownBuka=!dropdownBuka; if(dropdownBuka){ d.classList.add('show'); loadProjectsDariDb(); } else { d.classList.remove('show'); } }
-function setKunci(k){ terkunci=k; ['topUrl','topApi','topToken'].forEach(function(id){ document.getElementById(id).disabled=k; }); document.getElementById('btnLock').textContent=k?"🔓 BUKA KUNCI":"🔒 KUNCI"; }
-function toggleKunci(){ if(terkunci){ if(!confirm("Buka kunci?")) return; setKunci(false); } else setKunci(true); }
-function bukaProjectBaru(){ _editId=null; ['topUrl','topApi','topToken','projName','project'].forEach(function(id){ var el=document.getElementById(id); if(el) el.value=''; }); setKunci(false); document.getElementById('topStatus').textContent="Siap isi project baru..."; document.getElementById('dropdownProject').classList.remove('show'); dropdownBuka=false; updateInfoProject(); }
-function salin3Kolom(){ var t="URL: "+document.getElementById('topUrl').value+"\nAPI: "+document.getElementById('topApi').value+"\nTOKEN: "+document.getElementById('topToken').value; try{ navigator.clipboard.writeText(t); document.getElementById('topStatus').textContent="✅ Tersalin!"; }catch(e){ alert(t); } }
+function bukaProjectBaru(){ _editId=null; ['topNama','topUrl','topApi','topTokenGH','topTokenSB','projName','project'].forEach(function(id){ var el=document.getElementById(id); if(el) el.value=''; }); document.getElementById('topStatus').textContent="Siap isi project baru... ketik NAMA baru dulu ko!"; document.getElementById('dropdownProject').classList.remove('show'); dropdownBuka=false; updateInfoProject(); simpanSementara(); document.getElementById('topNama').focus(); }
+function salin5Kolom(){ var t="NAMA: "+v('topNama')+"\nURL: "+v('topUrl')+"\nAPI: "+v('topApi')+"\nTOKEN GH: "+v('topTokenGH')+"\nTOKEN SB: "+v('topTokenSB'); try{ navigator.clipboard.writeText(t); document.getElementById('topStatus').textContent="✅ Tersalin!"; }catch(e){ alert(t); } }
 function v(id){ return (document.getElementById(id).value||'').trim(); }
-function getGithub(){ var u=v('topUrl'); var m=u.match(/github\.com\/([^\/]+)\/([^\/\s]+)/)||u.match(/^([^\/\s]+)\/([^\/\s]+)$/); var owner='',repo=v('project'); if(m){ owner=m[1]; repo=m[2].replace('.git',''); document.getElementById('project').value=repo; } return {owner:owner,repo:repo,token:v('topToken'),file:v('fileName')||'index.html',branch:v('branch')||'main'}; }
-function getSb(){ var tabel=v('sbTableDepan')||v('sbTable')||"products"; return {url:v('topApi'), key:v('topToken'), tabel:tabel}; }
+function simpanSementara(){ try{ localStorage.setItem('master_sementara',JSON.stringify({nama:v('topNama'),url:v('topUrl'),api:v('topApi'),tokenGH:v('topTokenGH'),tokenSB:v('topTokenSB')})); }catch(e){} }
+function loadSementara(){ try{ var d=JSON.parse(localStorage.getItem('master_sementara')||'{}'); if(d.nama) document.getElementById('topNama').value=d.nama; if(d.url) document.getElementById('topUrl').value=d.url; if(d.api) document.getElementById('topApi').value=d.api; if(d.tokenGH) document.getElementById('topTokenGH').value=d.tokenGH; if(d.tokenSB) document.getElementById('topTokenSB').value=d.tokenSB; if(d.nama) document.getElementById('projName').value=d.nama; }catch(e){} }
+function getGithub(){ var u=v('topUrl'); var m=u.match(/github\.com\/([^\/]+)\/([^\/\s]+)/)||u.match(/^([^\/\s]+)\/([^\/\s]+)$/); var owner='',repo=v('project'); if(m){ owner=m[1]; repo=m[2].replace('.git',''); document.getElementById('project').value=repo; } return {owner:owner,repo:repo,token:v('topTokenGH'),file:v('fileName')||'index.html',branch:v('branch')||'main'}; }
+function getSb(){ var tabel=v('sbTableDepan')||v('sbTable')||"products"; return {url:v('topApi'), key:v('topTokenSB'), tabel:tabel}; }
 function simpanCacheKeHP(){ try{ localStorage.setItem('master_cache',cacheFull); }catch(e){} updateBotInfo(); }
 function pulihkanDariHP(){ try{ var c=localStorage.getItem('master_cache')||""; if(!c){ alert("Di HP nggak ada file! LOAD dulu!"); return; } cacheFull=c; document.getElementById('content').value=c; editorMode='full'; document.getElementById('status').textContent="✅ Dipulihkan dari HP! "+c.length+" karakter!"; tampilEditor('full'); }catch(e){ alert(e.message); } }
 function updateBotInfo(){ var el=document.getElementById('botInfo'); if(!el) return; if(cacheFull){ el.textContent="✅ File di HP: ADA! "+cacheFull.length+" karakter"; el.style.color="#8aff8a"; } else { el.textContent="❌ File belum ada. LOAD dulu di GITHUB."; el.style.color="#ff9999"; } }
@@ -242,10 +221,10 @@ async function loadAntrian(){ var s=getSb(); if(!s.url||!s.key){ alert("Klik pro
 function getMaster(){ return {url:MASTER_DB_URL, key:MASTER_DB_KEY}; }
 async function loadProjectsDariDb(){ var m=getMaster(); document.getElementById('list').innerHTML='<p>⏳ Loading...</p>'; try{ var r=await fetch(m.url+"/rest/v1/projects?select=*&order=created_at.desc",{headers:{apikey:m.key,Authorization:"Bearer "+m.key}}); var j=await r.json(); if(!Array.isArray(j)) throw new Error(JSON.stringify(j)); daftarDb=j; renderDb(); }catch(e){ document.getElementById('list').innerHTML='❌ '+e.message; } }
 function renderDb(){ var box=document.getElementById('list'); if(!daftarDb.length){ box.innerHTML='<p style="color:#888">Belum ada project.</p>'; return; } var html=""; for(var i=0;i<daftarDb.length;i++){ var p=daftarDb[i]; html+='<div class="proj" onclick="pilihDb('+i+')"><div><b>📁 '+(p.name||'-')+'</b><small>'+(p.github_repo||'')+'<br>API: '+(p.api_url||'')+'</small></div><button class="del" onclick="event.stopPropagation();hapusDb('+p.id+')">✕</button></div>'; } box.innerHTML=html; }
-function pilihDb(i){ var p=daftarDb[i]; if(!p) return; _editId=p.id; document.getElementById('projName').value=p.name||''; document.getElementById('topUrl').value=p.github_repo||''; document.getElementById('topApi').value=p.api_url||''; document.getElementById('topToken').value=bukaAES(p.token||p.github_token||''); var m=(p.github_repo||'').match(/github\.com\/([^\/]+)\/([^\/\s]+)/); if(m) document.getElementById('project').value=m[2].replace('.git',''); setKunci(true); document.getElementById('topStatus').textContent="✅ "+(p.name||'')+" dipilih! 🔐 Token dibuka"; document.getElementById('status').textContent="✅ "+(p.name||'')+" dipilih!"; document.getElementById('dropdownProject').classList.remove('show'); dropdownBuka=false; updateInfoProject(); }
-async function simpanProjectKeDb(){ var m=getMaster(); var tokenPolos=v('topToken'); var data={ name:v('projName')||v('project')||"Project Baru", github_repo:v('topUrl'), github_token:kunciAES(tokenPolos), api_url:v('topApi'), token:kunciAES(tokenPolos) }; if(!data.github_repo && !data.api_url){ alert("Isi URL / API dulu Ko!"); return; } try{ var url=m.url+"/rest/v1/projects", headers={apikey:m.key,Authorization:"Bearer "+m.key,"Content-Type":"application/json",Prefer:"return=representation"}; var r; if(_editId) r=await fetch(url+"?id=eq."+_editId,{method:"PATCH",headers:headers,body:JSON.stringify(data)}); else r=await fetch(url,{method:"POST",headers:headers,body:JSON.stringify(data)}); var j=await r.json(); if(!r.ok) throw new Error(JSON.stringify(j)); alert("✅ Tersimpan! 🔐 Token udah di-AES!"); setKunci(true); }catch(e){ alert("Gagal: "+e.message); } }
+function pilihDb(i){ var p=daftarDb[i]; if(!p) return; _editId=p.id; document.getElementById('projName').value=p.name||''; document.getElementById('topNama').value=p.name||''; document.getElementById('topUrl').value=p.github_repo||''; document.getElementById('topApi').value=p.api_url||''; document.getElementById('topTokenGH').value=bukaAES(p.github_token||''); document.getElementById('topTokenSB').value=bukaAES(p.token||''); var m=(p.github_repo||'').match(/github\.com\/([^\/]+)\/([^\/\s]+)/); if(m) document.getElementById('project').value=m[2].replace('.git',''); document.getElementById('topStatus').textContent="✅ "+(p.name||'')+" dipilih!"; document.getElementById('status').textContent="✅ "+(p.name||'')+" dipilih!"; document.getElementById('dropdownProject').classList.remove('show'); dropdownBuka=false; updateInfoProject(); simpanSementara(); }
+async function simpanProjectKeDb(){ var m=getMaster(); var data={ name:v('topNama')||v('projName')||v('project')||"Project Baru", github_repo:v('topUrl'), github_token:kunciAES(v('topTokenGH')), api_url:v('topApi'), token:kunciAES(v('topTokenSB')) }; if(!data.github_repo && !data.api_url){ alert("Isi URL / API dulu Ko!"); return; } try{ var url=m.url+"/rest/v1/projects", headers={apikey:m.key,Authorization:"Bearer "+m.key,"Content-Type":"application/json",Prefer:"return=representation"}; var r; if(_editId) r=await fetch(url+"?id=eq."+_editId,{method:"PATCH",headers:headers,body:JSON.stringify(data)}); else r=await fetch(url,{method:"POST",headers:headers,body:JSON.stringify(data)}); var j=await r.json(); if(!r.ok) throw new Error(JSON.stringify(j)); alert("✅ Tersimpan!"); simpanSementara(); }catch(e){ alert("Gagal: "+e.message); } }
 async function hapusDb(id){ if(!confirm("Hapus project ini?")) return; var m=getMaster(); await fetch(m.url+"/rest/v1/projects?id=eq."+id,{method:"DELETE",headers:{apikey:m.key,Authorization:"Bearer "+m.key}}); loadProjectsDariDb(); }
-function tambahManual(){ var n=v('newProj'); if(!n){ alert("Isi Nama Project!"); return; } document.getElementById('projName').value=n; document.getElementById('project').value=n; document.getElementById('dropdownProject').classList.remove('show'); dropdownBuka=false; updateInfoProject(); alert("Siap isi URL / API / TOKEN untuk "+n); }
+function tambahManual(){ var n=v('newProj'); if(!n){ alert("Isi Nama Project!"); return; } document.getElementById('projName').value=n; document.getElementById('topNama').value=n; document.getElementById('project').value=n; document.getElementById('dropdownProject').classList.remove('show'); dropdownBuka=false; updateInfoProject(); simpanSementara(); alert("Siap isi URL / API / TOKEN untuk "+n); }
 async function loadFile(){ var a=getGithub(); if(!a.owner||!a.repo||!a.token){ alert("Pilih project dulu di DEPAN!"); pindahHalaman('home'); return; } document.getElementById('status').textContent="⏳ Loading "+a.file+"..."; document.getElementById('debugBox').style.display='block'; try{ var r=await fetch("https://api.github.com/repos/"+a.owner+"/"+a.repo+"/contents/"+a.file+"?ref="+a.branch,{headers:{Authorization:"Bearer "+a.token}}); var j=await r.json(); if(j.message==="Not Found"){ alert("File tidak ketemu!"); return; } if(j.message){ alert(j.message); return; } sha=j.sha; cacheFull=decodeGithub(j.content); document.getElementById('content').value=cacheFull; tampilEditor('full'); document.getElementById('status').textContent="✅ Berhasil! "+cacheFull.length+" karakter!"; document.getElementById('debugBox').textContent="✅ File ketemu! Total: "+cacheFull.length; }catch(e){ document.getElementById('status').textContent="❌ "+e.message; } }
 async function saveFile(){ var a=getGithub(); simpanBagianKeFull(); if(!cacheFull){ alert("Isi file kosong!"); return; } if(!confirm("SAVE ke "+a.owner+"/"+a.repo+" ?")) return; document.getElementById('status').textContent="⏳ Saving..."; try{ var body={message:"Update via MASTER - "+new Date().toLocaleString('id-ID'),content:btoa(unescape(encodeURIComponent(cacheFull))),branch:a.branch}; if(sha) body.sha=sha; var r=await fetch("https://api.github.com/repos/"+a.owner+"/"+a.repo+"/contents/"+a.file,{method:"PUT",headers:{Authorization:"Bearer "+a.token,"Content-Type":"application/json"},body:JSON.stringify(body)}); var j=await r.json(); if(j.message && !j.content){ alert(j.message); return; } sha=j.content.sha; document.getElementById('status').textContent="✅ BERHASIL!"; alert("BERHASIL! ✅"); }catch(e){ alert(e.message); } }
 function isiTemplate(){ if(!confirm("Isi TEMPLATE?")) return; var t='<!DOCTYPE html><html><head><meta charset="UTF-8"><title>TOKO BARU</title><style>body{background:#0a0a0a;color:#fff;text-align:center;padding:40px}h1{color:#E8C97A}</style></head><body><h1>TOKO BARU</h1><p>WA: 628...</p><script>function balasBot(p){ if(p.includes("harga")) return "Harga 50rb kak!"; return "Halo kak!"; }'+CLOSE_SCRIPT+'</body></html>'; cacheFull=t; simpanCacheKeHP(); document.getElementById('content').value=t; tampilEditor('style'); }
@@ -258,7 +237,6 @@ async function kirimBackupKeSupabase(){ var s=getSb(),tabel=getSb().tabel; if(!i
 async function backupDatabase(){ var s=getSb(),tabel=getSb().tabel; try{ var r=await fetch(s.url+"/rest/v1/"+tabel+"?select=*",{headers:{apikey:s.key,Authorization:"Bearer "+s.key}}); var j=await r.json(); var blob=new Blob([JSON.stringify(j,null,2)],{type:"application/json"}); var a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download="backup-"+tabel+"-"+new Date().toISOString().slice(0,10)+".json"; a.click(); alert("Berhasil! Cek Download!"); }catch(e){ alert(e.message); } }
 async function backupSemuaTabel(){ var s=getSb(); var daftar=["products","members","admins","pegawai","orders","riwayat_saldo","bot_faq","bot_antrian","order_items","member_notifications"]; var tambahan=v('tabelTambahan'); if(tambahan) tambahan.split(",").forEach(function(t){ t=t.trim(); if(t && daftar.indexOf(t)===-1) daftar.push(t); }); var hasil={}; try{ for(var i=0;i<daftar.length;i++){ var r=await fetch(s.url+"/rest/v1/"+daftar[i]+"?select=*",{headers:{apikey:s.key,Authorization:"Bearer "+s.key}}); var j=await r.json(); hasil[daftar[i]]=Array.isArray(j)?j:[]; } var blob=new Blob([JSON.stringify(hasil,null,2)],{type:"application/json"}); var a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download="backup-SEMUA-"+new Date().toISOString().slice(0,10)+".json"; a.click(); alert("BERHASIL! ✅"); }catch(e){ alert(e.message); } }
 async function kirimBackupSemuaKeSupabase(){ var s=getSb(); if(!isiBackup){ alert("Pilih backup-SEMUA.json dulu!"); return; } if(Array.isArray(isiBackup)){ alert("File ini cuma 1 tabel!"); return; } var daftar=Object.keys(isiBackup); if(!confirm("Kirim RESTORE "+daftar.length+" tabel?")) return; try{ for(var t=0;t<daftar.length;t++){ var tabel=daftar[t], data=isiBackup[tabel]||[]; for(var i=0;i<data.length;i+=100){ await fetch(s.url+"/rest/v1/"+tabel,{method:"POST",headers:{apikey:s.key,Authorization:"Bearer "+s.key,"Content-Type":"application/json",Prefer:"resolution=merge-duplicates"},body:JSON.stringify(data.slice(i,i+100))}); } } alert("RESTORE BERHASIL! ✅"); }catch(e){ alert(e.message); } }
-// ===== GERBANG + LOCKSCREEN LUXURY + AES + RESET DI DALEM =====
 var userLogin = null;
 var pinSementara = "";
 async function cekCode(){
@@ -280,31 +258,10 @@ async function cekCode(){
     document.getElementById('lockPopup').style.display = 'flex';
   }catch(e){}
 }
-function updateDots(){
-  var dots = document.querySelectorAll('#pinDots .dot');
-  for(var i=0;i<dots.length;i++){ dots[i].style.background = i < pinSementara.length ? "#E8C97A" : "transparent"; }
-}
-function tekanPin(angka){
-  if(pinSementara.length >= 6) return;
-  pinSementara += angka;
-  updateDots();
-  if(pinSementara.length === 6){
-    setTimeout(function(){
-      var pinAsli = bukaAES(userLogin.pin);
-      if(String(pinSementara) === String(pinAsli)){
-        document.getElementById('lockPopup').style.display = 'none';
-        document.getElementById('gerbang').style.display = 'none';
-      } else {
-        document.getElementById('lockMsg').textContent = "PIN Salah";
-        pinSementara = "";
-        updateDots();
-      }
-    }, 200);
-  }
-}
+function updateDots(){ var dots = document.querySelectorAll('#pinDots .dot'); for(var i=0;i<dots.length;i++){ dots[i].style.background = i < pinSementara.length ? "#E8C97A" : "transparent"; } }
+function tekanPin(angka){ if(pinSementara.length >= 6) return; pinSementara += angka; updateDots(); if(pinSementara.length === 6){ setTimeout(function(){ var pinAsli = bukaAES(userLogin.pin); if(String(pinSementara) === String(pinAsli)){ document.getElementById('lockPopup').style.display = 'none'; document.getElementById('gerbang').style.display = 'none'; } else { document.getElementById('lockMsg').textContent = "PIN Salah"; pinSementara = ""; updateDots(); } }, 200); } }
 function hapusPin(){ pinSementara = pinSementara.slice(0,-1); updateDots(); }
 function tutupLock(){ document.getElementById('lockPopup').style.display = 'none'; pinSementara=""; updateDots(); }
-function cekPin(){}
 function bukaReset(){ document.getElementById('resetBox').style.display='block'; document.getElementById('keypadBox').style.display='none'; document.getElementById('resetMsg').textContent=''; }
 function tutupReset(){ document.getElementById('resetBox').style.display='none'; document.getElementById('keypadBox').style.display='grid'; }
 async function prosesResetPin(){
@@ -325,5 +282,5 @@ async function prosesResetPin(){
     setTimeout(function(){ tutupReset(); document.getElementById('lockMsg').textContent='PIN baru udah aktif, silakan masuk!'; }, 800);
   }catch(e){ msg.style.color='#ff6b6b'; msg.textContent='Gagal: '+e.message; }
 }
-loadSettingBot(); setKunci(false); pindahHalaman('home');
+loadSettingBot(); loadSementara(); pindahHalaman('home');
 </script></body></html>

@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>MONA - Chat</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;font-family:sans-serif}
+  html,body{height:100%;height:100dvh;overflow:hidden}
+  body{background:#ece5dd;display:flex;flex-direction:column;height:100dvh}
+  #head{background:#111;padding:12px 16px;color:#fff;display:flex;align-items:center;gap:10px;flex-shrink:0}
+  #head img{width:40px;height:40px;border-radius:50%;object-fit:cover}
+  #head b{font-size:16px}
+  #head span{font-size:11px;color:#25d366}
+  #status{font-size:11px;color:#888;text-align:center;padding:5px;background:#fff3cd}
+  #chat{flex:1;overflow-y:auto;padding:14px;padding-bottom:90px;display:flex;flex-direction:column;gap:10px}
+  .row{display:flex;gap:8px;max-width:90%}
+  .row.me{justify-content:flex-end;align-self:flex-end}
+  .avatar{width:36px;height:36px;min-width:36px;border-radius:50%;object-fit:cover}
+  .msg{padding:10px 13px;border-radius:14px;font-size:14px;line-height:1.45;word-break:break-word}
+  .msg.bot{background:#fff;color:#111}
+  .msg.me{background:#dcf8c6;color:#111}
+  #box{position:fixed;left:0;right:0;bottom:0;display:flex;gap:8px;padding:10px;padding-bottom:calc(10px + env(safe-area-inset-bottom));background:#fff;border-top:1px solid #ddd;z-index:99}
+  #pesan{flex:1;padding:14px;border-radius:20px;border:1px solid #ddd;outline:none;font-size:15px;min-width:0}
+  button{padding:12px 18px;border:none;border-radius:20px;background:#111;color:#fff;font-weight:bold;cursor:pointer;flex-shrink:0}
+</style>
+</head>
+<body>
+<div id="head">
+  <img src="mona.png" onerror="this.src='https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100'">
+  <div><b>MONA</b><br><span>● Online</span></div>
+</div>
+<div id="status">Memuat otak Mona...</div>
+<div id="chat"></div>
+<div id="box">
+  <input id="pesan" placeholder="Ketik pesan..." autocomplete="off">
+  <button onclick="kirim()">Kirim</button>
+</div>
+<script>
+const SUPABASE_URL = 'https://kkydbnjxbcxpcpor.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_Z-EI-4pmMWd8qhArrEvJdw_ZN8R6WAx';
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const chat = document.getElementById('chat');
+const input = document.getElementById('pesan');
+const statusEl = document.getElementById('status');
+
+// OTAK CADANGAN: Biar Mona bisa jawab walau Supabase lemot / gagal!
+let OTAK = [
+  {keyword:'halo|hai|hi|hello|selamat pagi|selamat siang|selamat malam', answer:'Halo kak, aku Mona 🙏<br>Ada yang bisa aku bantu?'},
+  {keyword:'alamat|rumah|lokasi|dimana|tinggal|braga|bandung|toko|boutique|alamat rumah', answer:'Alamat kita di Jl. Braga No.88, Bandung kak 🙏<br>Buka setiap hari 09.00 - 21.00'},
+  {keyword:'siapa|nama|kamu siapa|mona', answer:'Aku Mona kak, asisten dari Panorama Indonesia 🙏'},
+  {keyword:'harga|berapa|price|biaya', answer:'Untuk harga boleh tau produk yang mana kak? Biar aku cekin.'},
+  {keyword:'jam|buka|tutup|operasional', answer:'Kita buka setiap hari 09.00 - 21.00 kak 🙏'},
+  {keyword:'makasih|terima kasih|thank', answer:'Sama-sama kak 🙏 Senang bisa bantu!'},
+];
+let otakReady = false;
+
+function timeout(ms){ return new Promise(r=>setTimeout(()=>r(null), ms)); }
+
+async function getOtak(){
+  if(otakReady) return OTAK;
+  statusEl.textContent = 'Menghubungi Supabase...';
+  try{
+    // KASIH BATAS 3 DETIK! Kalo lewat, langsung pake otak cadangan, jangan bengong!
+    let p1 = supabaseClient.from('bot_rules').select('persamaan,jawaban,skor');
+    let r1 = await Promise.race([p1, timeout(3000)]);
+    if(r1 && r1.data){
+      let rules = r1.data.map(x => ({keyword: x.persamaan, answer: x.jawaban}));
+      let p2 = supabaseClient.from('bot_faq').select('keyword,answer,skor');
+      let r2 = await Promise.race([p2, timeout(3000)]);
+      let faq = (r2 && r2.data) ? r2.data : [];
+      if(rules.length || faq.length){
+        OTAK = [...rules, ...faq, ...OTAK]; // Gabungin sama cadangan
+        otakReady = true;
+        statusEl.textContent = 'Otak siap: ' + OTAK.length + ' aturan • Supabase ✅';
+        statusEl.style.background = '#d4edda';
+        return OTAK;
+      }
+    }
+    throw new Error('Supabase kosong / timeout');
+  }catch(e){
+    console.log('Supabase gagal:', e);
+    statusEl.textContent = 'Supabase lambat / RLS terkunci, pake otak cadangan ⚠️ • ' + OTAK.length + ' aturan';
+    statusEl.style.background = '#f8d7da';
+    otakReady = true;
+    return OTAK;
+  }
+}
+
+function norm(s){ return (s||'').toLowerCase().replace(/[^a-z0-9 ]/g,' ').replace(/\s+/g,' ').trim(); }
+function cariJawaban(q, otak){
+  let nq = norm(q);
+  let stop = ['boleh','tau','tahu','dong','kak','ya','kah','sih','nya','apa','dimana','di','mana','berapa','gimana','mau','tanya','tolong','kasih','kasi','info'];
+  let kataUser = nq.split(' ').filter(w => w.length > 2 && !stop.includes(w));
+  if(!kataUser.length) kataUser = nq.split(' ').filter(w=>w.length>2);
+  let best = null, bestScore = 0;
+  for(let r of otak){
+    let frasas = String(r.keyword||'').toLowerCase().split('|').map(x=>norm(x)).filter(Boolean);
+    for(let f of frasas){
+      let kataKunci = f.split(' ').filter(w => w.length > 2);
+      let cocok = 0;
+      for(let k of kataKunci){
+        if(kataUser.some(u => u.includes(k) || k.includes(u))) cocok++;
+      }
+      let skor = kataKunci.length ? (cocok / kataKunci.length) * 100 : 0;
+      if(nq.includes(f)) skor += 20;
+      if(skor > bestScore){ bestScore = skor; best = r; }
+    }
+  }
+  if(bestScore >= 50) return best.answer;
+  return null;
+}
+function tambah(teks, siapa){
+  let row = document.createElement('div');
+  row.className = 'row ' + (siapa==='me'?'me':'');
+  if(siapa==='bot'){
+    row.innerHTML = '<img src="mona.png" class="avatar" onerror="this.src=\'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100\'"><div class="msg bot"></div>';
+    row.querySelector('.msg').innerHTML = teks;
+  } else {
+    row.innerHTML = '<div class="msg me"></div>';
+    row.querySelector('.msg').textContent = teks;
+  }
+  chat.appendChild(row);
+  chat.scrollTop = chat.scrollHeight;
+  return row;
+}
+async function kirim(){
+  let teks = input.value.trim();
+  if(!teks) return;
+  tambah(teks, 'me');
+  input.value = '';
+  let rowBot = tambah('Mona lagi mikir...', 'bot');
+  let botMsg = rowBot.querySelector('.msg');
+  // JANGAN NUNGGU LAMA! Kalo otak belum siap, langsung pake cadangan!
+  let otak = OTAK;
+  if(!otakReady){ otak = await getOtak(); }
+  let jawaban = cariJawaban(teks, otak);
+  if(!jawaban){
+    jawaban = 'Halo kak, aku Mona 🙏<br><br>Untuk "'+teks+'" aku belum nemu jawabannya. Boleh ceritain lebih detail nggak kak?';
+    try{ await supabaseClient.from('bot_antrian').insert([{pertanyaan: teks, member_name: 'Tamu', status: 'MENUNGGU'}]); }catch(e){}
+  }
+  botMsg.innerHTML = jawaban;
+  chat.scrollTop = chat.scrollHeight;
+}
+input.addEventListener('keydown', e=>{ if(e.key==='Enter') kirim(); });
+tambah('Halo kak, aku Mona 🙏<br>Ada yang bisa aku bantu?', 'bot');
+getOtak();
+</script>
+</body>
+</html>

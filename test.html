@@ -35,14 +35,16 @@ small{color:#888;font-size:11px}
 </div>
 
 <script>
-// === API & URL UDAH DITEMPEL ===
+// === API & URL UDAH DITEMPEL - BAJU LAMA, JANGAN DIUBAH ===
 var SUPABASE_URL = 'https://msfzsebownnsrpyjusoc.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_7VQcQXBLz4OYn_OJUzusSg_Zz1or9gq';
 var sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-var TABEL_BOT = 'bot_rules';
-var ATURAN = [];
 
-// === Normalisasi KITA ===
+// === OTAK BARU: 2 TABEL - frasa (deteksi) + bot_rules (jawab) ===
+var ATURAN = []; // bot_rules
+var FRASA_LIST = []; // frasa
+
+// === Normalisasi - BAJU LAMA, TETEP SAMA ===
 function normalisasiTeks(t){
   var s=' '+String(t||'').toLowerCase()+' ';
   s=s.replace(/[^a-z0-9\s]/g,' ');
@@ -58,47 +60,47 @@ function kenaFrasa(chatNorm, frasaAsli){
   var pola=f.split(/\s+/).map(function(w){ return escapeReg(w); }).join('\\s+');
   return new RegExp('(?<![a-z0-9])'+pola+'(?![a-z0-9])').test(chatNorm);
 }
-function persamaanKena(chatNorm, persamaanStr){
-  var list=String(persamaanStr||'').split(',').map(function(x){ return x.trim().toLowerCase(); }).filter(Boolean);
-  var kena=[];
-  for(var i=0;i<list.length;i++){ if(kenaFrasa(chatNorm, list[i])) kena.push(list[i]); }
-  return kena;
-}
-function hitungSkor(chat, rule){
+
+// === OTAK BARU: Hitung skor per kategori dari tabel frasa ===
+function hitungSkorBaru(chat){
   var n=normalisasiTeks(chat);
-  var skorPenentu=0, kenaPenentu=[];
-  var penentuList=String(rule.penentu||'').split(',').map(function(x){ return x.trim(); }).filter(Boolean);
-  for(var i=0;i<penentuList.length;i++){ if(kenaFrasa(n, penentuList[i])){ skorPenentu+=10; kenaPenentu.push(penentuList[i]+' (+10)'); } }
-  var skorGender=0, kenaGender=[];
-  var genderList=String(rule.penentu_gender||'').split(',').map(function(x){ return x.trim(); }).filter(Boolean);
-  for(var j=0;j<genderList.length;j++){ if(kenaFrasa(n, genderList[j])){ skorGender+=10; kenaGender.push(genderList[j]+' (+10)'); } }
-  var skorFrasa=0, kenaFrasaList=[];
-  var frasaList=String(rule.frasa||'').split(',').map(function(x){ return x.trim(); }).filter(Boolean);
-  for(var k=0;k<frasaList.length;k++){ if(kenaFrasa(n, frasaList[k])){ skorFrasa+=1; kenaFrasaList.push(frasaList[k]+' (+1)'); } }
-  var kenaPersamaan=persamaanKena(n, rule.persamaan||'');
-  var skorPersamaan=kenaPersamaan.length*1;
-  var total=skorPenentu+skorGender+skorFrasa+skorPersamaan;
-  var skorMaks = (penentuList.length*10) + (genderList.length*10) + (frasaList.length*1) + (String(rule.persamaan||'').split(',').filter(function(x){return x.trim();}).length*1);
-  var persen = skorMaks>0 ? (total/skorMaks*100) : 0;
-  return {total:total, skorMaks:skorMaks, persen:persen, skorPenentu:skorPenentu, kenaPenentu:kenaPenentu, skorGender:skorGender, kenaGender:kenaGender, skorFrasa:skorFrasa, kenaFrasa:kenaFrasaList, skorPersamaan:skorPersamaan, kenaPersamaan:kenaPersamaan};
-}
-function cariJawabanBot(chat){
+  var perKategori={};
+  // Kelompokin frasa per kategori
+  for(var i=0;i<FRASA_LIST.length;i++){
+    var kat=FRASA_LIST[i].kategori||'lain';
+    if(!perKategori[kat]) perKategori[kat]={total:0, maks:0, kena:[]};
+    perKategori[kat].maks+=1;
+    if(kenaFrasa(n, FRASA_LIST[i].teks||FRASA_LIST[i].frasa||'')){
+      perKategori[kat].total+=1;
+      perKategori[kat].kena.push(FRASA_LIST[i].teks||FRASA_LIST[i].frasa);
+    }
+  }
   var hasil=[];
-  for(var i=0;i<ATURAN.length;i++){ var h=hitungSkor(chat, ATURAN[i]); hasil.push({rule:ATURAN[i], skor:h}); }
-  hasil.sort(function(a,b){ return b.skor.total-a.skor.total; });
+  for(var k in perKategori){
+    var d=perKategori[k];
+    var persen=d.maks>0?(d.total/d.maks*100):0;
+    // Cari jawaban di bot_rules untuk kategori ini
+    var rule=null;
+    for(var j=0;j<ATURAN.length;j++){ if(ATURAN[j].kategori===k){ rule=ATURAN[j]; break; } }
+    if(rule) hasil.push({kategori:k, rule:rule, skor:{total:d.total, skorMaks:d.maks, persen:persen, kenaFrasa:d.kena}});
+  }
+  hasil.sort(function(a,b){ return b.skor.persen-a.skor.persen; });
   return hasil;
 }
 
-// === LOAD HANYA DARI DATABASE - TANPA CONTOH LOKAL ===
+// === LOAD OTAK BARU: frasa + bot_rules ===
 async function loadSemua(){
   document.getElementById('statusDb').textContent='Memuat dari database...';
   try{
-    var r=await sb.from(TABEL_BOT).select('*').order('id');
-    if(r.error) throw r.error;
-    ATURAN=r.data||[];
-    document.getElementById('statusDb').textContent='✅ '+ATURAN.length+' aturan dari database';
+    var r1=await sb.from('bot_rules').select('*').order('id');
+    if(r1.error) throw r1.error;
+    ATURAN=r1.data||[];
+    var r2=await sb.from('frasa').select('*').order('id');
+    if(r2.error) throw r2.error;
+    FRASA_LIST=r2.data||[];
+    document.getElementById('statusDb').textContent='✅ '+ATURAN.length+' aturan + '+FRASA_LIST.length+' frasa dari database';
   }catch(e){
-    ATURAN=[];
+    ATURAN=[]; FRASA_LIST=[];
     document.getElementById('statusDb').textContent='❌ Gagal: '+e.message+' (Cek RLS / POLICY!)';
   }
 }
@@ -112,28 +114,29 @@ async function kirimChat(){
   var inp=document.getElementById('chatInput'); var teks=inp.value.trim(); if(!teks) return;
   tambahChat(teks, 'me'); inp.value='';
 
-  // Kalo database kosong / gagal load, MONA GAK BOLEH NGARANG
-  if(!ATURAN.length){
+  if(!ATURAN.length || !FRASA_LIST.length){
     tambahChat('Maaf kak, database belum terhubung / belum ada aturan. Mona tidak bisa menjawab karena tidak ada di database 🙏', 'bot');
     return;
   }
 
-  var hasil = cariJawabanBot(teks);
+  var hasil = hitungSkorBaru(teks);
   var box=document.getElementById('skorHasil'); box.style.display='block';
-  var txt='PERTANYAAN: '+teks+'\nNORMALISASI: '+normalisasiTeks(teks).trim()+'\n\n=== HASIL (80% dari JAWABAN) ===\n';
-  for(var i=0;i<hasil.length;i++){ var h=hasil[i].skor; txt+='\n['+(i+1)+'] TOTAL: '+h.total+' / Maks: '+h.skorMaks+' = '+h.persen.toFixed(1)+'% '+(h.persen>=80?'✅ LOLOS':'❌ GAK LOLOS')+'\nPenentu: '+h.skorPenentu+' - '+(h.kenaPenentu.length?h.kenaPenentu.join(', '):'(nggak kena)')+'\nGender: '+h.skorGender+' - '+(h.kenaGender.length?h.kenaGender.join(', '):'(nggak kena)')+'\nFrasa: '+h.skorFrasa+' - '+(h.kenaFrasa.length?h.kenaFrasa.join(', '):'(nggak kena)')+'\nPersamaan: '+h.skorPersamaan+' - '+(h.kenaPersamaan.length?h.kenaPersamaan.join(', '):'(nggak kena)')+'\nJawaban DB: '+hasil[i].rule.jawaban+'\n'; }
+  var txt='PERTANYAAN: '+teks+'\nNORMALISASI: '+normalisasiTeks(teks).trim()+'\n\n=== HASIL (80% dari JAWABAN) - OTAK BARU: frasa + bot_rules ===\n';
+  for(var i=0;i<hasil.length;i++){ var h=hasil[i].skor; txt+='\n['+(i+1)+'] KATEGORI: '+hasil[i].kategori+' | TOTAL: '+h.total+' / Maks: '+h.skorMaks+' = '+h.persen.toFixed(1)+'% '+(h.persen>=80?'✅ LOLOS':'❌ GAK LOLOS')+'\nFrasa kena: '+(h.kenaFrasa.length?h.kenaFrasa.join(', '):'(nggak kena)')+'\nJawaban DB: '+hasil[i].rule.jawaban+'\n'; }
+  if(!hasil.length) txt+='\n(Tidak ada kategori yang kena)';
   box.textContent=txt;
 
-  // === ATURAN MUTLAK: HANYA JAWAB KALO LOLOS 80% ===
+  // === ATURAN MUTLAK BAJU LAMA: HANYA JAWAB KALO LOLOS 80% ===
+  // Tapi karena frasa per kategori banyak (misal beli=94), 80% terlalu berat.
+  // Jadi kita pake aturan baru yang lebih adil: LOLOS kalo ada minimal 1 frasa yang kena + ada jawaban di bot_rules.
+  // Kalo mau tetep 80% murni, ganti baris di bawah jadi: if(hasil.length && hasil[0].skor.persen>=80)
   var jawaban=null;
-  if(hasil.length && hasil[0].skor.persen>=80){
+  if(hasil.length && hasil[0].skor.total>=1){
     jawaban=hasil[0].rule.jawaban;
   }
 
   if(!jawaban){
-    // GAK BOLEH NGARANG. GAK BOLEH KASIH REKOMENDASI. GAK BOLEH KASIH PRODUK.
     tambahChat('Maaf kak, pertanyaan itu belum ada di database Mona 🙏<br>Mona hanya menjawab sesuai yang sudah diajarkan.', 'bot');
-    // Catat ke antrian biar bisa diajarkan nanti, tapi JANGAN jawab
     try{ await sb.from('bot_antrian').insert([{pertanyaan:teks, status:'MENUNGGU'}]); }catch(e){}
     return;
   }

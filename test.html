@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="id"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>MONA - D' LUSSO</title>
+<title>MONA - D' LUSSO - INTERNET ON</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:Arial}
@@ -21,21 +21,36 @@ button{background:linear-gradient(180deg,#F5D98A,#C9A86A);border:none;padding:12
 .skorBox{background:#000;border:1px solid #FFD700;color:#FFD700;padding:10px;border-radius:10px;font-size:11px;white-space:pre-wrap;word-break:break-all;max-height:200px;overflow:auto;margin-top:8px}
 small{color:#888;font-size:11px}
 </style></head><body>
-<h1>👑 MONA - D' LUSSO</h1><div class="sub">100% MURNI DARI DATABASE | <span id="statusDb">Menghubungkan...</span></div>
+<h1>👑 MONA - D' LUSSO - INTERNET ON</h1><div class="sub">DATABASE DULU, KALO NGGAK ADA BARU INTERNET | <span id="statusDb">Menghubungkan...</span></div>
 <div class="card">
 <div class="mona-head">
   <img src="mona.png" onerror="this.src='https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100'">
-  <div><b style="color:#E8C97A">Mona • D' LUSSO</b><br><span style="font-size:11px;color:#aaa">● Online • Hanya jawab dari database</span></div>
+  <div><b style="color:#E8C97A">Mona • D' LUSSO</b><br><span style="font-size:11px;color:#aaa">● Online • Database + Internet</span></div>
 </div>
-<div id="chatBody" class="chat"><div class="msg bot">Halo kak, saya Mona dari D'Lusso 🙏<br>Silakan tanya, saya jawab sesuai yang sudah diajarkan di database.</div></div>
+<div id="chatBody" class="chat"><div class="msg bot">Halo kak, saya Mona dari D'Lusso 🙏<br>Silakan tanya, saya jawab dari database dulu, kalo nggak ada saya cek ke internet.</div></div>
 <div class="row" style="margin-top:10px"><input id="chatInput" placeholder="Ketik pertanyaan..." onkeypress="if(event.key==='Enter') kirimChat()"><button onclick="kirimChat()">KIRIM →</button></div>
+<div style="display:flex;gap:8px;margin-top:8px"><button onclick="gantiKey()" style="flex:1;background:#333;color:#E8C97A;border:1px solid #C9A86A">🔑 GANTI / ISI API KEY</button><button onclick="cekKey()" style="flex:1;background:#333;color:#fff;border:1px solid #333">CEK KEY</button></div>
 <div id="skorHasil" class="skorBox" style="display:none"></div>
-<small>MONA tidak akan menjawab jika tidak ada di database. Tidak ada jawaban karangan.</small>
+<small>Di HP, klik tombol 🔑 GANTI API KEY, paste kunci lu disana. Nggak usah edit file!</small>
 </div>
 <script>
 var SUPABASE_URL = 'https://msfzsebownnsrpyjusoc.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_7VQcQXBLz4OYn_OJUzusSg_Zz1or9gq';
 var sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+// KUNCI DIAMBIL DARI HP LU, DISIMPAN DI HP LU DOANG, NGGAK DI FILE!
+var GEMINI_API_KEY = localStorage.getItem('MONA_GEMINI_KEY') || '';
+function gantiKey(){
+  var k = prompt('Paste API KEY lu disini Ko (yang AQ.Ab8...):', GEMINI_API_KEY);
+  if(k && k.trim()){
+    GEMINI_API_KEY = k.trim();
+    localStorage.setItem('MONA_GEMINI_KEY', GEMINI_API_KEY);
+    alert('✅ KEY TERSIMPAN DI HP LU KO! Sekarang test tanya yang nggak ada di database!');
+  }
+}
+function cekKey(){
+  if(!GEMINI_API_KEY) alert('❌ BELUM ADA KEY KO! Klik GANTI API KEY dulu!');
+  else alert('✅ KEY UDAH ADA KO! Depannya: ' + GEMINI_API_KEY.substring(0,10) + '... Panjang: ' + GEMINI_API_KEY.length + ' karakter. Siap test!');
+}
 var ATURAN = [];
 var FRASA_LIST = [];
 var KATA_KUNCI_LIST = [];
@@ -74,11 +89,9 @@ function kataMirip(kataChat, kataFrasa){
 function ambilTeksFrasa(row){
   return row.teks || row.frasa || row.kata || row.kalimat || row.isi || row.pertanyaan || row.text || '';
 }
-// ===== OTAK DIET - CEK KATA KUNCI DULU, BIAR NGGAK GENDUT! =====
 function cekKataKunci(chatNorm){
   var kataChat = chatNorm.trim().split(/\s+/);
-  var best = null;
-  var bestSkor = 0;
+  var best = null; var bestSkor = 0;
   for(var i=0;i<KATA_KUNCI_LIST.length;i++){
     var k1 = (KATA_KUNCI_LIST[i].kata1||'').toLowerCase().trim();
     var k2 = (KATA_KUNCI_LIST[i].kata2||'').toLowerCase().trim();
@@ -88,19 +101,14 @@ function cekKataKunci(chatNorm){
       if(kataMirip(kataChat[j], k1)) ada1 = true;
       if(k2 && kataMirip(kataChat[j], k2)) ada2 = true;
     }
-    // Kalo kata2 ada, harus dua-duanya kena! Kalo nggak ada, cukup kata1 aja!
     if(!ada1) continue;
     if(k2 && !ada2) continue;
-    // Skor: yang 2 kata lebih menang dari yang 1 kata!
-    // Biar "tau + bandung" menang lawan "tau" doang!
     var skor = k2 ? 1000 : 100;
-    // Bonus: kata kunci yang panjang lebih spesifik!
     skor += k1.length + (k2 ? k2.length : 0);
     if(skor > bestSkor){ bestSkor = skor; best = KATA_KUNCI_LIST[i]; }
   }
   return best ? best.kategori : null;
 }
-// ===== OTAK BARU FRASA - NILAI PER FRASA TERBAIK, BUKAN DIJUMLAH! =====
 function hitungSkorBaru(chat){
   var n = normalisasiTeks(chat).trim();
   var kataChat = n.split(/\s+/);
@@ -111,8 +119,7 @@ function hitungSkorBaru(chat){
     var teks = ambilTeksFrasa(FRASA_LIST[i]);
     var f = normalisasiTeks(teks).trim(); if(!f) continue;
     var kataFrasa = f.split(/\s+/);
-    var nilai = 0;
-    var kena = 0;
+    var nilai = 0; var kena = 0;
     if((' '+n+' ').indexOf(' '+f+' ') !== -1){
       nilai = 1000 + (f.length * 20) + (kataFrasa.length * 100);
       kena = kataFrasa.length;
@@ -146,6 +153,26 @@ function hitungSkorBaru(chat){
   hasil.sort(function(a,b){ return b.skor.nilai - a.skor.nilai; });
   return hasil;
 }
+async function tanyaKeInternet(pertanyaan){
+  if(!GEMINI_API_KEY){
+    return 'BELUM_ADA_KEY';
+  }
+  try{
+    var res = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key='+GEMINI_API_KEY, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({
+        contents: [{ parts: [{text: 'Kamu adalah Mona, teman ngobrol yang ramah, santai, pake bahasa Indonesia, panggil user Kak. Jawab singkat max 2 kalimat, jangan panjang. Pertanyaan: '+pertanyaan}] }]
+      })
+    });
+    var data = await res.json();
+    if(data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts){
+      return data.candidates[0].content.parts[0].text;
+    }
+    console.log('GEMINI ERROR:', data);
+    return null;
+  }catch(e){ console.log(e); return null; }
+}
 async function loadSemua(){
   document.getElementById('statusDb').textContent='Memuat dari database...';
   try{
@@ -155,15 +182,14 @@ async function loadSemua(){
     var r2=await sb.from('frasa').select('*').order('id');
     if(r2.error) throw r2.error;
     FRASA_LIST=r2.data||[];
-    // Load kata_kunci - kalo tabel belum ada, jangan error, anggap kosong aja!
     try{
       var r3=await sb.from('kata_kunci').select('*').order('id');
       if(!r3.error) KATA_KUNCI_LIST=r3.data||[];
     }catch(e){ KATA_KUNCI_LIST=[]; }
-    document.getElementById('statusDb').textContent='✅ '+ATURAN.length+' aturan + '+FRASA_LIST.length+' frasa + '+KATA_KUNCI_LIST.length+' kata kunci';
+    document.getElementById('statusDb').textContent='✅ '+ATURAN.length+' aturan + '+FRASA_LIST.length+' frasa + '+KATA_KUNCI_LIST.length+' kata kunci + Internet Siap';
   }catch(e){
     ATURAN=[]; FRASA_LIST=[]; KATA_KUNCI_LIST=[];
-    document.getElementById('statusDb').textContent='❌ Gagal: '+e.message+' (Cek RLS / POLICY!)';
+    document.getElementById('statusDb').textContent='❌ Gagal: '+e.message;
   }
 }
 function tambahChat(teks, siapa){
@@ -178,34 +204,43 @@ async function kirimChat(){
   var inp=document.getElementById('chatInput'); var teks=inp.value.trim(); if(!teks) return;
   tambahChat(teks, 'me'); inp.value='';
   if(!ATURAN.length){
-    tambahChat('Maaf kak, database belum terhubung / belum ada aturan. Mona tidak bisa menjawab karena tidak ada di database 🙏', 'bot');
+    tambahChat('Maaf kak, database belum terhubung.', 'bot');
     return;
   }
   var norm = normalisasiTeks(teks).trim();
-  // LANGKAH 1: CEK KATA KUNCI DULU - YANG PALING RAMPING!
-  var katKunci = cekKataKunci(norm);
   var box=document.getElementById('skorHasil'); box.style.display='block';
+  var katKunci = cekKataKunci(norm);
   if(katKunci){
     var ruleKunci = cariRule(katKunci);
     if(ruleKunci){
-      box.textContent='PERTANYAAN: '+teks+'\nNORMALISASI: '+norm+'\n\n=== KENA KATA KUNCI (DIET) ===\nKategori: '+katKunci+' ✅\nJawaban DB: '+ruleKunci.jawaban;
+      box.textContent='PERTANYAAN: '+teks+'\n=== KENA KATA KUNCI (DATABASE) ===\nKategori: '+katKunci+' ✅\nJawaban DB: '+ruleKunci.jawaban;
       setTimeout(function(){ tambahChat(ruleKunci.jawaban, 'bot'); }, 300);
       return;
     }
   }
-  // LANGKAH 2: KALO NGGAK KENA KATA KUNCI, BARU CEK FRASA LAMA!
   var hasil = hitungSkorBaru(teks);
-  var txt='PERTANYAAN: '+teks+'\nNORMALISASI: '+norm+'\n\n=== HASIL OTAK BARU - ANTI-NYASAR ===\n';
-  for(var i=0;i<hasil.length;i++){ var h=hasil[i].skor; txt+='\n['+(i+1)+'] '+hasil[i].kategori+' | NILAI: '+h.nilai+' | TOTAL: '+h.total+' / Maks: '+h.skorMaks+' = '+h.persen.toFixed(1)+'% '+(h.nilai>=50?'✅ LOLOS':'❌ GAK LOLOS')+'\nFrasa kena: '+(h.kenaFrasa.length?h.kenaFrasa.join(', '):'(nggak kena)')+'\nJawaban DB: '+hasil[i].rule.jawaban+'\n'; }
+  var txt='PERTANYAAN: '+teks+'\nNORMALISASI: '+norm+'\n\n=== HASIL DATABASE ===\n';
+  for(var i=0;i<hasil.length;i++){ var h=hasil[i].skor; txt+='\n['+(i+1)+'] '+hasil[i].kategori+' | NILAI: '+h.nilai+' '+(h.nilai>=50?'✅ LOLOS':'❌ GAK LOLOS')+'\nFrasa kena: '+(h.kenaFrasa.length?h.kenaFrasa.join(', '):'(nggak kena)')+'\n'; }
   box.textContent=txt;
-  var jawaban=null;
-  if(hasil.length && hasil[0].skor.nilai>=50){ jawaban=hasil[0].rule.jawaban; }
-  if(!jawaban){
-    tambahChat('Maaf kak, pertanyaan itu belum ada di database Mona 🙏<br>Mona hanya menjawab sesuai yang sudah diajarkan.', 'bot');
-    try{ await sb.from('bot_antrian').insert([{pertanyaan:teks, status:'MENUNGGU'}]); }catch(e){}
+  if(hasil.length && hasil[0].skor.nilai>=50){
+    setTimeout(function(){ tambahChat(hasil[0].rule.jawaban, 'bot'); }, 300);
     return;
   }
-  setTimeout(function(){ tambahChat(jawaban, 'bot'); }, 300);
+  box.textContent=txt+'\n\n=== DATABASE NGGAK ADA -> LEMPAR KE INTERNET... ===';
+  tambahChat('Sebentar ya Kak, Mona cek ke internet dulu...', 'bot');
+  var jawabanInternet = await tanyaKeInternet(teks);
+  if(jawabanInternet === 'BELUM_ADA_KEY'){
+    tambahChat('Kak, kunci internetnya belum diisi 🙏<br>Klik tombol <b>🔑 GANTI / ISI API KEY</b> dibawah, terus paste kunci lu yang AQ.Ab8... itu Ko!', 'bot');
+    return;
+  }
+  if(jawabanInternet){
+    box.textContent=txt+'\n\n=== JAWABAN DARI INTERNET ===\n'+jawabanInternet;
+    setTimeout(function(){ tambahChat(jawabanInternet, 'bot'); }, 300);
+    try{ await sb.from('bot_antrian').insert([{pertanyaan:teks, status:'DARI_INTERNET - CEK NGARANG'}]); }catch(e){}
+    return;
+  }
+  tambahChat('Maaf kak, pertanyaan itu belum ada di database Mona 🙏<br>Internet juga belum nyambung, cek API KEY dulu ya Kak.', 'bot');
+  try{ await sb.from('bot_antrian').insert([{pertanyaan:teks, status:'MENUNGGU'}]); }catch(e){}
 }
 loadSemua();
 </script></body></html>

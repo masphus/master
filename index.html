@@ -93,6 +93,8 @@ small{color:#888;font-size:11px;line-height:1.4}
 <label>NAMA PROJECT / PEMBELI</label><input id="projName" class="kecil" placeholder="Ammo Travel - Si A" oninput="document.getElementById('topNama').value=this.value;simpanSementara()">
 <div class="row"><div><label>NAMA REPO</label><input id="project" class="kecil" placeholder="nama-repo"></div><div><label>BRANCH</label><input id="branch" class="kecil" value="main"></div></div>
 <label>NAMA FILE</label><input id="fileName" class="kecil" value="index.html">
+<button class="sec" onclick="listFiles()">📂 LIHAT FILE DI REPO</button>
+<div id="listFile" style="margin-top:8px"></div>
 <button class="sec" onclick="loadFile()">📥 LOAD FILE</button>
 <button class="sec" onclick="isiTemplate()">✨ TEMPLATE</button>
 <div id="debugBox" class="debug" style="display:none"></div>
@@ -170,6 +172,47 @@ function pilihDb(i){ var p=daftarDb[i]; if(!p) return; _editId=p.id; document.ge
 async function simpanProjectKeDb(){ var m=getMaster(); var data={ name:v('topNama')||v('projName')||v('project')||"Project Baru", github_repo:v('topUrl'), github_token:kunciAES(v('topTokenGH')), api_url:v('topApi'), token:kunciAES(v('topTokenSB')) }; if(!data.github_repo && !data.api_url){ alert("Isi URL / API dulu Ko!"); return; } try{ var url=m.url+"/rest/v1/projects", headers={apikey:m.key,Authorization:"Bearer "+m.key,"Content-Type":"application/json",Prefer:"return=representation"}; var r; if(_editId) r=await fetch(url+"?id=eq."+_editId,{method:"PATCH",headers:headers,body:JSON.stringify(data)}); else r=await fetch(url,{method:"POST",headers:headers,body:JSON.stringify(data)}); var j=await r.json(); if(!r.ok) throw new Error(JSON.stringify(j)); alert("✅ Tersimpan!"); simpanSementara(); }catch(e){ alert("Gagal: "+e.message); } }
 async function hapusDb(id){ if(!confirm("Hapus project ini?")) return; var m=getMaster(); await fetch(m.url+"/rest/v1/projects?id=eq."+id,{method:"DELETE",headers:{apikey:m.key,Authorization:"Bearer "+m.key}}); loadProjectsDariDb(); }
 function tambahManual(){ var n=v('newProj'); if(!n){ alert("Isi Nama Project!"); return; } document.getElementById('projName').value=n; document.getElementById('topNama').value=n; document.getElementById('project').value=n; document.getElementById('dropdownProject').classList.remove('show'); dropdownBuka=false; updateInfoProject(); simpanSementara(); alert("Siap isi URL / API / TOKEN untuk "+n); }
+async function listFiles(){
+  var a = getGithub();
+  if(!a.owner || !a.repo || !a.token){ alert("Pilih project dulu di DEPAN!"); pindahHalaman('home'); return; }
+  var box = document.getElementById('listFile');
+  box.innerHTML = '⏳ Loading daftar file...';
+  try{
+    var r = await fetch("https://api.github.com/repos/"+a.owner+"/"+a.repo+"/contents/?ref="+a.branch, {headers:{Authorization:"Bearer "+a.token}});
+    var j = await r.json();
+    if(!Array.isArray(j)){ box.innerHTML = '❌ '+ (j.message||'Gagal'); return; }
+    var html = '';
+    for(var i=0;i<j.length;i++){
+      var f = j[i];
+      if(f.type === 'dir'){
+        html += '<button class="sec" onclick="listFilesFolder(\''+f.name+'\')">📁 '+f.name+' /</button>';
+      } else {
+        html += '<button class="sec" onclick="pilihFile(\''+f.name+'\')">📄 '+f.name+'</button>';
+      }
+    }
+    box.innerHTML = html + '<button class="sec" onclick="document.getElementById(\'listFile\').innerHTML=\'\'">❌ TUTUP LIST</button>';
+  }catch(e){ box.innerHTML = '❌ '+e.message; }
+}
+async function listFilesFolder(folder){
+  var a = getGithub();
+  var box = document.getElementById('listFile');
+  box.innerHTML = '⏳ Loading '+folder+'...';
+  try{
+    var r = await fetch("https://api.github.com/repos/"+a.owner+"/"+a.repo+"/contents/"+folder+"?ref="+a.branch, {headers:{Authorization:"Bearer "+a.token}});
+    var j = await r.json();
+    var html = '<button class="sec" onclick="listFiles()">⬅️ KEMBALI</button>';
+    for(var i=0;i<j.length;i++){
+      var f = j[i];
+      html += '<button class="sec" onclick="pilihFile(\''+f.path+'\')">📄 '+f.path+'</button>';
+    }
+    box.innerHTML = html;
+  }catch(e){ box.innerHTML = '❌ '+e.message; }
+}
+function pilihFile(nama){
+  document.getElementById('fileName').value = nama;
+  document.getElementById('listFile').innerHTML = '';
+  document.getElementById('status').textContent = '✅ Dipilih: '+nama+' - tinggal LOAD FILE';
+}
 async function loadFile(){ var a=getGithub(); if(!a.owner||!a.repo||!a.token){ alert("Pilih project dulu di DEPAN!"); pindahHalaman('home'); return; } document.getElementById('status').textContent="⏳ Loading "+a.file+"..."; document.getElementById('debugBox').style.display='block'; try{ var r=await fetch("https://api.github.com/repos/"+a.owner+"/"+a.repo+"/contents/"+a.file+"?ref="+a.branch,{headers:{Authorization:"Bearer "+a.token}}); var j=await r.json(); if(j.message==="Not Found"){ alert("File tidak ketemu!"); return; } if(j.message){ alert(j.message); return; } sha=j.sha; cacheFull=decodeGithub(j.content); document.getElementById('content').value=cacheFull; tampilEditor('full'); document.getElementById('status').textContent="✅ Berhasil! "+cacheFull.length+" karakter!"; document.getElementById('debugBox').textContent="✅ File ketemu! Total: "+cacheFull.length; }catch(e){ document.getElementById('status').textContent="❌ "+e.message; } }
 async function saveFile(){ var a=getGithub(); simpanBagianKeFull(); if(!cacheFull){ alert("Isi file kosong!"); return; } if(!confirm("SAVE ke "+a.owner+"/"+a.repo+" ?")) return; document.getElementById('status').textContent="⏳ Saving..."; try{ var body={message:"Update via MASTER - "+new Date().toLocaleString('id-ID'),content:btoa(unescape(encodeURIComponent(cacheFull))),branch:a.branch}; if(sha) body.sha=sha; var r=await fetch("https://api.github.com/repos/"+a.owner+"/"+a.repo+"/contents/"+a.file,{method:"PUT",headers:{Authorization:"Bearer "+a.token,"Content-Type":"application/json"},body:JSON.stringify(body)}); var j=await r.json(); if(j.message && !j.content){ alert(j.message); return; } sha=j.content.sha; document.getElementById('status').textContent="✅ BERHASIL!"; alert("BERHASIL! ✅"); }catch(e){ alert(e.message); } }
 function isiTemplate(){ if(!confirm("Isi TEMPLATE?")) return; var t='<!DOCTYPE html><html><head><meta charset="UTF-8"><title>TOKO BARU</title><style>body{background:#0a0a0a;color:#fff;text-align:center;padding:40px}h1{color:#E8C97A}</style></head><body><h1>TOKO BARU</h1><p>WA: 628...</p><script>function balasBot(p){ if(p.includes("harga")) return "Harga 50rb kak!"; return "Halo kak!"; }'+CLOSE_SCRIPT+'</body></html>'; cacheFull=t; simpanCacheKeHP(); document.getElementById('content').value=t; tampilEditor('style'); }

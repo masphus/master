@@ -38,6 +38,7 @@ var SUPABASE_KEY = 'sb_publishable_7VQcQXBLz4OYn_OJUzusSg_Zz1or9gq';
 var sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 var ATURAN = [];
 var FRASA_LIST = [];
+var KATA_KUNCI_LIST = [];
 function normalisasiTeks(t){
   var s=' '+String(t||'').toLowerCase()+' ';
   s=s.replace(/[^a-z0-9\s]/g,' ');
@@ -73,7 +74,33 @@ function kataMirip(kataChat, kataFrasa){
 function ambilTeksFrasa(row){
   return row.teks || row.frasa || row.kata || row.kalimat || row.isi || row.pertanyaan || row.text || '';
 }
-// ===== OTAK BARU MONA - JANGAN HAPUS FRASA, UBAH CARA BERFIKIR! =====
+// ===== OTAK DIET - CEK KATA KUNCI DULU, BIAR NGGAK GENDUT! =====
+function cekKataKunci(chatNorm){
+  var kataChat = chatNorm.trim().split(/\s+/);
+  var best = null;
+  var bestSkor = 0;
+  for(var i=0;i<KATA_KUNCI_LIST.length;i++){
+    var k1 = (KATA_KUNCI_LIST[i].kata1||'').toLowerCase().trim();
+    var k2 = (KATA_KUNCI_LIST[i].kata2||'').toLowerCase().trim();
+    if(!k1) continue;
+    var ada1 = false, ada2 = false;
+    for(var j=0;j<kataChat.length;j++){
+      if(kataMirip(kataChat[j], k1)) ada1 = true;
+      if(k2 && kataMirip(kataChat[j], k2)) ada2 = true;
+    }
+    // Kalo kata2 ada, harus dua-duanya kena! Kalo nggak ada, cukup kata1 aja!
+    if(!ada1) continue;
+    if(k2 && !ada2) continue;
+    // Skor: yang 2 kata lebih menang dari yang 1 kata!
+    // Biar "tau + bandung" menang lawan "tau" doang!
+    var skor = k2 ? 1000 : 100;
+    // Bonus: kata kunci yang panjang lebih spesifik!
+    skor += k1.length + (k2 ? k2.length : 0);
+    if(skor > bestSkor){ bestSkor = skor; best = KATA_KUNCI_LIST[i]; }
+  }
+  return best ? best.kategori : null;
+}
+// ===== OTAK BARU FRASA - NILAI PER FRASA TERBAIK, BUKAN DIJUMLAH! =====
 function hitungSkorBaru(chat){
   var n = normalisasiTeks(chat).trim();
   var kataChat = n.split(/\s+/);
@@ -86,12 +113,10 @@ function hitungSkorBaru(chat){
     var kataFrasa = f.split(/\s+/);
     var nilai = 0;
     var kena = 0;
-    // 1. KALO FRASA UTUH ADA DI CHAT -> PALING BENAR, MENANG!
     if((' '+n+' ').indexOf(' '+f+' ') !== -1){
       nilai = 1000 + (f.length * 20) + (kataFrasa.length * 100);
       kena = kataFrasa.length;
     } else {
-      // 2. KALO NGGAK UTUH, HITUNG KATA PER KATA - HARUS 100% KENA!
       for(var k=0;k<kataFrasa.length;k++){
         for(var j=0;j<kataChat.length;j++){
           if(kataMirip(kataChat[j], kataFrasa[k])){
@@ -105,14 +130,8 @@ function hitungSkorBaru(chat){
       if(kena !== kataFrasa.length) continue;
       nilai += 50 + (f.length * 5);
     }
-    // 3. HUKUMAN BUAT FRASA 1 KATA - BIAR NGGAK NYOLONG KALIMAT PANJANG!
-    if(kataFrasa.length === 1 && kataChat.length > 2){
-      nilai = nilai * 0.1;
-    }
-    if(kataFrasa.length === 2 && kataChat.length > 4){
-      nilai = nilai * 0.5;
-    }
-    // Simpan skor TERBAIK per kategori, bukan dijumlah!
+    if(kataFrasa.length === 1 && kataChat.length > 2) nilai = nilai * 0.1;
+    if(kataFrasa.length === 2 && kataChat.length > 4) nilai = nilai * 0.5;
     var sudah = null;
     for(var h=0;h<hasil.length;h++){ if(hasil[h].kategori===kat){ sudah=hasil[h]; break; } }
     if(!sudah){
@@ -121,10 +140,7 @@ function hitungSkorBaru(chat){
       if(!rule) continue;
       hasil.push({kategori:kat, rule:rule, skor:{total:1, skorMaks:1, persen:100, kenaFrasa:[teks], nilai:nilai}});
     } else {
-      if(nilai > sudah.skor.nilai){
-        sudah.skor.nilai = nilai;
-        sudah.skor.kenaFrasa = [teks];
-      }
+      if(nilai > sudah.skor.nilai){ sudah.skor.nilai = nilai; sudah.skor.kenaFrasa = [teks]; }
     }
   }
   hasil.sort(function(a,b){ return b.skor.nilai - a.skor.nilai; });
@@ -139,9 +155,14 @@ async function loadSemua(){
     var r2=await sb.from('frasa').select('*').order('id');
     if(r2.error) throw r2.error;
     FRASA_LIST=r2.data||[];
-    document.getElementById('statusDb').textContent='✅ '+ATURAN.length+' aturan + '+FRASA_LIST.length+' frasa dari database';
+    // Load kata_kunci - kalo tabel belum ada, jangan error, anggap kosong aja!
+    try{
+      var r3=await sb.from('kata_kunci').select('*').order('id');
+      if(!r3.error) KATA_KUNCI_LIST=r3.data||[];
+    }catch(e){ KATA_KUNCI_LIST=[]; }
+    document.getElementById('statusDb').textContent='✅ '+ATURAN.length+' aturan + '+FRASA_LIST.length+' frasa + '+KATA_KUNCI_LIST.length+' kata kunci';
   }catch(e){
-    ATURAN=[]; FRASA_LIST=[];
+    ATURAN=[]; FRASA_LIST=[]; KATA_KUNCI_LIST=[];
     document.getElementById('statusDb').textContent='❌ Gagal: '+e.message+' (Cek RLS / POLICY!)';
   }
 }
@@ -149,16 +170,32 @@ function tambahChat(teks, siapa){
   var body=document.getElementById('chatBody');
   var d=document.createElement('div'); d.className='msg '+(siapa==='me'?'me':'bot'); d.innerHTML=teks; body.appendChild(d); body.scrollTop=body.scrollHeight;
 }
+function cariRule(kategori){
+  for(var i=0;i<ATURAN.length;i++){ if(ATURAN[i].kategori===kategori) return ATURAN[i]; }
+  return null;
+}
 async function kirimChat(){
   var inp=document.getElementById('chatInput'); var teks=inp.value.trim(); if(!teks) return;
   tambahChat(teks, 'me'); inp.value='';
-  if(!ATURAN.length || !FRASA_LIST.length){
+  if(!ATURAN.length){
     tambahChat('Maaf kak, database belum terhubung / belum ada aturan. Mona tidak bisa menjawab karena tidak ada di database 🙏', 'bot');
     return;
   }
-  var hasil = hitungSkorBaru(teks);
+  var norm = normalisasiTeks(teks).trim();
+  // LANGKAH 1: CEK KATA KUNCI DULU - YANG PALING RAMPING!
+  var katKunci = cekKataKunci(norm);
   var box=document.getElementById('skorHasil'); box.style.display='block';
-  var txt='PERTANYAAN: '+teks+'\nNORMALISASI: '+normalisasiTeks(teks).trim()+'\n\n=== HASIL OTAK BARU - ANTI-NYASAR ===\n';
+  if(katKunci){
+    var ruleKunci = cariRule(katKunci);
+    if(ruleKunci){
+      box.textContent='PERTANYAAN: '+teks+'\nNORMALISASI: '+norm+'\n\n=== KENA KATA KUNCI (DIET) ===\nKategori: '+katKunci+' ✅\nJawaban DB: '+ruleKunci.jawaban;
+      setTimeout(function(){ tambahChat(ruleKunci.jawaban, 'bot'); }, 300);
+      return;
+    }
+  }
+  // LANGKAH 2: KALO NGGAK KENA KATA KUNCI, BARU CEK FRASA LAMA!
+  var hasil = hitungSkorBaru(teks);
+  var txt='PERTANYAAN: '+teks+'\nNORMALISASI: '+norm+'\n\n=== HASIL OTAK BARU - ANTI-NYASAR ===\n';
   for(var i=0;i<hasil.length;i++){ var h=hasil[i].skor; txt+='\n['+(i+1)+'] '+hasil[i].kategori+' | NILAI: '+h.nilai+' | TOTAL: '+h.total+' / Maks: '+h.skorMaks+' = '+h.persen.toFixed(1)+'% '+(h.nilai>=50?'✅ LOLOS':'❌ GAK LOLOS')+'\nFrasa kena: '+(h.kenaFrasa.length?h.kenaFrasa.join(', '):'(nggak kena)')+'\nJawaban DB: '+hasil[i].rule.jawaban+'\n'; }
   box.textContent=txt;
   var jawaban=null;

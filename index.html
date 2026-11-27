@@ -59,7 +59,7 @@ small{color:#888;font-size:11px;line-height:1.4}
   </div>
 </div>
 
-<!-- ===== POP-UP LOCKSCREEN LUXURY ===== -->
+<!-- ===== POP-UP LOCKSCREEN LUXURY + RESET DI DALEM ===== -->
 <div id="lockPopup" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);backdrop-filter:blur(8px);z-index:10000;align-items:center;justify-content:center;padding:20px">
   <div style="width:100%;max-width:340px;background:radial-gradient(circle at 50% 0%,#2a2100 0%,#0a0a0a 60%);border:1px solid #C9A86A;border-radius:28px;padding:28px 20px 20px;text-align:center;box-shadow:0 0 50px rgba(201,168,106,.35)">
     <div style="font-size:40px">👑</div>
@@ -74,7 +74,7 @@ small{color:#888;font-size:11px;line-height:1.4}
       <span class="dot" style="width:14px;height:14px;border:1px solid #C9A86A;border-radius:50%"></span>
       <span class="dot" style="width:14px;height:14px;border:1px solid #C9A86A;border-radius:50%"></span>
     </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
+    <div id="keypadBox" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
       <button onclick="tekanPin('1')" style="background:#1a170e;border:1px solid #3a2f14;color:#fff;border-radius:50%;height:60px;font-size:20px;margin:0">1</button>
       <button onclick="tekanPin('2')" style="background:#1a170e;border:1px solid #3a2f14;color:#fff;border-radius:50%;height:60px;font-size:20px;margin:0">2</button>
       <button onclick="tekanPin('3')" style="background:#1a170e;border:1px solid #3a2f14;color:#fff;border-radius:50%;height:60px;font-size:20px;margin:0">3</button>
@@ -89,6 +89,18 @@ small{color:#888;font-size:11px;line-height:1.4}
       <button onclick="tutupLock()" style="background:transparent;border:none;color:#888;border-radius:50%;height:60px;font-size:16px;margin:0">✕</button>
     </div>
     <div id="lockMsg" style="font-size:12px;color:#ff6b6b;margin-top:12px;min-height:16px"></div>
+    <div onclick="bukaReset()" style="color:#E8C97A;font-size:12px;margin-top:8px;cursor:pointer;text-decoration:underline">Lupa PIN? Reset di sini</div>
+    <!-- BOX RESET - MUNCUL KALO PENCET LUPA PIN -->
+    <div id="resetBox" style="display:none;text-align:left;margin-top:14px;background:#0a0a0a;border:1px solid #C9A86A;border-radius:14px;padding:12px">
+      <div style="color:#E8C97A;font-size:12px;font-weight:900;text-align:center">🔐 RESET PIN</div>
+      <label style="margin-top:10px">KUNCI RAHASIA</label>
+      <input id="resetKunci" placeholder="Dlusso-Kunci-Rahasia-123" autocomplete="off">
+      <label>PIN BARU (6 ANGKA)</label>
+      <input id="resetPinBaru" placeholder="123456" inputmode="numeric" autocomplete="off">
+      <button onclick="prosesResetPin()">SIMPAN PIN BARU</button>
+      <div onclick="tutupReset()" style="color:#888;font-size:12px;text-align:center;margin-top:8px;cursor:pointer">Batal, balik ke keypad</div>
+      <div id="resetMsg" style="font-size:12px;text-align:center;margin-top:8px;color:#8aff8a;min-height:16px"></div>
+    </div>
   </div>
 </div>
 
@@ -195,12 +207,8 @@ function kunciAES(teks){
 }
 function bukaAES(teksAcak){
   if(!teksAcak) return "";
-  // Kalo masih polos (PIN lama / token lama), balikin apa adanya biar gak ke-kunci
   if(String(teksAcak).indexOf("U2FsdGVkX1") !== 0) return String(teksAcak);
-  try{
-    var hasil = CryptoJS.AES.decrypt(String(teksAcak), KUNCI_AES).toString(CryptoJS.enc.Utf8);
-    return hasil || String(teksAcak);
-  }catch(e){ return String(teksAcak); }
+  try{ var hasil = CryptoJS.AES.decrypt(String(teksAcak), KUNCI_AES).toString(CryptoJS.enc.Utf8); return hasil || String(teksAcak); }catch(e){ return String(teksAcak); }
 }
 function updateInfoProject(){ var n=document.getElementById('projName').value||document.getElementById('project').value||"Belum pilih project"; var t="✅ Lagi ngerjain: "+n; ['infoProjGithub','infoProjSupabase','infoProjBot'].forEach(function(id){ var el=document.getElementById(id); if(el) el.textContent=t; }); }
 function pindahHalaman(ke){ ['home','github','supabase','bot'].forEach(function(x){ var el=document.getElementById('page-'+x); if(el) el.style.display=(ke===x?'block':'none'); }); document.getElementById('btnHome').className='tabBtn'+(ke==='home'?' active':''); document.getElementById('btnGithub').className='tabBtn'+(ke==='github'?' active':''); document.getElementById('btnSupabase').className='tabBtn'+(ke==='supabase'?' active':''); document.getElementById('btnBot').className='tabBtn'+(ke==='bot'?' botActive':''); try{ localStorage.setItem('master_halaman',ke); }catch(e){} updateInfoProject(); if(ke==='bot') updateBotInfo(); window.scrollTo(0,0); }
@@ -214,7 +222,7 @@ function bukaProjectBaru(){ _editId=null; ['topUrl','topApi','topToken','projNam
 function salin3Kolom(){ var t="URL: "+document.getElementById('topUrl').value+"\nAPI: "+document.getElementById('topApi').value+"\nTOKEN: "+document.getElementById('topToken').value; try{ navigator.clipboard.writeText(t); document.getElementById('topStatus').textContent="✅ Tersalin!"; }catch(e){ alert(t); } }
 function v(id){ return (document.getElementById(id).value||'').trim(); }
 function getGithub(){ var u=v('topUrl'); var m=u.match(/github\.com\/([^\/]+)\/([^\/\s]+)/)||u.match(/^([^\/\s]+)\/([^\/\s]+)$/); var owner='',repo=v('project'); if(m){ owner=m[1]; repo=m[2].replace('.git',''); document.getElementById('project').value=repo; } return {owner:owner,repo:repo,token:v('topToken'),file:v('fileName')||'index.html',branch:v('branch')||'main'}; }
-function getSb(){ var tabel=v('sbTableDepan')||v('sbTable')||"products"; var rawKey=v('topToken'); return {url:v('topApi'), key:rawKey, tabel:tabel}; }
+function getSb(){ var tabel=v('sbTableDepan')||v('sbTable')||"products"; return {url:v('topApi'), key:v('topToken'), tabel:tabel}; }
 function simpanCacheKeHP(){ try{ localStorage.setItem('master_cache',cacheFull); }catch(e){} updateBotInfo(); }
 function pulihkanDariHP(){ try{ var c=localStorage.getItem('master_cache')||""; if(!c){ alert("Di HP nggak ada file! LOAD dulu!"); return; } cacheFull=c; document.getElementById('content').value=c; editorMode='full'; document.getElementById('status').textContent="✅ Dipulihkan dari HP! "+c.length+" karakter!"; tampilEditor('full'); }catch(e){ alert(e.message); } }
 function updateBotInfo(){ var el=document.getElementById('botInfo'); if(!el) return; if(cacheFull){ el.textContent="✅ File di HP: ADA! "+cacheFull.length+" karakter"; el.style.color="#8aff8a"; } else { el.textContent="❌ File belum ada. LOAD dulu di GITHUB."; el.style.color="#ff9999"; } }
@@ -250,7 +258,7 @@ async function kirimBackupKeSupabase(){ var s=getSb(),tabel=getSb().tabel; if(!i
 async function backupDatabase(){ var s=getSb(),tabel=getSb().tabel; try{ var r=await fetch(s.url+"/rest/v1/"+tabel+"?select=*",{headers:{apikey:s.key,Authorization:"Bearer "+s.key}}); var j=await r.json(); var blob=new Blob([JSON.stringify(j,null,2)],{type:"application/json"}); var a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download="backup-"+tabel+"-"+new Date().toISOString().slice(0,10)+".json"; a.click(); alert("Berhasil! Cek Download!"); }catch(e){ alert(e.message); } }
 async function backupSemuaTabel(){ var s=getSb(); var daftar=["products","members","admins","pegawai","orders","riwayat_saldo","bot_faq","bot_antrian","order_items","member_notifications"]; var tambahan=v('tabelTambahan'); if(tambahan) tambahan.split(",").forEach(function(t){ t=t.trim(); if(t && daftar.indexOf(t)===-1) daftar.push(t); }); var hasil={}; try{ for(var i=0;i<daftar.length;i++){ var r=await fetch(s.url+"/rest/v1/"+daftar[i]+"?select=*",{headers:{apikey:s.key,Authorization:"Bearer "+s.key}}); var j=await r.json(); hasil[daftar[i]]=Array.isArray(j)?j:[]; } var blob=new Blob([JSON.stringify(hasil,null,2)],{type:"application/json"}); var a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download="backup-SEMUA-"+new Date().toISOString().slice(0,10)+".json"; a.click(); alert("BERHASIL! ✅"); }catch(e){ alert(e.message); } }
 async function kirimBackupSemuaKeSupabase(){ var s=getSb(); if(!isiBackup){ alert("Pilih backup-SEMUA.json dulu!"); return; } if(Array.isArray(isiBackup)){ alert("File ini cuma 1 tabel!"); return; } var daftar=Object.keys(isiBackup); if(!confirm("Kirim RESTORE "+daftar.length+" tabel?")) return; try{ for(var t=0;t<daftar.length;t++){ var tabel=daftar[t], data=isiBackup[tabel]||[]; for(var i=0;i<data.length;i+=100){ await fetch(s.url+"/rest/v1/"+tabel,{method:"POST",headers:{apikey:s.key,Authorization:"Bearer "+s.key,"Content-Type":"application/json",Prefer:"resolution=merge-duplicates"},body:JSON.stringify(data.slice(i,i+100))}); } } alert("RESTORE BERHASIL! ✅"); }catch(e){ alert(e.message); } }
-// ===== GERBANG + LOCKSCREEN LUXURY + AES =====
+// ===== GERBANG + LOCKSCREEN LUXURY + AES + RESET DI DALEM =====
 var userLogin = null;
 var pinSementara = "";
 async function cekCode(){
@@ -267,6 +275,8 @@ async function cekCode(){
     updateDots();
     document.getElementById('lockNama').textContent = "Welcome Back, " + (userLogin.nama || "");
     document.getElementById('lockMsg').textContent = "";
+    document.getElementById('resetBox').style.display = 'none';
+    document.getElementById('keypadBox').style.display = 'grid';
     document.getElementById('lockPopup').style.display = 'flex';
   }catch(e){}
 }
@@ -280,7 +290,6 @@ function tekanPin(angka){
   updateDots();
   if(pinSementara.length === 6){
     setTimeout(function(){
-      // PIN di DB udah AES, jadi dibuka dulu baru dibandingin. PIN lama polos masih bisa.
       var pinAsli = bukaAES(userLogin.pin);
       if(String(pinSementara) === String(pinAsli)){
         document.getElementById('lockPopup').style.display = 'none';
@@ -296,5 +305,25 @@ function tekanPin(angka){
 function hapusPin(){ pinSementara = pinSementara.slice(0,-1); updateDots(); }
 function tutupLock(){ document.getElementById('lockPopup').style.display = 'none'; pinSementara=""; updateDots(); }
 function cekPin(){}
+function bukaReset(){ document.getElementById('resetBox').style.display='block'; document.getElementById('keypadBox').style.display='none'; document.getElementById('resetMsg').textContent=''; }
+function tutupReset(){ document.getElementById('resetBox').style.display='none'; document.getElementById('keypadBox').style.display='grid'; }
+async function prosesResetPin(){
+  var kunciInput = (document.getElementById('resetKunci').value||'').trim();
+  var pinBaru = (document.getElementById('resetPinBaru').value||'').trim();
+  var msg = document.getElementById('resetMsg');
+  if(kunciInput !== KUNCI_AES){ msg.style.color='#ff6b6b'; msg.textContent='Kunci rahasia salah!'; return; }
+  if(pinBaru.length !== 6 || !/^[0-9]{6}$/.test(pinBaru)){ msg.style.color='#ff6b6b'; msg.textContent='PIN baru harus 6 angka!'; return; }
+  if(!userLogin){ msg.style.color='#ff6b6b'; msg.textContent='Login dulu pake @code!'; return; }
+  try{
+    var m = getMaster();
+    var pinTerkunci = kunciAES(pinBaru);
+    var r = await fetch(m.url+"/rest/v1/akses?code=eq."+String(userLogin.code).toLowerCase(),{method:"PATCH",headers:{apikey:m.key,Authorization:"Bearer "+m.key,"Content-Type":"application/json"},body:JSON.stringify({pin:pinTerkunci})});
+    if(!r.ok) throw new Error(await r.text());
+    userLogin.pin = pinTerkunci;
+    msg.style.color='#8aff8a'; msg.textContent='✅ PIN baru tersimpan! Balik ke keypad, masuk pake PIN baru!';
+    pinSementara=''; updateDots();
+    setTimeout(function(){ tutupReset(); document.getElementById('lockMsg').textContent='PIN baru udah aktif, silakan masuk!'; }, 800);
+  }catch(e){ msg.style.color='#ff6b6b'; msg.textContent='Gagal: '+e.message; }
+}
 loadSettingBot(); setKunci(false); pindahHalaman('home');
 </script></body></html>

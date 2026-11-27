@@ -49,16 +49,16 @@ small{color:#888;font-size:11px;line-height:1.4}
 .menu3 button{flex:1;padding:14px 4px;font-size:12px;margin-top:10px}
 .menu3 button small{display:block;font-size:10px;font-weight:400;margin-top:3px;opacity:.8}
 </style></head><body>
-<!-- ===== GERBANG ===== -->
+<!-- ===== GERBANG DEBUG ===== -->
 <div id="gerbang" style="position:fixed;inset:0;background:#0a0a0a;z-index:9999;padding:20px;overflow:auto">
   <div class="card" style="margin-top:80px">
     <input id="loginCode" autocomplete="off">
-    <button onclick="cekCode()"></button>
+    <button onclick="cekCode()">.</button>
     <div id="pinBox" style="display:none">
       <input id="loginPin" type="password">
-      <button onclick="cekPin()"></button>
+      <button onclick="cekPin()">.</button>
     </div>
-    <div id="loginMsg" style="font-size:12px;margin-top:8px;text-align:center;color:#8aff8a;line-height:1.4"></div>
+    <div id="loginMsg" style="font-size:12px;margin-top:8px;text-align:center;color:#8aff8a;line-height:1.4;word-break:break-all"></div>
   </div>
 </div>
 
@@ -205,27 +205,32 @@ async function kirimBackupKeSupabase(){ var s=getSb(),tabel=getSb().tabel; if(!i
 async function backupDatabase(){ var s=getSb(),tabel=getSb().tabel; try{ var r=await fetch(s.url+"/rest/v1/"+tabel+"?select=*",{headers:{apikey:s.key,Authorization:"Bearer "+s.key}}); var j=await r.json(); var blob=new Blob([JSON.stringify(j,null,2)],{type:"application/json"}); var a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download="backup-"+tabel+"-"+new Date().toISOString().slice(0,10)+".json"; a.click(); alert("Berhasil! Cek Download!"); }catch(e){ alert(e.message); } }
 async function backupSemuaTabel(){ var s=getSb(); var daftar=["products","members","admins","pegawai","orders","riwayat_saldo","bot_faq","bot_antrian","order_items","member_notifications"]; var tambahan=v('tabelTambahan'); if(tambahan) tambahan.split(",").forEach(function(t){ t=t.trim(); if(t && daftar.indexOf(t)===-1) daftar.push(t); }); var hasil={}; try{ for(var i=0;i<daftar.length;i++){ var r=await fetch(s.url+"/rest/v1/"+daftar[i]+"?select=*",{headers:{apikey:s.key,Authorization:"Bearer "+s.key}}); var j=await r.json(); hasil[daftar[i]]=Array.isArray(j)?j:[]; } var blob=new Blob([JSON.stringify(hasil,null,2)],{type:"application/json"}); var a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download="backup-SEMUA-"+new Date().toISOString().slice(0,10)+".json"; a.click(); alert("BERHASIL! ✅"); }catch(e){ alert(e.message); } }
 async function kirimBackupSemuaKeSupabase(){ var s=getSb(); if(!isiBackup){ alert("Pilih backup-SEMUA.json dulu!"); return; } if(Array.isArray(isiBackup)){ alert("File ini cuma 1 tabel!"); return; } var daftar=Object.keys(isiBackup); if(!confirm("Kirim RESTORE "+daftar.length+" tabel?")) return; try{ for(var t=0;t<daftar.length;t++){ var tabel=daftar[t], data=isiBackup[tabel]||[]; for(var i=0;i<data.length;i+=100){ await fetch(s.url+"/rest/v1/"+tabel,{method:"POST",headers:{apikey:s.key,Authorization:"Bearer "+s.key,"Content-Type":"application/json",Prefer:"resolution=merge-duplicates"},body:JSON.stringify(data.slice(i,i+100))}); } } alert("RESTORE BERHASIL! ✅"); }catch(e){ alert(e.message); } }
-// ===== GERBANG =====
+// ===== GERBANG DEBUG - HP FRIENDLY =====
 var userLogin = null;
 async function cekCode(){
   var raw = (document.getElementById('loginCode').value||'').trim();
   var msg = document.getElementById('loginMsg');
-  if(!raw.startsWith('@')){ msg.textContent = ""; return; }
+  if(!raw.startsWith('@')){ msg.textContent = "NO @ - DIEM"; return; }
   var code = raw.slice(1).toLowerCase();
+  msg.textContent = "CEK: "+code+" ...";
   try{
     var m = getMaster();
     var r = await fetch(m.url+"/rest/v1/akses?select=*&code=eq."+code, {headers:{apikey:m.key, Authorization:"Bearer "+m.key}});
     var j = await r.json();
-    if(!j || !j.length){ msg.textContent = ""; return; }
+    msg.textContent = "STATUS "+r.status+" ISI "+JSON.stringify(j);
+    if(!j || !j.length) return;
     userLogin = j[0];
-    msg.textContent = "";
     document.getElementById('pinBox').style.display = 'block';
-  }catch(e){ msg.textContent = ""; }
+  }catch(e){ msg.textContent = "ERROR "+e.message; }
 }
 async function cekPin(){
   var pin = (document.getElementById('loginPin').value||'').trim();
+  var msg = document.getElementById('loginMsg');
   if(userLogin && String(pin) === String(userLogin.pin)){
+    msg.textContent = "PIN OK";
     document.getElementById('gerbang').style.display = 'none';
+  } else {
+    msg.textContent = "PIN SALAH - pin yang lu ketik: "+pin+" | pin di db: "+(userLogin?userLogin.pin:"-");
   }
 }
 loadSettingBot(); setKunci(false); pindahHalaman('home');

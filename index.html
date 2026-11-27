@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="id"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>👑 MASTER D' LUSSO</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:Arial}
 body{background:#0a0a0a;color:#fff;padding:12px 12px 40px;background:radial-gradient(circle at 50% 0%,#2a2100 0%,#0a0a0a 55%)}
@@ -49,16 +50,45 @@ small{color:#888;font-size:11px;line-height:1.4}
 .menu3 button{flex:1;padding:14px 4px;font-size:12px;margin-top:10px}
 .menu3 button small{display:block;font-size:10px;font-weight:400;margin-top:3px;opacity:.8}
 </style></head><body>
-<!-- ===== GERBANG DEBUG ===== -->
+<!-- ===== GERBANG ===== -->
 <div id="gerbang" style="position:fixed;inset:0;background:#0a0a0a;z-index:9999;padding:20px;overflow:auto">
   <div class="card" style="margin-top:80px">
     <input id="loginCode" autocomplete="off">
-    <button onclick="cekCode()">.</button>
-    <div id="pinBox" style="display:none">
-      <input id="loginPin" type="password">
-      <button onclick="cekPin()">.</button>
+    <button onclick="cekCode()">LOGOUT</button>
+    <div id="loginMsg" style="font-size:12px;margin-top:8px;text-align:center;color:#8aff8a;line-height:1.4"></div>
+  </div>
+</div>
+
+<!-- ===== POP-UP LOCKSCREEN LUXURY ===== -->
+<div id="lockPopup" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);backdrop-filter:blur(8px);z-index:10000;align-items:center;justify-content:center;padding:20px">
+  <div style="width:100%;max-width:340px;background:radial-gradient(circle at 50% 0%,#2a2100 0%,#0a0a0a 60%);border:1px solid #C9A86A;border-radius:28px;padding:28px 20px 20px;text-align:center;box-shadow:0 0 50px rgba(201,168,106,.35)">
+    <div style="font-size:40px">👑</div>
+    <div style="color:#E8C97A;font-family:Georgia;letter-spacing:4px;font-size:18px;margin-top:6px">D' LUSSO</div>
+    <div id="lockNama" style="color:#fff;font-size:14px;margin-top:10px">Welcome Back</div>
+    <div style="color:#888;font-size:11px;margin-top:2px">Masukkan PIN untuk membuka 🔐 AES</div>
+    <div id="pinDots" style="display:flex;gap:12px;justify-content:center;margin:22px 0">
+      <span class="dot" style="width:14px;height:14px;border:1px solid #C9A86A;border-radius:50%"></span>
+      <span class="dot" style="width:14px;height:14px;border:1px solid #C9A86A;border-radius:50%"></span>
+      <span class="dot" style="width:14px;height:14px;border:1px solid #C9A86A;border-radius:50%"></span>
+      <span class="dot" style="width:14px;height:14px;border:1px solid #C9A86A;border-radius:50%"></span>
+      <span class="dot" style="width:14px;height:14px;border:1px solid #C9A86A;border-radius:50%"></span>
+      <span class="dot" style="width:14px;height:14px;border:1px solid #C9A86A;border-radius:50%"></span>
     </div>
-    <div id="loginMsg" style="font-size:12px;margin-top:8px;text-align:center;color:#8aff8a;line-height:1.4;word-break:break-all"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
+      <button onclick="tekanPin('1')" style="background:#1a170e;border:1px solid #3a2f14;color:#fff;border-radius:50%;height:60px;font-size:20px;margin:0">1</button>
+      <button onclick="tekanPin('2')" style="background:#1a170e;border:1px solid #3a2f14;color:#fff;border-radius:50%;height:60px;font-size:20px;margin:0">2</button>
+      <button onclick="tekanPin('3')" style="background:#1a170e;border:1px solid #3a2f14;color:#fff;border-radius:50%;height:60px;font-size:20px;margin:0">3</button>
+      <button onclick="tekanPin('4')" style="background:#1a170e;border:1px solid #3a2f14;color:#fff;border-radius:50%;height:60px;font-size:20px;margin:0">4</button>
+      <button onclick="tekanPin('5')" style="background:#1a170e;border:1px solid #3a2f14;color:#fff;border-radius:50%;height:60px;font-size:20px;margin:0">5</button>
+      <button onclick="tekanPin('6')" style="background:#1a170e;border:1px solid #3a2f14;color:#fff;border-radius:50%;height:60px;font-size:20px;margin:0">6</button>
+      <button onclick="tekanPin('7')" style="background:#1a170e;border:1px solid #3a2f14;color:#fff;border-radius:50%;height:60px;font-size:20px;margin:0">7</button>
+      <button onclick="tekanPin('8')" style="background:#1a170e;border:1px solid #3a2f14;color:#fff;border-radius:50%;height:60px;font-size:20px;margin:0">8</button>
+      <button onclick="tekanPin('9')" style="background:#1a170e;border:1px solid #3a2f14;color:#fff;border-radius:50%;height:60px;font-size:20px;margin:0">9</button>
+      <button onclick="hapusPin()" style="background:transparent;border:none;color:#888;border-radius:50%;height:60px;font-size:16px;margin:0">⌫</button>
+      <button onclick="tekanPin('0')" style="background:#1a170e;border:1px solid #3a2f14;color:#fff;border-radius:50%;height:60px;font-size:20px;margin:0">0</button>
+      <button onclick="tutupLock()" style="background:transparent;border:none;color:#888;border-radius:50%;height:60px;font-size:16px;margin:0">✕</button>
+    </div>
+    <div id="lockMsg" style="font-size:12px;color:#ff6b6b;margin-top:12px;min-height:16px"></div>
   </div>
 </div>
 
@@ -157,6 +187,21 @@ small{color:#888;font-size:11px;line-height:1.4}
 <script>
 var MASTER_DB_URL = "https://lrnnosiewovhaoyyvsmc.supabase.co";
 var MASTER_DB_KEY = "sb_publishable_2tzMRe0rQriqi4q3GLYWkQ_8A2scdc5";
+// ===== KUNCI AES - GANTI JADI RAHASIA LU SENDIRI =====
+var KUNCI_AES = "Dlusso-Kunci-Rahasia-123";
+function kunciAES(teks){
+  if(!teks) return "";
+  try{ return CryptoJS.AES.encrypt(String(teks), KUNCI_AES).toString(); }catch(e){ return teks; }
+}
+function bukaAES(teksAcak){
+  if(!teksAcak) return "";
+  // Kalo masih polos (PIN lama / token lama), balikin apa adanya biar gak ke-kunci
+  if(String(teksAcak).indexOf("U2FsdGVkX1") !== 0) return String(teksAcak);
+  try{
+    var hasil = CryptoJS.AES.decrypt(String(teksAcak), KUNCI_AES).toString(CryptoJS.enc.Utf8);
+    return hasil || String(teksAcak);
+  }catch(e){ return String(teksAcak); }
+}
 function updateInfoProject(){ var n=document.getElementById('projName').value||document.getElementById('project').value||"Belum pilih project"; var t="✅ Lagi ngerjain: "+n; ['infoProjGithub','infoProjSupabase','infoProjBot'].forEach(function(id){ var el=document.getElementById(id); if(el) el.textContent=t; }); }
 function pindahHalaman(ke){ ['home','github','supabase','bot'].forEach(function(x){ var el=document.getElementById('page-'+x); if(el) el.style.display=(ke===x?'block':'none'); }); document.getElementById('btnHome').className='tabBtn'+(ke==='home'?' active':''); document.getElementById('btnGithub').className='tabBtn'+(ke==='github'?' active':''); document.getElementById('btnSupabase').className='tabBtn'+(ke==='supabase'?' active':''); document.getElementById('btnBot').className='tabBtn'+(ke==='bot'?' botActive':''); try{ localStorage.setItem('master_halaman',ke); }catch(e){} updateInfoProject(); if(ke==='bot') updateBotInfo(); window.scrollTo(0,0); }
 var sha="",isiFileHP="",isiBackup=null,editorMode='full',cacheFull="",daftarDb=[],_editId=null,terkunci=false,dropdownBuka=false;
@@ -169,7 +214,7 @@ function bukaProjectBaru(){ _editId=null; ['topUrl','topApi','topToken','projNam
 function salin3Kolom(){ var t="URL: "+document.getElementById('topUrl').value+"\nAPI: "+document.getElementById('topApi').value+"\nTOKEN: "+document.getElementById('topToken').value; try{ navigator.clipboard.writeText(t); document.getElementById('topStatus').textContent="✅ Tersalin!"; }catch(e){ alert(t); } }
 function v(id){ return (document.getElementById(id).value||'').trim(); }
 function getGithub(){ var u=v('topUrl'); var m=u.match(/github\.com\/([^\/]+)\/([^\/\s]+)/)||u.match(/^([^\/\s]+)\/([^\/\s]+)$/); var owner='',repo=v('project'); if(m){ owner=m[1]; repo=m[2].replace('.git',''); document.getElementById('project').value=repo; } return {owner:owner,repo:repo,token:v('topToken'),file:v('fileName')||'index.html',branch:v('branch')||'main'}; }
-function getSb(){ var tabel=v('sbTableDepan')||v('sbTable')||"products"; return {url:v('topApi'), key:v('topToken'), tabel:tabel}; }
+function getSb(){ var tabel=v('sbTableDepan')||v('sbTable')||"products"; var rawKey=v('topToken'); return {url:v('topApi'), key:rawKey, tabel:tabel}; }
 function simpanCacheKeHP(){ try{ localStorage.setItem('master_cache',cacheFull); }catch(e){} updateBotInfo(); }
 function pulihkanDariHP(){ try{ var c=localStorage.getItem('master_cache')||""; if(!c){ alert("Di HP nggak ada file! LOAD dulu!"); return; } cacheFull=c; document.getElementById('content').value=c; editorMode='full'; document.getElementById('status').textContent="✅ Dipulihkan dari HP! "+c.length+" karakter!"; tampilEditor('full'); }catch(e){ alert(e.message); } }
 function updateBotInfo(){ var el=document.getElementById('botInfo'); if(!el) return; if(cacheFull){ el.textContent="✅ File di HP: ADA! "+cacheFull.length+" karakter"; el.style.color="#8aff8a"; } else { el.textContent="❌ File belum ada. LOAD dulu di GITHUB."; el.style.color="#ff9999"; } }
@@ -189,8 +234,8 @@ async function loadAntrian(){ var s=getSb(); if(!s.url||!s.key){ alert("Klik pro
 function getMaster(){ return {url:MASTER_DB_URL, key:MASTER_DB_KEY}; }
 async function loadProjectsDariDb(){ var m=getMaster(); document.getElementById('list').innerHTML='<p>⏳ Loading...</p>'; try{ var r=await fetch(m.url+"/rest/v1/projects?select=*&order=created_at.desc",{headers:{apikey:m.key,Authorization:"Bearer "+m.key}}); var j=await r.json(); if(!Array.isArray(j)) throw new Error(JSON.stringify(j)); daftarDb=j; renderDb(); }catch(e){ document.getElementById('list').innerHTML='❌ '+e.message; } }
 function renderDb(){ var box=document.getElementById('list'); if(!daftarDb.length){ box.innerHTML='<p style="color:#888">Belum ada project.</p>'; return; } var html=""; for(var i=0;i<daftarDb.length;i++){ var p=daftarDb[i]; html+='<div class="proj" onclick="pilihDb('+i+')"><div><b>📁 '+(p.name||'-')+'</b><small>'+(p.github_repo||'')+'<br>API: '+(p.api_url||'')+'</small></div><button class="del" onclick="event.stopPropagation();hapusDb('+p.id+')">✕</button></div>'; } box.innerHTML=html; }
-function pilihDb(i){ var p=daftarDb[i]; if(!p) return; _editId=p.id; document.getElementById('projName').value=p.name||''; document.getElementById('topUrl').value=p.github_repo||''; document.getElementById('topApi').value=p.api_url||''; document.getElementById('topToken').value=p.token||p.github_token||''; var m=(p.github_repo||'').match(/github\.com\/([^\/]+)\/([^\/\s]+)/); if(m) document.getElementById('project').value=m[2].replace('.git',''); setKunci(true); document.getElementById('topStatus').textContent="✅ "+(p.name||'')+" dipilih!"; document.getElementById('status').textContent="✅ "+(p.name||'')+" dipilih!"; document.getElementById('dropdownProject').classList.remove('show'); dropdownBuka=false; updateInfoProject(); }
-async function simpanProjectKeDb(){ var m=getMaster(); var data={ name:v('projName')||v('project')||"Project Baru", github_repo:v('topUrl'), github_token:v('topToken'), api_url:v('topApi'), token:v('topToken') }; if(!data.github_repo && !data.api_url){ alert("Isi URL / API dulu Ko!"); return; } try{ var url=m.url+"/rest/v1/projects", headers={apikey:m.key,Authorization:"Bearer "+m.key,"Content-Type":"application/json",Prefer:"return=representation"}; var r; if(_editId) r=await fetch(url+"?id=eq."+_editId,{method:"PATCH",headers:headers,body:JSON.stringify(data)}); else r=await fetch(url,{method:"POST",headers:headers,body:JSON.stringify(data)}); var j=await r.json(); if(!r.ok) throw new Error(JSON.stringify(j)); alert("✅ Tersimpan!"); setKunci(true); }catch(e){ alert("Gagal: "+e.message); } }
+function pilihDb(i){ var p=daftarDb[i]; if(!p) return; _editId=p.id; document.getElementById('projName').value=p.name||''; document.getElementById('topUrl').value=p.github_repo||''; document.getElementById('topApi').value=p.api_url||''; document.getElementById('topToken').value=bukaAES(p.token||p.github_token||''); var m=(p.github_repo||'').match(/github\.com\/([^\/]+)\/([^\/\s]+)/); if(m) document.getElementById('project').value=m[2].replace('.git',''); setKunci(true); document.getElementById('topStatus').textContent="✅ "+(p.name||'')+" dipilih! 🔐 Token dibuka"; document.getElementById('status').textContent="✅ "+(p.name||'')+" dipilih!"; document.getElementById('dropdownProject').classList.remove('show'); dropdownBuka=false; updateInfoProject(); }
+async function simpanProjectKeDb(){ var m=getMaster(); var tokenPolos=v('topToken'); var data={ name:v('projName')||v('project')||"Project Baru", github_repo:v('topUrl'), github_token:kunciAES(tokenPolos), api_url:v('topApi'), token:kunciAES(tokenPolos) }; if(!data.github_repo && !data.api_url){ alert("Isi URL / API dulu Ko!"); return; } try{ var url=m.url+"/rest/v1/projects", headers={apikey:m.key,Authorization:"Bearer "+m.key,"Content-Type":"application/json",Prefer:"return=representation"}; var r; if(_editId) r=await fetch(url+"?id=eq."+_editId,{method:"PATCH",headers:headers,body:JSON.stringify(data)}); else r=await fetch(url,{method:"POST",headers:headers,body:JSON.stringify(data)}); var j=await r.json(); if(!r.ok) throw new Error(JSON.stringify(j)); alert("✅ Tersimpan! 🔐 Token udah di-AES!"); setKunci(true); }catch(e){ alert("Gagal: "+e.message); } }
 async function hapusDb(id){ if(!confirm("Hapus project ini?")) return; var m=getMaster(); await fetch(m.url+"/rest/v1/projects?id=eq."+id,{method:"DELETE",headers:{apikey:m.key,Authorization:"Bearer "+m.key}}); loadProjectsDariDb(); }
 function tambahManual(){ var n=v('newProj'); if(!n){ alert("Isi Nama Project!"); return; } document.getElementById('projName').value=n; document.getElementById('project').value=n; document.getElementById('dropdownProject').classList.remove('show'); dropdownBuka=false; updateInfoProject(); alert("Siap isi URL / API / TOKEN untuk "+n); }
 async function loadFile(){ var a=getGithub(); if(!a.owner||!a.repo||!a.token){ alert("Pilih project dulu di DEPAN!"); pindahHalaman('home'); return; } document.getElementById('status').textContent="⏳ Loading "+a.file+"..."; document.getElementById('debugBox').style.display='block'; try{ var r=await fetch("https://api.github.com/repos/"+a.owner+"/"+a.repo+"/contents/"+a.file+"?ref="+a.branch,{headers:{Authorization:"Bearer "+a.token}}); var j=await r.json(); if(j.message==="Not Found"){ alert("File tidak ketemu!"); return; } if(j.message){ alert(j.message); return; } sha=j.sha; cacheFull=decodeGithub(j.content); document.getElementById('content').value=cacheFull; tampilEditor('full'); document.getElementById('status').textContent="✅ Berhasil! "+cacheFull.length+" karakter!"; document.getElementById('debugBox').textContent="✅ File ketemu! Total: "+cacheFull.length; }catch(e){ document.getElementById('status').textContent="❌ "+e.message; } }
@@ -205,33 +250,51 @@ async function kirimBackupKeSupabase(){ var s=getSb(),tabel=getSb().tabel; if(!i
 async function backupDatabase(){ var s=getSb(),tabel=getSb().tabel; try{ var r=await fetch(s.url+"/rest/v1/"+tabel+"?select=*",{headers:{apikey:s.key,Authorization:"Bearer "+s.key}}); var j=await r.json(); var blob=new Blob([JSON.stringify(j,null,2)],{type:"application/json"}); var a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download="backup-"+tabel+"-"+new Date().toISOString().slice(0,10)+".json"; a.click(); alert("Berhasil! Cek Download!"); }catch(e){ alert(e.message); } }
 async function backupSemuaTabel(){ var s=getSb(); var daftar=["products","members","admins","pegawai","orders","riwayat_saldo","bot_faq","bot_antrian","order_items","member_notifications"]; var tambahan=v('tabelTambahan'); if(tambahan) tambahan.split(",").forEach(function(t){ t=t.trim(); if(t && daftar.indexOf(t)===-1) daftar.push(t); }); var hasil={}; try{ for(var i=0;i<daftar.length;i++){ var r=await fetch(s.url+"/rest/v1/"+daftar[i]+"?select=*",{headers:{apikey:s.key,Authorization:"Bearer "+s.key}}); var j=await r.json(); hasil[daftar[i]]=Array.isArray(j)?j:[]; } var blob=new Blob([JSON.stringify(hasil,null,2)],{type:"application/json"}); var a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download="backup-SEMUA-"+new Date().toISOString().slice(0,10)+".json"; a.click(); alert("BERHASIL! ✅"); }catch(e){ alert(e.message); } }
 async function kirimBackupSemuaKeSupabase(){ var s=getSb(); if(!isiBackup){ alert("Pilih backup-SEMUA.json dulu!"); return; } if(Array.isArray(isiBackup)){ alert("File ini cuma 1 tabel!"); return; } var daftar=Object.keys(isiBackup); if(!confirm("Kirim RESTORE "+daftar.length+" tabel?")) return; try{ for(var t=0;t<daftar.length;t++){ var tabel=daftar[t], data=isiBackup[tabel]||[]; for(var i=0;i<data.length;i+=100){ await fetch(s.url+"/rest/v1/"+tabel,{method:"POST",headers:{apikey:s.key,Authorization:"Bearer "+s.key,"Content-Type":"application/json",Prefer:"resolution=merge-duplicates"},body:JSON.stringify(data.slice(i,i+100))}); } } alert("RESTORE BERHASIL! ✅"); }catch(e){ alert(e.message); } }
-// ===== GERBANG DEBUG - HP FRIENDLY =====
+// ===== GERBANG + LOCKSCREEN LUXURY + AES =====
 var userLogin = null;
+var pinSementara = "";
 async function cekCode(){
   var raw = (document.getElementById('loginCode').value||'').trim();
-  var msg = document.getElementById('loginMsg');
-  if(!raw.startsWith('@')){ msg.textContent = "NO @ - DIEM"; return; }
+  if(!raw.startsWith('@')) return;
   var code = raw.slice(1).toLowerCase();
-  msg.textContent = "CEK: "+code+" ...";
   try{
     var m = getMaster();
     var r = await fetch(m.url+"/rest/v1/akses?select=*&code=eq."+code, {headers:{apikey:m.key, Authorization:"Bearer "+m.key}});
     var j = await r.json();
-    msg.textContent = "STATUS "+r.status+" ISI "+JSON.stringify(j);
     if(!j || !j.length) return;
     userLogin = j[0];
-    document.getElementById('pinBox').style.display = 'block';
-  }catch(e){ msg.textContent = "ERROR "+e.message; }
+    pinSementara = "";
+    updateDots();
+    document.getElementById('lockNama').textContent = "Welcome Back, " + (userLogin.nama || "");
+    document.getElementById('lockMsg').textContent = "";
+    document.getElementById('lockPopup').style.display = 'flex';
+  }catch(e){}
 }
-async function cekPin(){
-  var pin = (document.getElementById('loginPin').value||'').trim();
-  var msg = document.getElementById('loginMsg');
-  if(userLogin && String(pin) === String(userLogin.pin)){
-    msg.textContent = "PIN OK";
-    document.getElementById('gerbang').style.display = 'none';
-  } else {
-    msg.textContent = "PIN SALAH - pin yang lu ketik: "+pin+" | pin di db: "+(userLogin?userLogin.pin:"-");
+function updateDots(){
+  var dots = document.querySelectorAll('#pinDots .dot');
+  for(var i=0;i<dots.length;i++){ dots[i].style.background = i < pinSementara.length ? "#E8C97A" : "transparent"; }
+}
+function tekanPin(angka){
+  if(pinSementara.length >= 6) return;
+  pinSementara += angka;
+  updateDots();
+  if(pinSementara.length === 6){
+    setTimeout(function(){
+      // PIN di DB udah AES, jadi dibuka dulu baru dibandingin. PIN lama polos masih bisa.
+      var pinAsli = bukaAES(userLogin.pin);
+      if(String(pinSementara) === String(pinAsli)){
+        document.getElementById('lockPopup').style.display = 'none';
+        document.getElementById('gerbang').style.display = 'none';
+      } else {
+        document.getElementById('lockMsg').textContent = "PIN Salah";
+        pinSementara = "";
+        updateDots();
+      }
+    }, 200);
   }
 }
+function hapusPin(){ pinSementara = pinSementara.slice(0,-1); updateDots(); }
+function tutupLock(){ document.getElementById('lockPopup').style.display = 'none'; pinSementara=""; updateDots(); }
+function cekPin(){}
 loadSettingBot(); setKunci(false); pindahHalaman('home');
 </script></body></html>

@@ -48,17 +48,14 @@ small{color:#888;font-size:11px;line-height:1.4}
 </style></head><body>
 <h1>👑 MASTER</h1><div class="sub">D' LUSSO - BERSIH 7 KOLOM - PENGAMAN OFF</div>
 <div class="tabs">
-<button class="tabBtn active" id="btnHome" onclick="pindahHalaman('home')">🏠 DEPAN</button>
-<button class="tabBtn" id="btnGithub" onclick="pindahHalaman('github')">📂 GITHUB</button>
-<button class="tabBtn" id="btnSupabase" onclick="pindahHalaman('supabase')">🗄️ SUPABASE</button>
-<button class="tabBtn" id="btnBot" onclick="pindahHalaman('bot')">🤖 BOT</button>
+<button class="tabBtn active" id="btnHome" onclick="pindahHalaman('home')">🏠 HOME</button>
+<button class="tabBtn" id="btnDaftar" onclick="toggleDaftarProject()">📂 DAFTAR PROJECT</button>
 </div>
-<div id="page-home" class="page active">
-<button class="btnPanjang" onclick="toggleDaftarProject()">📂 DAFTAR PROJECT - KLIK UNTUK PILIH ▼</button>
 <div id="dropdownProject" class="dropdown">
 <div id="list"><p style="color:#888;font-size:12px;padding:8px">⏳ Loading...</p></div>
 <div class="row" style="padding:0 4px 4px"><input id="newProj" class="kecil" placeholder="Nama project baru"><button class="sec" style="width:90px" onclick="tambahManual()">+ TAMBAH</button></div>
 </div>
+<div id="page-home" class="page active">
 <div class="card top3">
 <label>📁 NAMA</label>
 <input id="topNama" placeholder="Fashion-gw" autocomplete="off" oninput="simpanSementara()">
@@ -138,11 +135,11 @@ var KUNCI_AES = "Dlusso-Kunci-Rahasia-123";
 function kunciAES(teks){ if(!teks) return ""; try{ return CryptoJS.AES.encrypt(String(teks), KUNCI_AES).toString(); }catch(e){ return teks; } }
 function bukaAES(teksAcak){ if(!teksAcak) return ""; if(String(teksAcak).indexOf("U2FsdGVkX1") !== 0) return String(teksAcak); try{ var hasil = CryptoJS.AES.decrypt(String(teksAcak), KUNCI_AES).toString(CryptoJS.enc.Utf8); return hasil || String(teksAcak); }catch(e){ return String(teksAcak); } }
 function updateInfoProject(){ var n=document.getElementById('topNama').value||document.getElementById('projName').value||document.getElementById('project').value||"Belum pilih project"; var t="✅ Lagi ngerjain: "+n; ['infoProjGithub','infoProjSupabase','infoProjBot'].forEach(function(id){ var el=document.getElementById(id); if(el) el.textContent=t; }); }
-function pindahHalaman(ke){ ['home','github','supabase','bot'].forEach(function(x){ var el=document.getElementById('page-'+x); if(el) el.style.display=(ke===x?'block':'none'); }); document.getElementById('btnHome').className='tabBtn'+(ke==='home'?' active':''); document.getElementById('btnGithub').className='tabBtn'+(ke==='github'?' active':''); document.getElementById('btnSupabase').className='tabBtn'+(ke==='supabase'?' active':''); document.getElementById('btnBot').className='tabBtn'+(ke==='bot'?' botActive':''); try{ localStorage.setItem('master_halaman',ke); }catch(e){} updateInfoProject(); if(ke==='bot') updateBotInfo(); window.scrollTo(0,0); }
+function pindahHalaman(ke){ ['home','github','supabase','bot'].forEach(function(x){ var el=document.getElementById('page-'+x); if(el) el.style.display=(ke===x?'block':'none'); }); var bh=document.getElementById('btnHome'); if(bh) bh.className='tabBtn'+(ke==='home'?' active':''); var bd=document.getElementById('btnDaftar'); if(bd) bd.className='tabBtn'; try{ localStorage.setItem('master_halaman',ke); }catch(e){} updateInfoProject(); if(ke==='bot') updateBotInfo(); window.scrollTo(0,0); }
 var sha="",isiFileHP="",isiBackup=null,editorMode='full',cacheFull="",daftarDb=[],_editId=null,dropdownBuka=false;
 var CLOSE_SCRIPT="<"+"/"+"script>";
 var labelEditor={style:"🎨 Lagi edit: STYLE",body:"📝 Lagi edit: BODY",script:"🧠 Lagi edit: SCRIPT",head:"🏷️ Lagi edit: HEAD",full:"📄 Lagi edit: FULL"};
-function toggleDaftarProject(){ var d=document.getElementById('dropdownProject'); dropdownBuka=!dropdownBuka; if(dropdownBuka){ d.classList.add('show'); loadProjectsDariDb(); } else { d.classList.remove('show'); } }
+function toggleDaftarProject(){ var d=document.getElementById('dropdownProject'); dropdownBuka=!dropdownBuka; if(dropdownBuka){ d.classList.add('show'); var bd=document.getElementById('btnDaftar'); if(bd) bd.className='tabBtn active'; loadProjectsDariDb(); } else { d.classList.remove('show'); var bd2=document.getElementById('btnDaftar'); if(bd2) bd2.className='tabBtn'; } }
 function bukaProjectBaru(){ _editId=null; ['topNama','topUrl','topApi','topTokenGH','topTokenSB','projName','project'].forEach(function(id){ var el=document.getElementById(id); if(el) el.value=''; }); document.getElementById('topStatus').textContent="Siap isi project baru... ketik NAMA baru dulu ko!"; document.getElementById('dropdownProject').classList.remove('show'); dropdownBuka=false; updateInfoProject(); simpanSementara(); document.getElementById('topNama').focus(); }
 function salin5Kolom(){ var t="NAMA: "+v('topNama')+"\nURL GH: "+v('topUrl')+"\nAPI SB: "+v('topApi')+"\nTOKEN GH: "+v('topTokenGH')+"\nTOKEN SB: "+v('topTokenSB'); try{ navigator.clipboard.writeText(t); document.getElementById('topStatus').textContent="✅ Tersalin!"; }catch(e){ alert(t); } }
 function v(id){ return (document.getElementById(id).value||'').trim(); }

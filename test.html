@@ -1,160 +1,229 @@
 <!DOCTYPE html>
 <html lang="id"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>👑 MASTER D' LUSSO</title>
+<title>🧪 TES BOT V5</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:Arial}
-body{background:#0a0a0a;color:#fff;padding:12px 12px 40px;background:radial-gradient(circle at 50% 0%,#2a2100 0%,#0a0a0a 55%)}
-h1{text-align:center;font-family:Georgia;font-size:26px;letter-spacing:4px;color:#E8C97A;margin-top:10px}
-.sub{text-align:center;color:#aaa;font-size:11px;letter-spacing:1px;margin:5px 0 10px}
-.card{background:#151207;border:1px solid #C9A86A;border-radius:16px;padding:12px;margin-top:12px}
-.card.bot{border-color:#00E5FF;background:#0a1a20}
-label{display:block;font-size:11px;letter-spacing:1px;color:#E8C97A;margin:10px 0 4px;font-weight:800}
-input{width:100%;background:#0a0a0a;border:1px solid #3a2f14;color:#fff;padding:11px 10px;border-radius:10px;outline:none;font-size:13px}
-input:disabled{background:#1a1a1a;color:#aaa;border-color:#222}
-input.kecil{font-size:12px;padding:9px 8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-textarea{width:100%;height:320px;background:#000;border:1px solid #3a2f14;color:#7CFC00;padding:10px;border-radius:10px;font-family:monospace;font-size:11px;outline:none}
-textarea.botArea{border-color:#00E5FF;color:#7DF9FF;height:220px}
-button{width:100%;background:linear-gradient(180deg,#F5D98A,#C9A86A);border:none;padding:13px;border-radius:11px;font-weight:900;font-size:13px;margin-top:10px;cursor:pointer;color:#000}
-.sec{background:#1a170e;color:#E8C97A;border:1px solid #C9A86A}
-.botBtn{background:linear-gradient(180deg,#7DF9FF,#00A8C9);color:#000}
+body{background:#0a0a0a;color:#fff;padding:12px;padding-bottom:20px}
+h1{text-align:center;color:#7DF9FF;font-size:20px;letter-spacing:2px;margin:8px 0 2px}
+.sub{text-align:center;color:#888;font-size:11px;margin-bottom:10px}
+.card{background:#151515;border:1px solid #00E5FF;border-radius:14px;padding:12px;margin-top:10px}
+label{font-size:11px;color:#7DF9FF;font-weight:800;display:block;margin:10px 0 4px}
+input,textarea,select{width:100%;background:#0a0a0a;border:1px solid #333;color:#fff;padding:11px;border-radius:10px;font-size:13px;outline:none}
+textarea{height:70px}
+button{width:100%;background:linear-gradient(180deg,#7DF9FF,#00A8C9);border:none;padding:13px;border-radius:11px;font-weight:900;font-size:13px;margin-top:10px;cursor:pointer;color:#000}
+.sec{background:#1a1a1a;color:#7DF9FF;border:1px solid #00E5FF}
 .row{display:flex;gap:8px}.row>*{flex:1}
-.proj{display:flex;justify-content:space-between;align-items:center;background:#0a0a0a;border:1px solid #333;border-radius:12px;padding:10px;margin-top:8px;cursor:pointer}
-.proj.active{border-color:#E8C97A;background:#221f10}
-.proj small{color:#888;font-size:11px;display:block;margin-top:2px;word-break:break-all}
-.del{background:#333;color:#ff6b6b;border:none;padding:7px 10px;border-radius:8px;width:auto;margin:0;font-size:12px}
-#status,#sbStatus,#botStatus{font-size:12px;margin-top:8px;text-align:center;color:#8aff8a;line-height:1.4}
+.chat{height:320px;overflow-y:auto;display:flex;flex-direction:column;gap:10px;padding:10px;background:#000;border-radius:10px;border:1px solid #333}
+.msg{padding:10px 12px;border-radius:14px;font-size:13px;line-height:1.4;max-width:92%}
+.me{align-self:flex-end;background:#00E5FF;color:#000;font-weight:700}
+.bot{align-self:flex-start;background:#222;color:#eee;border:1px solid #333}
+.bot b{color:#7DF9FF}
+.skorBox{background:#000;border:1px solid #FFD700;color:#FFD700;padding:10px;border-radius:10px;font-size:11px;white-space:pre-wrap;word-break:break-all;max-height:220px;overflow:auto;margin-top:8px}
+.debug{background:#000;border:1px solid #FF6B6B;color:#FF9999;padding:10px;border-radius:10px;font-size:11px;white-space:pre-wrap;word-break:break-all;max-height:200px;overflow:auto}
 small{color:#888;font-size:11px;line-height:1.4}
-.top3{background:#1a170e;border:1px solid #E8C97A;padding:14px}
-.top3-grid{display:flex;gap:10px}
-.top3-grid>div{flex:1;min-width:0}
-.top3-grid label{font-size:12px;margin:0 0 6px;text-align:center}
-.top3-grid input{font-size:14px;padding:14px 10px;border-radius:12px;border:1px solid #C9A86A}
-.tabs{display:flex;gap:8px;position:sticky;top:0;z-index:99;background:#0a0a0a;padding:8px 0}
-.tabBtn{flex:1;padding:12px;border-radius:12px;font-weight:900;font-size:13px;cursor:pointer;border:1px solid #3a2f14;background:#1a170e;color:#aaa;margin:0}
-.tabBtn.active{background:linear-gradient(180deg,#F5D98A,#C9A86A);color:#000}
-.tabBtn.botActive{background:linear-gradient(180deg,#7DF9FF,#00A8C9);color:#000}
-.page{display:none}.page.active{display:block}
-.eTabs{display:flex;flex-wrap:wrap;gap:6px;padding:6px 0}.eTabs .tabBtn{flex:1;min-width:80px;padding:10px;font-size:11px}
-.faqItem{background:#0a0a0a;border:1px solid #333;border-radius:10px;padding:10px;margin-top:8px}
-.faqItem b{color:#7DF9FF;font-size:12px}.faqItem p{color:#ccc;font-size:12px;margin-top:3px}
-.debug{background:#000;border:1px solid #ffcc00;color:#ffcc00;padding:8px;border-radius:8px;font-size:11px;margin-top:8px;white-space:pre-wrap;word-break:break-all;max-height:120px;overflow:auto}
+.badge{display:inline-block;background:#FFD700;color:#000;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:900}
+.badgeP{background:#FF6B6B;color:#fff;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:900}
+.badgeG{background:#FF9FF3;color:#000;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:900}
 </style></head><body>
-<h1>👑 MASTER</h1><div class="sub">D' LUSSO</div>
+<h1>🧪 TES BOT V5</h1><div class="sub">PROJECT KHUSUS NGETES BOT DOANG - KURUS! Cuma Chat! | <span id="jmlAturan">0 aturan</span></div>
 
-<div class="card top3">
-<div class="top3-grid">
-<div><label>🌐 URL</label><input id="topUrl" placeholder="github.com/..." autocomplete="off"></div>
-<div><label>🗄️ API</label><input id="topApi" placeholder="xxx.supabase.co" autocomplete="off"></div>
-<div><label>🔑 TOKEN</label><input id="topToken" placeholder="ghp_ / sb_ / eyJ..." autocomplete="off"></div>
-</div>
-<div class="row"><button class="sec" id="btnLock" onclick="toggleKunci()">🔒 KUNCI</button><button class="sec" onclick="bukaProjectBaru()">➕ PROJECT BARU</button></div>
-<div class="row"><button onclick="simpanProjectKeDb()">💾 SIMPAN PROJECT INI</button><button class="sec" onclick="salin3Kolom()">📋 SALIN 3 KOLOM</button></div>
-<div id="topStatus" style="font-size:12px;margin-top:8px;text-align:center;color:#8aff8a"></div>
-</div>
-
-<div class="card"><b style="color:#E8C97A">📂 DAFTAR PROJECT</b>
-<div class="row"><button class="sec" onclick="loadProjectsDariDb()">🗄️ LOAD DARI DATABASE</button><button class="sec" onclick="loadDaftar()">📂 LOAD DARI GITHUB</button></div>
-<div id="list"><p style="color:#888;font-size:12px;padding:8px 0">Belum ada project.</p></div>
-<div class="row"><input id="newProj" class="kecil" placeholder="Nama project baru"><button class="sec" style="width:90px" onclick="tambahManual()">+ TAMBAH</button></div></div>
-
-<div class="tabs">
-<button class="tabBtn active" id="btnGithub" onclick="pindahHalaman('github')">📂 GITHUB</button>
-<button class="tabBtn" id="btnSupabase" onclick="pindahHalaman('supabase')">🗄️ SUPABASE</button>
-<button class="tabBtn" id="btnBot" onclick="pindahHalaman('bot')">🤖 BOT</button>
+<div class="card" style="border-color:#FFD700">
+<b style="color:#FFD700">⚙️ SETTING DATABASE - ISI SEKALI DOANG!</b>
+<label>🌐 API SUPABASE (URL)</label><input id="cfgUrl" placeholder="https://xxx.supabase.co">
+<label>🔑 TOKEN SUPABASE</label><input id="cfgKey" placeholder="sb_publishable_...">
+<label>📁 NAMA TABEL BOT</label><input id="cfgTabel" value="bot_rules">
+<div class="row"><button class="sec" onclick="simpanCfg()">💾 SIMPAN SETTING</button><button onclick="loadDariDb()">🔄 LOAD DARI DB</button></div>
+<div id="cfgStatus" style="font-size:12px;text-align:center;color:#8aff8a;margin-top:6px"></div>
+<small>Setting ini kesimpen di HP, jadi nggak usah isi ulang. Kalo mau tes lokal doang tanpa DB, kosongin aja, pencet "PAKE CONTOH LOKAL" di bawah!</small>
 </div>
 
-<div id="page-github" class="page active">
-<div class="card"><b style="color:#E8C97A">📂 GITHUB</b>
-<label>NAMA PROJECT / PEMBELI</label><input id="projName" class="kecil" placeholder="Ammo Travel - Si A">
-<div class="row"><div><label>NAMA REPO</label><input id="project" class="kecil" placeholder="nama-repo"></div><div><label>BRANCH</label><input id="branch" class="kecil" value="main"></div></div>
-<label>NAMA FILE</label><input id="fileName" class="kecil" value="index.html">
-<button class="sec" onclick="loadFile()">📥 LOAD FILE</button>
-<button class="sec" onclick="isiTemplate()">✨ TEMPLATE</button>
-<div id="status">Belum load...</div><div id="debugBox" class="debug" style="display:none"></div>
-<button class="sec" onclick="pulihkanDariHP()">♻️ PULIHKAN DARI HP</button></div>
-<div class="card"><b style="color:#E8C97A">📝 ISI FILE</b>
-<div class="eTabs"><button class="tabBtn active" id="eBtnStyle" onclick="tampilEditor('style')">🎨 STYLE</button><button class="tabBtn" id="eBtnBody" onclick="tampilEditor('body')">📝 BODY</button><button class="tabBtn" id="eBtnScript" onclick="tampilEditor('script')">🧠 SCRIPT</button><button class="tabBtn" id="eBtnHead" onclick="tampilEditor('head')">🏷️ HEAD</button><button class="tabBtn" id="eBtnFull" onclick="tampilEditor('full')">📄 FULL</button></div>
-<div id="editorInfo" style="font-size:12px;color:#E8C97A;text-align:center;padding:8px;background:#0a0a0a;border-radius:10px;border:1px solid #3a2f14">🎨 Lagi edit: STYLE</div>
-<textarea id="content" placeholder="Klik LOAD FILE dulu..."></textarea><div id="info" style="font-size:11px;color:#888;margin-top:6px">Karakter: 0</div>
-<button onclick="saveFile()">💾 SAVE KE GITHUB</button></div>
-<div class="card"><b style="color:#E8C97A">⚡ GANTI CEPAT</b><label>CARI</label><input id="findTxt" class="kecil" placeholder="628..."><label>GANTI JADI</label><input id="replaceTxt" class="kecil" placeholder="628..."><button class="sec" onclick="doReplace()">🔄 GANTI SEMUA</button></div>
-<div class="card"><b style="color:#E8C97A">📱 FILE HP → GITHUB</b><input type="file" id="fileHP" accept=".html,.css,.js,.txt,.json" style="padding:10px"><div id="fileHPInfo" style="font-size:11px;color:#888;margin-top:6px">Belum ada file dipilih</div><button class="sec" onclick="kirimFileHPKeGithub()">📤 KIRIM FILE HP KE GITHUB</button></div>
+<div class="card">
+<b style="color:#7DF9FF">💬 CHAT - TES BOT DI SINI!</b>
+<div id="chatBody" class="chat"><div class="msg bot">Halo kak! Gw BOT V5 🧪<br>Coba tanya:<br>• <b>PPDB di buka kapan</b><br>• <b>PPDB di tutup kapan</b><br>• <b>Selamat pagi Bu, PPDB dibuka kapan?</b><br>• <b>Selamat pagi Pak, PPDB dibuka kapan?</b><br>• <b>Kok PPDB belum dibuka sih tolong dong?</b></div></div>
+<div class="row" style="margin-top:10px"><input id="chatInput" placeholder="Ketik pertanyaan... contoh: PPDB di buka kapan" onkeypress="if(event.key==='Enter') kirimChat()"><button style="width:90px" onclick="kirimChat()">KIRIM →</button></div>
+<div class="row"><button class="sec" onclick="tesCepat('PPDB di buka kapan')">🧪 PPDB BUKA</button><button class="sec" onclick="tesCepat('PPDB di tutup kapan')">🧪 PPDB TUTUP</button></div>
+<div class="row"><button class="sec" onclick="tesCepat('Selamat pagi Bu, PPDB dibuka kapan?')">🧪 BU (Gender)</button><button class="sec" onclick="tesCepat('Selamat pagi Pak, PPDB dibuka kapan?')">🧪 PAK (Gender)</button></div>
+<div class="row"><button class="sec" onclick="tesCepat('Kok PPDB belum dibuka sih tolong dong?')">🧪 KOK + TOLONG</button><button class="sec" onclick="tesCepat('Lho kok PPDB tutup?')">🧪 LHO + KOK</button></div>
+<div id="skorHasil" class="skorBox" style="display:none"></div>
 </div>
 
-<div id="page-supabase" class="page">
-<div class="card"><b style="color:#E8C97A">🗄️ SUPABASE</b>
-<label>NAMA TABEL</label><input id="sbTable" class="kecil" value="products">
-<button class="sec" onclick="backupDatabase()">⬇️ BACKUP 1 TABEL</button>
-<label>TABEL TAMBAHAN (PISAH KOMA)</label><input id="tabelTambahan" class="kecil" placeholder="promo,diskon,voucher">
-<button onclick="backupSemuaTabel()">⬇️ BACKUP SEMUA - 1 FILE JSON</button><div id="sbStatus"></div></div>
-<div class="card"><b style="color:#E8C97A">🗄️ RESTORE</b><input type="file" id="backupHP" accept=".json" style="padding:10px"><div id="backupHPInfo" style="font-size:11px;color:#888;margin-top:6px">Belum ada backup dipilih.</div><button onclick="kirimBackupKeSupabase()">🗄️ KIRIM 1 TABEL</button><button class="sec" onclick="kirimBackupSemuaKeSupabase()">🗄️ KIRIM SEMUA TABEL</button></div>
+<div class="card">
+<b style="color:#7DF9FF">➕ AJARI BOT - LANGSUNG MASUK DATABASE!</b>
+<small>Ini kolom yang udah kita sepakati! <b style="color:#fff">Nggak ada kata yang dibuang!</b> Semua kata dihitung! 1 frasa = 1 skor, Penentu = 10 skor!</small>
+<label>💬 PERTANYAAN (Contoh pertanyaan orang)</label><input id="fPertanyaan" placeholder="PPDB dibuka kapan">
+<label>💬 JAWABAN BOT</label><textarea id="fJawaban" placeholder="PPDB dibuka tanggal 1 Mei..."></textarea>
+<label>🔑 PENENTU JAWABAN - Buka / Tutup (+10 SKOR!)</label><input id="fPenentu" placeholder="dibuka">
+<label>👩👨 PENENTU GENDER - Bu / Pak / Bunda / Ayah (+10 SKOR!)</label><input id="fGender" placeholder="bu">
+<label>🔄 PERSAMAAN - Sinonim, pisah koma (,)</label><input id="fPersamaan" placeholder="dibuka, di buka, kebuka, mulai">
+<label>🎯 FRASA - 12 frasa, pisah koma (,). Semua kata dihitung! kok, lho, tolong semua +1!</label><textarea id="fFrasa" placeholder="kapan, ppdb, tanggal, pendaftaran, sebelum, bisa, melalui, admin, kira kira, apakah, sekolah, harapan"></textarea>
+<div class="row"><div><label>🏷️ INTENT_NAME</label><input id="fIntent" placeholder="ppdb_buka"></div><div><label>⭐ PRIORITAS (1-100)</label><input id="fPrioritas" type="number" value="10"></div></div>
+<label>💡 ALTERNATIF - Kalo jawaban nggak ketemu, kasih ini!</label><input id="fAlternatif" placeholder="Tunggu gelombang 2 ya kak!">
+<button onclick="ajariBot()">🏆 AJARI BOT INI! (SIMPAN KE DB)</button>
+<div class="row"><button class="sec" onclick="isiContohBuka()">✨ CONTOH PPDB BUKA</button><button class="sec" onclick="isiContohTutup()">🔒 CONTOH PPDB TUTUP</button></div>
+<div class="row"><button class="sec" onclick="isiContohBu()">👩 CONTOH BU</button><button class="sec" onclick="isiContohPak()">👨 CONTOH PAK</button></div>
+<div id="ajariStatus" style="font-size:12px;text-align:center;color:#8aff8a;margin-top:6px"></div>
 </div>
 
-<div id="page-bot" class="page">
-<div class="card bot"><b style="color:#7DF9FF">🤖 EDIT BOT</b><div id="botInfo" style="font-size:11px;color:#aaa;margin-top:6px">File di HP: belum ada.</div>
-<textarea id="botCode" class="botArea" placeholder="1. LOAD FILE dulu di GITHUB&#10;2. Pencet AMBIL BOT"></textarea>
-<div class="row"><button class="botBtn" onclick="ambilBotDariFile()">🤖 AMBIL BOT</button><button class="botBtn" onclick="simpanBotKeFile()">💾 SIMPAN BOT + GITHUB</button></div><div id="botStatus"></div></div>
-<div class="card bot"><b style="color:#7DF9FF">💬 BOT FAQ - Tabel bot_faq</b><button class="botBtn" onclick="loadBotFaq()">🔄 LIHAT FAQ</button><div id="faqList"><p style="color:#888">Belum load.</p></div><label>❓ PERTANYAAN</label><input id="faqQ" class="kecil" placeholder="harga, ongkir"><label>💬 JAWABAN</label><input id="faqA" class="kecil" placeholder="Harga mulai 50rb..."><button class="botBtn" onclick="tambahFaq()">+ TAMBAH FAQ</button><div id="faqStatus" style="font-size:12px;color:#8aff8a;text-align:center;margin-top:8px"></div></div>
-<div class="card bot"><b style="color:#7DF9FF">📋 ANTRIAN</b><button class="botBtn" onclick="loadAntrian()">🔄 LIHAT ANTRIAN</button><div id="antrianList"><p style="color:#888">Belum load.</p></div></div>
-<div class="card bot"><b style="color:#7DF9FF">⚙️ SETTING BOT</b><label>NAMA BOT</label><input id="botNama" class="kecil" value="Admin D'Lusso"><label>PESAN PEMBUKA</label><input id="botSalam" class="kecil" value="Halo kak! Selamat datang di D'Lusso!"><label>NOMOR WA</label><input id="botWa" class="kecil" placeholder="628..."><button class="botBtn" onclick="simpanSettingBot()">💾 SIMPAN SETTING BOT</button></div>
+<div class="card">
+<b style="color:#7DF9FF">📚 SEMUA ATURAN BOT (DARI DB / LOKAL)</b>
+<button class="sec" onclick="loadDariDb()">🔄 LOAD ULANG</button>
+<button class="sec" onclick="pakeContohLokal()">🧪 PAKE CONTOH LOKAL (TANPA DB, BUAT TES CEPET!)</button>
+<div id="listAturan" style="margin-top:8px"></div>
+</div>
+
+<div class="card" style="border-color:#FF6B6B">
+<b style="color:#FF9999">📋 BOT ANTRIAN - Yang nggak bisa dijawab BOT!</b>
+<small>Kalo BOT nggak bisa jawab, pertanyaan-nya masuk sini, biar Admin bisa ngajarin lagi! Kayak Sofia!</small>
+<button class="sec" onclick="loadAntrian()">🔄 LIHAT ANTRIAN</button>
+<div id="listAntrian" style="margin-top:8px;font-size:12px;color:#ccc"></div>
 </div>
 
 <script>
-// ===== MASTER DB - UDAH DITANAM PERMANEN PUNYA KO CHENG =====
-var MASTER_DB_URL = "https://lrnnosiewovhaoyyvsmc.supabase.co";
-var MASTER_DB_KEY = "sb_publishable_2tzMRe0rQriqi4q3GLYWkQ_8A2scdc5";
-// ==============================================================
-function pindahHalaman(ke){ ['github','supabase','bot'].forEach(function(x){ document.getElementById('page-'+x).style.display=(ke===x?'block':'none'); }); document.getElementById('btnGithub').className='tabBtn'+(ke==='github'?' active':''); document.getElementById('btnSupabase').className='tabBtn'+(ke==='supabase'?' active':''); document.getElementById('btnBot').className='tabBtn'+(ke==='bot'?' botActive':''); try{ localStorage.setItem('master_halaman',ke); }catch(e){} if(ke==='bot') updateBotInfo(); }
-var sha="",isiFileHP="",isiBackup=null,editorMode='full',cacheFull="",daftarDb=[],_editId=null,terkunci=false;
-var CLOSE_SCRIPT="<"+"/"+"script>";
-var labelEditor={style:"🎨 Lagi edit: STYLE",body:"📝 Lagi edit: BODY",script:"🧠 Lagi edit: SCRIPT",head:"🏷️ Lagi edit: HEAD",full:"📄 Lagi edit: FULL"};
-function setKunci(k){ terkunci=k; ['topUrl','topApi','topToken'].forEach(function(id){ document.getElementById(id).disabled=k; }); document.getElementById('btnLock').textContent=k?"🔓 BUKA KUNCI":"🔒 KUNCI"; }
-function toggleKunci(){ if(terkunci){ if(!confirm("Buka kunci?")) return; setKunci(false); } else setKunci(true); }
-function bukaProjectBaru(){ _editId=null; ['topUrl','topApi','topToken','projName','project'].forEach(function(id){ var el=document.getElementById(id); if(el) el.value=''; }); setKunci(false); document.getElementById('topStatus').textContent="Siap isi project baru..."; }
-function salin3Kolom(){ var t="URL: "+document.getElementById('topUrl').value+"\nAPI: "+document.getElementById('topApi').value+"\nTOKEN: "+document.getElementById('topToken').value; try{ navigator.clipboard.writeText(t); document.getElementById('topStatus').textContent="✅ Tersalin!"; }catch(e){ alert(t); } }
-function v(id){ return (document.getElementById(id).value||'').trim(); }
-function getGithub(){ var u=v('topUrl'); var m=u.match(/github\.com\/([^\/]+)\/([^\/\s]+)/)||u.match(/^([^\/\s]+)\/([^\/\s]+)$/); var owner='',repo=v('project'); if(m){ owner=m[1]; repo=m[2].replace('.git',''); document.getElementById('project').value=repo; } return {owner:owner,repo:repo,token:v('topToken'),file:v('fileName')||'index.html',branch:v('branch')||'main'}; }
-function getSb(){ return {url:v('topApi'), key:v('topToken')}; }
-function simpanCacheKeHP(){ try{ localStorage.setItem('master_cache',cacheFull); }catch(e){} updateBotInfo(); }
-function pulihkanDariHP(){ try{ var c=localStorage.getItem('master_cache')||""; if(!c){ alert("Di HP nggak ada file! LOAD dulu!"); return; } cacheFull=c; document.getElementById('content').value=c; editorMode='full'; document.getElementById('status').textContent="✅ Dipulihkan dari HP! "+c.length+" karakter!"; tampilEditor('full'); }catch(e){ alert(e.message); } }
-function updateBotInfo(){ var el=document.getElementById('botInfo'); if(!el) return; if(cacheFull){ el.textContent="✅ File di HP: ADA! "+cacheFull.length+" karakter"; el.style.color="#8aff8a"; } else { el.textContent="❌ File belum ada. LOAD dulu di GITHUB."; el.style.color="#ff9999"; } }
-function decodeGithub(b64){ try{ var bin=atob(b64.replace(/\n/g,'')); var bytes=new Uint8Array(bin.length); for(var i=0;i<bin.length;i++) bytes[i]=bin.charCodeAt(i); return new TextDecoder('utf-8').decode(bytes); }catch(e){ return ""; } }
-function simpanBagianKeFull(){ var isi=document.getElementById('content').value; if(!cacheFull && !isi) return; if(isi==="" && cacheFull!=="") return; if(editorMode==='full'){ cacheFull=isi; simpanCacheKeHP(); return; } if(editorMode==='style'){ cacheFull=cacheFull.replace(/<style[^>]*>[\s\S]*?<\/style>/i,"<style>"+isi+"</style>"); simpanCacheKeHP(); return; } if(editorMode==='head'){ cacheFull=cacheFull.replace(/<head[^>]*>[\s\S]*?<\/head>/i,"<head>"+isi+"</head>"); simpanCacheKeHP(); return; } if(editorMode==='body'){ var mm=cacheFull.match(/<body[^>]*>/i); if(mm){ var s=cacheFull.indexOf(mm[0])+mm[0].length; var e=cacheFull.lastIndexOf("</body>"); cacheFull=cacheFull.slice(0,s)+isi+cacheFull.slice(e); } simpanCacheKeHP(); return; } if(editorMode==='script'){ var idx=cacheFull.lastIndexOf("<script"); if(idx>=0){ var eT=cacheFull.indexOf(">",idx); var eC=cacheFull.indexOf(CLOSE_SCRIPT,eT); if(eT>=0 && eC>=0) cacheFull=cacheFull.slice(0,eT+1)+isi+cacheFull.slice(eC); } simpanCacheKeHP(); return; } }
-function ambilBagian(tag){ var m=cacheFull.match(new RegExp("<"+tag+"[^>]*>([\\s\\S]*?)<\\/"+tag+">","i")); return m?m[1]:""; }
-function tampilEditor(mode){ if(mode!==editorMode) simpanBagianKeFull(); editorMode=mode; ['style','body','script','head','full'].forEach(function(k){ var b=document.getElementById('eBtn'+k.charAt(0).toUpperCase()+k.slice(1)); if(b) b.className='tabBtn'+(k===mode?' active':''); }); document.getElementById('editorInfo').textContent=labelEditor[mode]; if(mode==='full') document.getElementById('content').value=cacheFull; else if(mode==='style') document.getElementById('content').value=ambilBagian('style')||"/* TIDAK ADA <style> */"; else if(mode==='head') document.getElementById('content').value=ambilBagian('head')||"<!-- TIDAK ADA <head> -->"; else if(mode==='body') document.getElementById('content').value=ambilBagian('body')||"<!-- TIDAK ADA <body> -->"; else if(mode==='script'){ var hasil=""; var re=new RegExp("<script[^>]*>([\\s\\S]*?)<\\/script>","gi"); var mm; while((mm=re.exec(cacheFull))!==null) hasil=mm[1]; document.getElementById('content').value=hasil||"// TIDAK ADA <script>"; } document.getElementById('info').textContent="Karakter: "+document.getElementById('content').value.length+" | Total: "+cacheFull.length; }
-var cacheBot="";
-function ambilBotDariFile(){ if(!cacheFull) cacheFull=localStorage.getItem('master_cache')||""; if(!cacheFull){ alert("LOAD FILE dulu!"); pindahHalaman('github'); return; } var lines=cacheFull.split("\n"), botLines=[]; for(var i=0;i<lines.length;i++) if(/bot|faq|antrian|balas|chat/i.test(lines[i])) botLines.push(lines[i]); cacheBot=botLines.join("\n")||"// Gak ada BOT"; document.getElementById('botCode').value=cacheBot; document.getElementById('botStatus').textContent="✅ Ketemu "+botLines.length+" baris BOT!"; }
-function simpanBotKeFile(){ var baru=document.getElementById('botCode').value; if(!baru){ alert("Isi BOT dulu!"); return; } if(!cacheFull) cacheFull=localStorage.getItem('master_cache')||""; if(!cacheFull){ alert("LOAD FILE dulu!"); return; } if(!confirm("Simpan BOT + SAVE ke GitHub?")) return; var lines=cacheFull.split("\n"), sisa=[]; for(var i=0;i<lines.length;i++) if(!/bot|faq|antrian|balas|chat/i.test(lines[i])) sisa.push(lines[i]); cacheFull=sisa.join("\n"); var idx=cacheFull.lastIndexOf(CLOSE_SCRIPT); if(idx>=0) cacheFull=cacheFull.slice(0,idx)+"\n/* BOT */\n"+baru+"\n"+cacheFull.slice(idx); else cacheFull+="\n<script>\n"+baru+"\n"+CLOSE_SCRIPT; simpanCacheKeHP(); document.getElementById('content').value=cacheFull; editorMode='full'; document.getElementById('botStatus').textContent="✅ BOT ditempel, lagi SAVE..."; saveFile(); }
-function simpanSettingBot(){ localStorage.setItem('master_bot',JSON.stringify({nama:document.getElementById('botNama').value,salam:document.getElementById('botSalam').value,wa:document.getElementById('botWa').value})); alert("Setting BOT tersimpan! ✅"); }
-function loadSettingBot(){ try{ var d=JSON.parse(localStorage.getItem('master_bot')||'{}'); if(d.nama) document.getElementById('botNama').value=d.nama; if(d.salam) document.getElementById('botSalam').value=d.salam; if(d.wa) document.getElementById('botWa').value=d.wa; }catch(e){} }
-async function loadBotFaq(){ var s=getSb(); if(!s.url||!s.key){ alert("Klik project dulu!"); return; } document.getElementById('faqList').innerHTML='<p>⏳ Loading...</p>'; try{ var r=await fetch(s.url+"/rest/v1/bot_faq?select=*&order=id",{headers:{apikey:s.key,Authorization:"Bearer "+s.key}}); var j=await r.json(); if(!Array.isArray(j)||!j.length){ document.getElementById('faqList').innerHTML='<p style="color:#888">Belum ada FAQ.</p>'; return; } var html=""; for(var i=0;i<j.length;i++){ var f=j[i]; html+='<div class="faqItem"><b>❓ '+(f.pertanyaan||f.question||'-')+'</b><p>💬 '+(f.jawaban||f.answer||'-')+'</p><button class="del" onclick="hapusFaq('+f.id+')">Hapus</button></div>'; } document.getElementById('faqList').innerHTML=html; }catch(e){ document.getElementById('faqList').innerHTML='❌ '+e.message; } }
-async function tambahFaq(){ var s=getSb(); var q=v('faqQ'),a=v('faqA'); if(!q||!a){ alert("Isi pertanyaan + jawaban!"); return; } try{ var r=await fetch(s.url+"/rest/v1/bot_faq",{method:"POST",headers:{apikey:s.key,Authorization:"Bearer "+s.key,"Content-Type":"application/json",Prefer:"return=representation"},body:JSON.stringify({pertanyaan:q,jawaban:a})}); if(!r.ok) throw new Error(await r.text()); document.getElementById('faqQ').value=''; document.getElementById('faqA').value=''; loadBotFaq(); }catch(e){ alert("Gagal: "+e.message); } }
-async function hapusFaq(id){ if(!confirm("Hapus FAQ ini?")) return; var s=getSb(); await fetch(s.url+"/rest/v1/bot_faq?id=eq."+id,{method:"DELETE",headers:{apikey:s.key,Authorization:"Bearer "+s.key}}); loadBotFaq(); }
-async function loadAntrian(){ var s=getSb(); if(!s.url||!s.key){ alert("Klik project dulu!"); return; } document.getElementById('antrianList').innerHTML='<p>⏳ Loading...</p>'; try{ var r=await fetch(s.url+"/rest/v1/bot_antrian?select=*&order=id.desc&limit=20",{headers:{apikey:s.key,Authorization:"Bearer "+s.key}}); var j=await r.json(); if(!Array.isArray(j)||!j.length){ document.getElementById('antrianList').innerHTML='<p style="color:#888">Antrian kosong!</p>'; return; } var html=""; for(var i=0;i<j.length;i++){ var x=j[i]; html+='<div class="faqItem"><b>📋 '+(x.nama||x.name||'-')+'</b><p>'+(x.pesan||x.message||JSON.stringify(x))+'</p></div>'; } document.getElementById('antrianList').innerHTML=html; }catch(e){ document.getElementById('antrianList').innerHTML='❌ '+e.message; } }
-function getMaster(){ return {url:MASTER_DB_URL, key:MASTER_DB_KEY}; }
-async function loadProjectsDariDb(){ var m=getMaster(); document.getElementById('list').innerHTML='<p>⏳ Loading...</p>'; try{ var r=await fetch(m.url+"/rest/v1/projects?select=*&order=created_at.desc",{headers:{apikey:m.key,Authorization:"Bearer "+m.key}}); var j=await r.json(); if(!Array.isArray(j)) throw new Error(JSON.stringify(j)); daftarDb=j; renderDb(); }catch(e){ alert(e.message); } }
-function renderDb(){ var box=document.getElementById('list'); if(!daftarDb.length){ box.innerHTML='<p style="color:#888">Belum ada project di database.</p>'; return; } var html=""; for(var i=0;i<daftarDb.length;i++){ var p=daftarDb[i]; html+='<div class="proj" onclick="pilihDb('+i+')"><div><b>📁 '+(p.name||'-')+'</b><small>'+(p.github_repo||'')+'<br>API: '+(p.api_url||'')+'</small></div><button class="del" onclick="event.stopPropagation();hapusDb('+p.id+')">✕</button></div>'; } box.innerHTML=html; }
-function pilihDb(i){ var p=daftarDb[i]; if(!p) return; _editId=p.id; document.getElementById('projName').value=p.name||''; document.getElementById('topUrl').value=p.github_repo||''; document.getElementById('topApi').value=p.api_url||''; document.getElementById('topToken').value=p.token||p.github_token||''; var m=(p.github_repo||'').match(/github\.com\/([^\/]+)\/([^\/\s]+)/); if(m) document.getElementById('project').value=m[2].replace('.git',''); setKunci(true); document.getElementById('topStatus').textContent="✅ "+(p.name||'')+" dipilih! 3 kolom terkunci 🔒"; document.getElementById('status').textContent="✅ "+(p.name||'')+" dipilih! Tinggal LOAD FILE / BACKUP!"; }
-async function simpanProjectKeDb(){ var m=getMaster(); var data={ name:v('projName')||v('project')||"Project Baru", github_repo:v('topUrl'), github_token:v('topToken'), api_url:v('topApi'), token:v('topToken') }; if(!data.github_repo && !data.api_url){ alert("Isi URL / API dulu Ko!"); return; } try{ var url=m.url+"/rest/v1/projects", headers={apikey:m.key,Authorization:"Bearer "+m.key,"Content-Type":"application/json",Prefer:"return=representation"}; var r; if(_editId) r=await fetch(url+"?id=eq."+_editId,{method:"PATCH",headers:headers,body:JSON.stringify(data)}); else r=await fetch(url,{method:"POST",headers:headers,body:JSON.stringify(data)}); var j=await r.json(); if(!r.ok) throw new Error(JSON.stringify(j)); alert("✅ Tersimpan!"); setKunci(true); loadProjectsDariDb(); }catch(e){ alert("Gagal: "+e.message); } }
-async function hapusDb(id){ if(!confirm("Hapus project ini?")) return; var m=getMaster(); await fetch(m.url+"/rest/v1/projects?id=eq."+id,{method:"DELETE",headers:{apikey:m.key,Authorization:"Bearer "+m.key}}); loadProjectsDariDb(); }
-function getP(){ try{ return JSON.parse(localStorage.getItem('master_projects')||'[]'); }catch(e){ return []; } }
-function setP(a){ localStorage.setItem('master_projects',JSON.stringify(a)); render(); }
-function render(){ var arr=getP(),box=document.getElementById('list'),cur=v('project'); if(!arr.length){ box.innerHTML='<p style="color:#888">Belum ada project lokal.</p>'; return; } var html=""; for(var i=0;i<arr.length;i++){ var p=arr[i]; html+='<div class="proj" onclick="pilih('+i+')"><div><b>📁 '+p.repo+'</b><small>'+p.owner+' / '+p.repo+'</small></div><button class="del" onclick="event.stopPropagation();hapus('+i+')">✕</button></div>'; } box.innerHTML=html; }
-function pilih(i){ var p=getP()[i]; document.getElementById('topUrl').value="https://github.com/"+p.owner+"/"+p.repo; document.getElementById('project').value=p.repo; document.getElementById('projName').value=p.repo; setKunci(true); document.getElementById('status').textContent="✅ "+p.repo+" dipilih!"; }
-function hapus(i){ if(!confirm("Hapus?")) return; var a=getP(); a.splice(i,1); setP(a); }
-function tambahManual(){ var n=v('newProj'); if(!n){ alert("Isi Nama Project!"); return; } var a=getP(); a.push({owner:"",repo:n,branch:'main',file:'index.html'}); setP(a); document.getElementById('newProj').value=''; }
-async function loadDaftar(){ var g=getGithub(); if(!g.token){ alert("Isi Token dulu di atas!"); return; } document.getElementById('list').innerHTML='<p>⏳ Loading...</p>'; try{ var r=await fetch("https://api.github.com/user/repos?per_page=100&sort=updated",{headers:{Authorization:"Bearer "+g.token}}); var j=await r.json(); if(j.message){ alert(j.message); render(); return; } var a=getP(); for(var i=0;i<j.length;i++){ var x=j[i]; var ada=false; for(var k=0;k<a.length;k++) if(a[k].repo===x.name) ada=true; if(!ada) a.push({owner:x.owner.login,repo:x.name,branch:x.default_branch||'main',file:'index.html'}); } setP(a); alert("Ketemu "+j.length+" project!"); }catch(e){ alert(e.message); render(); } }
-async function loadFile(){ var a=getGithub(); if(!a.owner||!a.repo||!a.token){ alert("Isi URL + Token di atas dulu! Atau klik project!"); return; } document.getElementById('status').textContent="⏳ Loading "+a.file+"..."; document.getElementById('debugBox').style.display='block'; try{ var r=await fetch("https://api.github.com/repos/"+a.owner+"/"+a.repo+"/contents/"+a.file+"?ref="+a.branch,{headers:{Authorization:"Bearer "+a.token}}); var j=await r.json(); if(j.message==="Not Found"){ alert("File tidak ketemu!"); return; } if(j.message){ alert(j.message); return; } sha=j.sha; cacheFull=decodeGithub(j.content); document.getElementById('content').value=cacheFull; tampilEditor('full'); document.getElementById('status').textContent="✅ Berhasil! "+cacheFull.length+" karakter!"; document.getElementById('debugBox').textContent="✅ File ketemu! Total: "+cacheFull.length; }catch(e){ document.getElementById('status').textContent="❌ "+e.message; } }
-async function saveFile(){ var a=getGithub(); simpanBagianKeFull(); if(!cacheFull){ alert("Isi file kosong!"); return; } if(!confirm("SAVE ke "+a.owner+"/"+a.repo+" ?")) return; document.getElementById('status').textContent="⏳ Saving..."; try{ var body={message:"Update via MASTER - "+new Date().toLocaleString('id-ID'),content:btoa(unescape(encodeURIComponent(cacheFull))),branch:a.branch}; if(sha) body.sha=sha; var r=await fetch("https://api.github.com/repos/"+a.owner+"/"+a.repo+"/contents/"+a.file,{method:"PUT",headers:{Authorization:"Bearer "+a.token,"Content-Type":"application/json"},body:JSON.stringify(body)}); var j=await r.json(); if(j.message && !j.content){ alert(j.message); return; } sha=j.content.sha; document.getElementById('status').textContent="✅ BERHASIL!"; alert("BERHASIL! ✅"); }catch(e){ alert(e.message); } }
-function isiTemplate(){ if(!confirm("Isi TEMPLATE?")) return; var t='<!DOCTYPE html><html><head><meta charset="UTF-8"><title>TOKO BARU</title><style>body{background:#0a0a0a;color:#fff;text-align:center;padding:40px}h1{color:#E8C97A}</style></head><body><h1>TOKO BARU</h1><p>WA: 628...</p><script>function balasBot(p){ if(p.includes("harga")) return "Harga 50rb kak!"; return "Halo kak!"; }'+CLOSE_SCRIPT+'</body></html>'; cacheFull=t; simpanCacheKeHP(); document.getElementById('content').value=t; tampilEditor('style'); }
-function doReplace(){ var f=v('findTxt'),r=v('replaceTxt'); if(!f){ alert("Isi Cari-nya!"); return; } simpanBagianKeFull(); var cnt=(cacheFull.match(new RegExp(f.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),'g'))||[]).length; if(!cnt){ alert("Gak ketemu!"); return; } if(!confirm("Ganti "+cnt+" tempat?")) return; cacheFull=cacheFull.split(f).join(r); simpanCacheKeHP(); tampilEditor(editorMode); alert("Berhasil ganti "+cnt+"! Tinggal SAVE!"); }
-document.getElementById('content').addEventListener('input',function(e){ document.getElementById('info').textContent="Karakter: "+e.target.value.length+" | Total: "+cacheFull.length; });
-document.getElementById('fileHP').addEventListener('change',function(e){ var f=e.target.files[0]; if(!f) return; var rd=new FileReader(); rd.onload=function(ev){ isiFileHP=ev.target.result; document.getElementById('fileHPInfo').textContent="✅ "+f.name+" siap!"; document.getElementById('fileName').value=f.name; }; rd.readAsText(f); });
-async function kirimFileHPKeGithub(){ var a=getGithub(); if(!isiFileHP){ alert("Pilih file dulu!"); return; } if(!confirm("Kirim ke "+a.owner+"/"+a.repo+" ?")) return; try{ var cek=await fetch("https://api.github.com/repos/"+a.owner+"/"+a.repo+"/contents/"+a.file+"?ref="+a.branch,{headers:{Authorization:"Bearer "+a.token}}); var cekJ=await cek.json(); var body={message:"Upload dari HP via MASTER",content:btoa(unescape(encodeURIComponent(isiFileHP))),branch:a.branch}; if(cekJ.sha) body.sha=cekJ.sha; var r=await fetch("https://api.github.com/repos/"+a.owner+"/"+a.repo+"/contents/"+a.file,{method:"PUT",headers:{Authorization:"Bearer "+a.token,"Content-Type":"application/json"},body:JSON.stringify(body)}); var j=await r.json(); if(j.message && !j.content){ alert(j.message); return; } alert("BERHASIL! ✅"); }catch(e){ alert(e.message); } }
-document.getElementById('backupHP').addEventListener('change',function(e){ var f=e.target.files[0]; if(!f) return; var rd=new FileReader(); rd.onload=function(ev){ try{ isiBackup=JSON.parse(ev.target.result); document.getElementById('backupHPInfo').textContent="✅ "+f.name+" terbaca!"; }catch(err){ alert("File JSON rusak!"); } }; rd.readAsText(f); });
-async function kirimBackupKeSupabase(){ var s=getSb(),tabel=v('sbTable')||"products"; if(!isiBackup){ alert("Pilih backup.json dulu!"); return; } var dataKirim=Array.isArray(isiBackup)?isiBackup:(isiBackup[tabel]||[isiBackup]); if(!confirm("Kirim "+dataKirim.length+" data ke "+tabel+" ?")) return; try{ var sukses=0; for(var i=0;i<dataKirim.length;i+=100){ var potong=dataKirim.slice(i,i+100); var r=await fetch(s.url+"/rest/v1/"+tabel,{method:"POST",headers:{apikey:s.key,Authorization:"Bearer "+s.key,"Content-Type":"application/json",Prefer:"resolution=merge-duplicates"},body:JSON.stringify(potong)}); if(r.ok) sukses+=potong.length; } document.getElementById('sbStatus').textContent="✅ Selesai! Sukses: "+sukses; alert("BERHASIL! ✅"); }catch(e){ alert(e.message); } }
-async function backupDatabase(){ var s=getSb(),tabel=v('sbTable')||"products"; try{ var r=await fetch(s.url+"/rest/v1/"+tabel+"?select=*",{headers:{apikey:s.key,Authorization:"Bearer "+s.key}}); var j=await r.json(); var blob=new Blob([JSON.stringify(j,null,2)],{type:"application/json"}); var a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download="backup-"+tabel+"-"+new Date().toISOString().slice(0,10)+".json"; a.click(); alert("Berhasil! Cek Download!"); }catch(e){ alert(e.message); } }
-async function backupSemuaTabel(){ var s=getSb(); var daftar=["products","members","admins","pegawai","orders","riwayat_saldo","bot_faq","bot_antrian","order_items","member_notifications"]; var tambahan=v('tabelTambahan'); if(tambahan) tambahan.split(",").forEach(function(t){ t=t.trim(); if(t && daftar.indexOf(t)===-1) daftar.push(t); }); var hasil={}; try{ for(var i=0;i<daftar.length;i++){ var r=await fetch(s.url+"/rest/v1/"+daftar[i]+"?select=*",{headers:{apikey:s.key,Authorization:"Bearer "+s.key}}); var j=await r.json(); hasil[daftar[i]]=Array.isArray(j)?j:[]; } var blob=new Blob([JSON.stringify(hasil,null,2)],{type:"application/json"}); var a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download="backup-SEMUA-"+new Date().toISOString().slice(0,10)+".json"; a.click(); alert("BERHASIL! ✅"); }catch(e){ alert(e.message); } }
-async function kirimBackupSemuaKeSupabase(){ var s=getSb(); if(!isiBackup){ alert("Pilih backup-SEMUA.json dulu!"); return; } if(Array.isArray(isiBackup)){ alert("File ini cuma 1 tabel!"); return; } var daftar=Object.keys(isiBackup); if(!confirm("Kirim RESTORE "+daftar.length+" tabel?")) return; try{ for(var t=0;t<daftar.length;t++){ var tabel=daftar[t], data=isiBackup[tabel]||[]; for(var i=0;i<data.length;i+=100){ await fetch(s.url+"/rest/v1/"+tabel,{method:"POST",headers:{apikey:s.key,Authorization:"Bearer "+s.key,"Content-Type":"application/json",Prefer:"resolution=merge-duplicates"},body:JSON.stringify(data.slice(i,i+100))}); } } alert("RESTORE BERHASIL! ✅"); }catch(e){ alert(e.message); } }
-loadSettingBot(); setKunci(false); pindahHalaman('github');
+var sb=null;
+var ATURAN=[];
+function getCfg(){ return {url:document.getElementById('cfgUrl').value.trim(), key:document.getElementById('cfgKey').value.trim(), tabel:document.getElementById('cfgTabel').value.trim()||'bot_rules'}; }
+function simpanCfg(){ var c=getCfg(); try{ localStorage.setItem('tesbot_cfg', JSON.stringify(c)); }catch(e){} document.getElementById('cfgStatus').textContent='✅ Setting tersimpan!'; initSb(); }
+function loadCfg(){ try{ var c=JSON.parse(localStorage.getItem('tesbot_cfg')||'{}'); if(c.url) document.getElementById('cfgUrl').value=c.url; if(c.key) document.getElementById('cfgKey').value=c.key; if(c.tabel) document.getElementById('cfgTabel').value=c.tabel; }catch(e){} initSb(); }
+function initSb(){ var c=getCfg(); if(c.url && c.key && window.supabase){ try{ sb=window.supabase.createClient(c.url, c.key); }catch(e){ sb=null; } } }
+function normalisasiTeks(t){
+  var s=' '+String(t||'').toLowerCase()+' ';
+  s=s.replace(/[^a-z0-9\s]/g,' '); s=s.replace(/\s+/g,' ');
+  s=s.replace(/\bdi\s+([a-z]+)/g,'di$1');
+  s=s.replace(/\bke\s+([a-z]+)/g,'ke$1');
+  s=s.replace(/\s+/g,' ').trim();
+  return ' '+s+' ';
+}
+function escapeReg(s){ return s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'); }
+function kenaFrasa(chatNorm, frasaAsli){
+  var f=normalisasiTeks(frasaAsli).trim(); if(!f) return false;
+  var pola=f.split(/\s+/).map(function(w){ return escapeReg(w); }).join('\\s+');
+  var re=new RegExp('(?<![a-z0-9])'+pola+'(?![a-z0-9])');
+  return re.test(chatNorm);
+}
+function persamaanKena(chatNorm, persamaanStr){
+  var list=String(persamaanStr||'').split(',').map(function(x){ return x.trim().toLowerCase(); }).filter(Boolean);
+  var kena=[];
+  for(var i=0;i<list.length;i++){ if(kenaFrasa(chatNorm, list[i])) kena.push(list[i]); }
+  return kena;
+}
+function hitungSkor(chat, rule){
+  var n=normalisasiTeks(chat);
+  var skorPenentu=0, kenaPenentu=[];
+  var penentuList=String(rule.penentu||'').split(',').map(function(x){ return x.trim(); }).filter(Boolean);
+  for(var i=0;i<penentuList.length;i++){ if(kenaFrasa(n, penentuList[i])){ skorPenentu+=10; kenaPenentu.push(penentuList[i]+' (+10 PENENTU!)'); } }
+  var skorGender=0, kenaGender=[];
+  var genderList=String(rule.penentu_gender||rule.penentuGender||'').split(',').map(function(x){ return x.trim(); }).filter(Boolean);
+  for(var j=0;j<genderList.length;j++){ if(kenaFrasa(n, genderList[j])){ skorGender+=10; kenaGender.push(genderList[j]+' (+10 GENDER!)'); } }
+  var skorFrasa=0, kenaFrasaList=[];
+  var frasaList=String(rule.frasa||rule.keyword||'').split(',').map(function(x){ return x.trim(); }).filter(Boolean);
+  for(var k=0;k<frasaList.length;k++){ if(kenaFrasa(n, frasaList[k])){ skorFrasa+=1; kenaFrasaList.push(frasaList[k]+' (+1)'); } }
+  var kenaPersamaan=persamaanKena(n, rule.persamaan||'');
+  var skorPersamaan=kenaPersamaan.length*1;
+  var total=skorPenentu+skorGender+skorFrasa+skorPersamaan;
+  var persis=false;
+  if(normalisasiTeks(rule.pertanyaan||'').trim()===n.trim() && n.trim()){ total+=100; persis=true; }
+  return {total:total, skorPenentu:skorPenentu, kenaPenentu:kenaPenentu, skorGender:skorGender, kenaGender:kenaGender, skorFrasa:skorFrasa, kenaFrasa:kenaFrasaList, skorPersamaan:skorPersamaan, kenaPersamaan:kenaPersamaan, persis:persis, prioritas:Number(rule.prioritas||0)};
+}
+function cariJawaban(chat){
+  var hasil=[];
+  for(var i=0;i<ATURAN.length;i++){ var h=hitungSkor(chat, ATURAN[i]); hasil.push({rule:ATURAN[i], skor:h}); }
+  hasil.sort(function(a,b){ if(b.skor.total!==a.skor.total) return b.skor.total-a.skor.total; return b.skor.prioritas-a.skor.prioritas; });
+  return hasil;
+}
+function tambahChat(teks, siapa){
+  var body=document.getElementById('chatBody');
+  var d=document.createElement('div'); d.className='msg '+(siapa==='me'?'me':'bot'); d.innerHTML=teks; body.appendChild(d); body.scrollTop=body.scrollHeight;
+}
+function kirimChat(){
+  var inp=document.getElementById('chatInput'); var teks=inp.value.trim(); if(!teks) return;
+  tambahChat(teks, 'me'); inp.value='';
+  var hasil=cariJawaban(teks);
+  var box=document.getElementById('skorHasil'); box.style.display='block';
+  var txt='PERTANYAAN: '+teks+'\nNORMALISASI: '+normalisasiTeks(teks).trim()+'\n(Rumus: di+spasi=digabung! ke+spasi=digabung! Semua kata dihitung! 1 frasa=1, Penentu=10, Gender=10, Persis=100!)\n\n=== HASIL V5 ===\n';
+  for(var i=0;i<hasil.length;i++){ var h=hasil[i].skor; txt+='\n['+(i+1)+'] TOTAL: '+h.total+' '+(i===0?'🏆 MENANG!':'')+' | Prioritas: '+h.prioritas+'\n🔑 Penentu: '+h.skorPenentu+' - '+(h.kenaPenentu.length?h.kenaPenentu.join(', '):'(nggak kena)')+'\n👩👨 Gender: '+h.skorGender+' - '+(h.kenaGender.length?h.kenaGender.join(', '):'(nggak kena)')+'\n🎯 Frasa: '+h.skorFrasa+' - '+(h.kenaFrasa.length?h.kenaFrasa.join(', '):'(nggak kena)')+'\n🔄 Persamaan: '+h.skorPersamaan+' - '+(h.kenaPersamaan.length?h.kenaPersamaan.join(', '):'(nggak kena)')+(h.persis?' + PERSIS +100!':'')+'\n💬 Jawaban: '+hasil[i].rule.jawaban+'\n'; }
+  box.textContent=txt;
+  var jawaban=null;
+  if(hasil.length && hasil[0].skor.total>=1){ jawaban=hasil[0].rule.jawaban; }
+  if(!jawaban){
+    var alt='';
+    if(hasil.length && hasil[0].rule.alternatif) alt='<br><br>💡 Alternatif: '+hasil[0].rule.alternatif;
+    jawaban='Maaf kak, untuk "'+teks+'" BOT belum paham 🙏'+alt+'<br><br>BOT udah nyimpen pertanyaan kakak ke ANTRIAN, biar Admin bisa ngajarin lagi ya!';
+    simpanAntrian(teks);
+  }
+  setTimeout(function(){ tambahChat(jawaban, 'bot'); }, 400);
+}
+function tesCepat(t){ document.getElementById('chatInput').value=t; kirimChat(); }
+async function simpanAntrian(teks){
+  if(!sb) return; try{ var c=getCfg(); await sb.from('bot_antrian').insert([{pertanyaan:teks, member_name:'Tamu TES-BOT', whatsapp:'', status:'MENUNGGU'}]); }catch(e){}
+}
+async function loadAntrian(){
+  var box=document.getElementById('listAntrian'); if(!sb){ box.innerHTML='❌ Isi setting DB dulu!'; return; }
+  try{ var c=getCfg(); var r=await sb.from('bot_antrian').select('*').order('created_at',{ascending:false}).limit(20); var d=r.data||[]; if(!d.length){ box.innerHTML='Belum ada antrian. Bagus, BOT-nya udah pinter semua!'; return; } box.innerHTML=d.map(function(x){ return '• '+x.pertanyaan+' - <b style="color:#FFD700">'+x.status+'</b> <button style="width:auto;padding:6px 10px;font-size:11px;margin:0" onclick="ajarkanDariAntrian(\''+String(x.pertanyaan).replace(/'/g,"")+'\')">AJARI INI!</button>'; }).join('<br>'); }catch(e){ box.innerHTML='❌ '+e.message; }
+}
+function ajarkanDariAntrian(teks){ document.getElementById('fPertanyaan').value=teks; document.getElementById('fJawaban').focus(); window.scrollTo(0, document.body.scrollHeight); }
+function isiContohBuka(){
+  document.getElementById('fPertanyaan').value='PPDB dibuka kapan';
+  document.getElementById('fJawaban').value='PPDB dibuka tanggal 1 Mei dan ditutup tanggal 30 Juni, pendaftaran sebelum PPDB dibuka bisa melalui Admin. Hubungi Admin untuk daftar!';
+  document.getElementById('fPenentu').value='dibuka'; document.getElementById('fGender').value='';
+  document.getElementById('fPersamaan').value='dibuka, di buka, kebuka, mulai';
+  document.getElementById('fFrasa').value='kapan, ppdb, tanggal, pendaftaran, sebelum, bisa, melalui, admin, kira kira, apakah, sekolah, harapan';
+  document.getElementById('fIntent').value='ppdb_buka'; document.getElementById('fPrioritas').value='10'; document.getElementById('fAlternatif').value='Tunggu gelombang 2 ya kak!';
+  document.getElementById('ajariStatus').textContent='✅ Contoh PPDB BUKA keisi! Tinggal AJARI!';
+}
+function isiContohTutup(){
+  document.getElementById('fPertanyaan').value='PPDB ditutup kapan';
+  document.getElementById('fJawaban').value='PPDB ditutup tanggal 30 Juni kak, pendaftaran sudah ditutup. Tunggu PPDB gelombang berikutnya ya!';
+  document.getElementById('fPenentu').value='ditutup'; document.getElementById('fGender').value='';
+  document.getElementById('fPersamaan').value='ditutup, di tutup, ketutup, selesai, berakhir';
+  document.getElementById('fFrasa').value='kapan, ppdb, tanggal, pendaftaran, sebelum, bisa, melalui, admin, kira kira, apakah, sekolah, harapan';
+  document.getElementById('fIntent').value='ppdb_tutup'; document.getElementById('fPrioritas').value='10'; document.getElementById('fAlternatif').value='Tunggu gelombang 2 ya kak!';
+  document.getElementById('ajariStatus').textContent='✅ Contoh PPDB TUTUP keisi! Frasa-nya SAMA PERSIS kayak PPDB BUKA, yang beda cuma PENENTU-nya!';
+}
+function isiContohBu(){
+  document.getElementById('fPertanyaan').value='Selamat pagi Bu, PPDB dibuka kapan?';
+  document.getElementById('fJawaban').value='Selamat pagi Bu, PPDB dibuka tanggal 1 Mei ya Bu! Bunda mau daftar anaknya?';
+  document.getElementById('fPenentu').value='dibuka'; document.getElementById('fGender').value='bu, bunda, ibu';
+  document.getElementById('fPersamaan').value='dibuka, di buka, kebuka, mulai';
+  document.getElementById('fFrasa').value='selamat, pagi, bu, ppdb, dibuka, kapan, bunda, daftar, anaknya, tolong, kok, lho';
+  document.getElementById('fIntent').value='ppdb_buka_bu'; document.getElementById('fPrioritas').value='20'; document.getElementById('fAlternatif').value='';
+  document.getElementById('ajariStatus').textContent='✅ Contoh BU keisi! Penentu Gender: bu, bunda, ibu (+10)!';
+}
+function isiContohPak(){
+  document.getElementById('fPertanyaan').value='Selamat pagi Pak, PPDB dibuka kapan?';
+  document.getElementById('fJawaban').value='Selamat pagi Pak, PPDB dibuka tanggal 1 Mei ya Pak! Bapak mau daftar anaknya?';
+  document.getElementById('fPenentu').value='dibuka'; document.getElementById('fGender').value='pak, bapak, ayah';
+  document.getElementById('fPersamaan').value='dibuka, di buka, kebuka, mulai';
+  document.getElementById('fFrasa').value='selamat, pagi, pak, ppdb, dibuka, kapan, bapak, daftar, anaknya, tolong, kok, lho';
+  document.getElementById('fIntent').value='ppdb_buka_pak'; document.getElementById('fPrioritas').value='20'; document.getElementById('fAlternatif').value='';
+  document.getElementById('ajariStatus').textContent='✅ Contoh PAK keisi! Penentu Gender: pak, bapak, ayah (+10)!';
+}
+function pakeContohLokal(){
+  ATURAN=[
+    {pertanyaan:'PPDB dibuka kapan', jawaban:'PPDB dibuka tanggal 1 Mei dan ditutup tanggal 30 Juni, pendaftaran sebelum PPDB dibuka bisa melalui Admin. Hubungi Admin untuk daftar!', penentu:'dibuka', penentu_gender:'', persamaan:'dibuka, di buka, kebuka, mulai', frasa:'kapan, ppdb, tanggal, pendaftaran, sebelum, bisa, melalui, admin, kira kira, apakah, sekolah, harapan', intent_name:'ppdb_buka', prioritas:10, alternatif:'Tunggu gelombang 2 ya kak!'},
+    {pertanyaan:'PPDB ditutup kapan', jawaban:'PPDB ditutup tanggal 30 Juni kak, pendaftaran sudah ditutup. Tunggu PPDB gelombang berikutnya ya!', penentu:'ditutup', penentu_gender:'', persamaan:'ditutup, di tutup, ketutup, selesai, berakhir', frasa:'kapan, ppdb, tanggal, pendaftaran, sebelum, bisa, melalui, admin, kira kira, apakah, sekolah, harapan', intent_name:'ppdb_tutup', prioritas:10, alternatif:'Tunggu gelombang 2 ya kak!'},
+    {pertanyaan:'Selamat pagi Bu, PPDB dibuka kapan?', jawaban:'Selamat pagi Bu, PPDB dibuka tanggal 1 Mei ya Bu! Bunda mau daftar anaknya?', penentu:'dibuka', penentu_gender:'bu, bunda, ibu', persamaan:'dibuka, di buka, kebuka, mulai', frasa:'selamat, pagi, bu, ppdb, dibuka, kapan, bunda, daftar, anaknya, tolong, kok, lho', intent_name:'ppdb_buka_bu', prioritas:20, alternatif:''},
+    {pertanyaan:'Selamat pagi Pak, PPDB dibuka kapan?', jawaban:'Selamat pagi Pak, PPDB dibuka tanggal 1 Mei ya Pak! Bapak mau daftar anaknya?', penentu:'dibuka', penentu_gender:'pak, bapak, ayah', persamaan:'dibuka, di buka, kebuka, mulai', frasa:'selamat, pagi, pak, ppdb, dibuka, kapan, bapak, daftar, anaknya, tolong, kok, lho', intent_name:'ppdb_buka_pak', prioritas:20, alternatif:''}
+  ];
+  renderAturan(); document.getElementById('ajariStatus').textContent='✅ 4 contoh lokal ke-load! PPDB BUKA + PPDB TUTUP + BU + PAK! Coba tes di atas!';
+}
+async function loadDariDb(){
+  if(!sb){ document.getElementById('cfgStatus').textContent='❌ Isi setting DB dulu, atau pake CONTOH LOKAL!'; pakeContohLokal(); return; }
+  var c=getCfg(); document.getElementById('cfgStatus').textContent='⏳ Loading dari '+c.tabel+'...';
+  try{ var r=await sb.from(c.tabel).select('*').order('id'); var d=r.data||[]; if(r.error) throw r.error; ATURAN=d; renderAturan(); document.getElementById('cfgStatus').textContent='✅ Ke-load '+d.length+' aturan dari DB!'; }catch(e){ document.getElementById('cfgStatus').textContent='❌ Gagal: '+e.message+' - Coba pake CONTOH LOKAL dulu!'; }
+}
+async function ajariBot(){
+  var data={pertanyaan:document.getElementById('fPertanyaan').value.trim(), jawaban:document.getElementById('fJawaban').value.trim(), penentu:document.getElementById('fPenentu').value.trim(), penentu_gender:document.getElementById('fGender').value.trim(), persamaan:document.getElementById('fPersamaan').value.trim(), frasa:document.getElementById('fFrasa').value.trim(), intent_name:document.getElementById('fIntent').value.trim(), prioritas:Number(document.getElementById('fPrioritas').value||10), alternatif:document.getElementById('fAlternatif').value.trim()};
+  if(!data.pertanyaan || !data.jawaban){ alert('Isi PERTANYAAN + JAWABAN dulu bro!'); return; }
+  if(!data.penentu){ alert('Isi PENENTU dulu bro! Minimal 1! Contoh: dibuka / ditutup'); return; }
+  if(sb){ try{ var c=getCfg(); var r=await sb.from(c.tabel).insert([data]).select().single(); if(r.error) throw r.error; document.getElementById('ajariStatus').textContent='✅ BERHASIL masuk DB!'; loadDariDb(); return; }catch(e){ document.getElementById('ajariStatus').textContent='❌ Gagal ke DB: '+e.message+' - Disimpen lokal dulu ya!'; } }
+  ATURAN.push(data); renderAturan(); document.getElementById('ajariStatus').textContent='✅ BERHASIL (lokal)! Total: '+ATURAN.length+' aturan!';
+}
+function renderAturan(){
+  document.getElementById('jmlAturan').textContent=ATURAN.length+' aturan';
+  var box=document.getElementById('listAturan');
+  if(!ATURAN.length){ box.innerHTML='<p style="color:#888">Belum ada aturan. Pencet PAKE CONTOH LOKAL!</p>'; return; }
+  box.innerHTML=ATURAN.map(function(r,i){ return '<div style="background:#000;border:1px solid #333;border-radius:10px;padding:10px;margin-top:8px"><b style="color:#7DF9FF">🏆 Aturan '+(i+1)+' - '+ (r.intent_name||'')+' <span class="badge">Prioritas: '+(r.prioritas||0)+'</span></b><p style="color:#ccc;font-size:12px;margin-top:4px">❓ '+r.pertanyaan+'</p><p style="color:#ccc;font-size:12px">💬 '+r.jawaban+'</p><p style="font-size:12px"><span class="badgeP">PENENTU: '+(r.penentu||'')+'</span> <span class="badgeG">GENDER: '+(r.penentu_gender||r.penentuGender||'-')+'</span></p><p style="color:#FFD700;font-size:11px;margin-top:4px">🔄 Persamaan: '+(r.persamaan||'')+'</p><p style="color:#aaa;font-size:11px">🎯 Frasa: '+(r.frasa||r.keyword||'')+'</p><p style="color:#8aff8a;font-size:11px">💡 Alternatif: '+(r.alternatif||'-')+'</p></div>'; }).join('');
+}
+loadCfg(); pakeContohLokal();
 </script></body></html>

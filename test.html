@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="id"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>MONA - D' LUSSO - INTERNET ON</title>
+<title>MONA - D' LUSSO - DATABASE ONLY</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:Arial}
@@ -21,36 +21,21 @@ button{background:linear-gradient(180deg,#F5D98A,#C9A86A);border:none;padding:12
 .skorBox{background:#000;border:1px solid #FFD700;color:#FFD700;padding:10px;border-radius:10px;font-size:11px;white-space:pre-wrap;word-break:break-all;max-height:200px;overflow:auto;margin-top:8px}
 small{color:#888;font-size:11px}
 </style></head><body>
-<h1>👑 MONA - D' LUSSO - INTERNET ON</h1><div class="sub">DATABASE DULU, KALO NGGAK ADA BARU INTERNET | <span id="statusDb">Menghubungkan...</span></div>
+<h1>👑 MONA - D' LUSSO - DATABASE ONLY</h1><div class="sub">DATABASE DOANG, TANPA INTERNET, TANPA API KEY | <span id="statusDb">Menghubungkan...</span></div>
 <div class="card">
 <div class="mona-head">
   <img src="mona.png" onerror="this.src='https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100'">
-  <div><b style="color:#E8C97A">Mona • D' LUSSO</b><br><span style="font-size:11px;color:#aaa">● Online • Database + Internet</span></div>
+  <div><b style="color:#E8C97A">Mona • D' LUSSO</b><br><span style="font-size:11px;color:#aaa">● Online • Database Only</span></div>
 </div>
-<div id="chatBody" class="chat"><div class="msg bot">Halo kak, saya Mona dari D'Lusso 🙏<br>Silakan tanya, saya jawab dari database dulu, kalo nggak ada saya cek ke internet.</div></div>
+<div id="chatBody" class="chat"><div class="msg bot">Halo kak, saya Mona dari D'Lusso 🙏<br>Silakan tanya, saya jawab dari database.</div></div>
 <div class="row" style="margin-top:10px"><input id="chatInput" placeholder="Ketik pertanyaan..." onkeypress="if(event.key==='Enter') kirimChat()"><button onclick="kirimChat()">KIRIM →</button></div>
-<div style="display:flex;gap:8px;margin-top:8px"><button onclick="gantiKey()" style="flex:1;background:#333;color:#E8C97A;border:1px solid #C9A86A">🔑 GANTI / ISI API KEY</button><button onclick="cekKey()" style="flex:1;background:#333;color:#fff;border:1px solid #333">CEK KEY</button></div>
 <div id="skorHasil" class="skorBox" style="display:none"></div>
-<small>Di HP, klik tombol 🔑 GANTI API KEY, paste kunci lu disana. Nggak usah edit file!</small>
+<small>DATABASE DOANG. TEST DULU, NGARANG BELAKANGAN.</small>
 </div>
 <script>
 var SUPABASE_URL = 'https://msfzsebownnsrpyjusoc.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_7VQcQXBLz4OYn_OJUzusSg_Zz1or9gq';
 var sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-// KUNCI DIAMBIL DARI HP LU, DISIMPAN DI HP LU DOANG, NGGAK DI FILE!
-var GEMINI_API_KEY = localStorage.getItem('MONA_GEMINI_KEY') || '';
-function gantiKey(){
-  var k = prompt('Paste API KEY lu disini Ko (yang AQ.Ab8...):', GEMINI_API_KEY);
-  if(k && k.trim()){
-    GEMINI_API_KEY = k.trim();
-    localStorage.setItem('MONA_GEMINI_KEY', GEMINI_API_KEY);
-    alert('✅ KEY TERSIMPAN DI HP LU KO! Sekarang test tanya yang nggak ada di database!');
-  }
-}
-function cekKey(){
-  if(!GEMINI_API_KEY) alert('❌ BELUM ADA KEY KO! Klik GANTI API KEY dulu!');
-  else alert('✅ KEY UDAH ADA KO! Depannya: ' + GEMINI_API_KEY.substring(0,10) + '... Panjang: ' + GEMINI_API_KEY.length + ' karakter. Siap test!');
-}
 var ATURAN = [];
 var FRASA_LIST = [];
 var KATA_KUNCI_LIST = [];
@@ -153,26 +138,6 @@ function hitungSkorBaru(chat){
   hasil.sort(function(a,b){ return b.skor.nilai - a.skor.nilai; });
   return hasil;
 }
-async function tanyaKeInternet(pertanyaan){
-  if(!GEMINI_API_KEY){
-    return 'BELUM_ADA_KEY';
-  }
-  try{
-    var res = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key='+GEMINI_API_KEY, {
-      method: 'POST',
-      headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({
-        contents: [{ parts: [{text: 'Kamu adalah Mona, teman ngobrol yang ramah, santai, pake bahasa Indonesia, panggil user Kak. Jawab singkat max 2 kalimat, jangan panjang. Pertanyaan: '+pertanyaan}] }]
-      })
-    });
-    var data = await res.json();
-    if(data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts){
-      return data.candidates[0].content.parts[0].text;
-    }
-    console.log('GEMINI ERROR:', data);
-    return null;
-  }catch(e){ console.log(e); return null; }
-}
 async function loadSemua(){
   document.getElementById('statusDb').textContent='Memuat dari database...';
   try{
@@ -186,7 +151,7 @@ async function loadSemua(){
       var r3=await sb.from('kata_kunci').select('*').order('id');
       if(!r3.error) KATA_KUNCI_LIST=r3.data||[];
     }catch(e){ KATA_KUNCI_LIST=[]; }
-    document.getElementById('statusDb').textContent='✅ '+ATURAN.length+' aturan + '+FRASA_LIST.length+' frasa + '+KATA_KUNCI_LIST.length+' kata kunci + Internet Siap';
+    document.getElementById('statusDb').textContent='✅ '+ATURAN.length+' aturan + '+FRASA_LIST.length+' frasa + '+KATA_KUNCI_LIST.length+' kata kunci';
   }catch(e){
     ATURAN=[]; FRASA_LIST=[]; KATA_KUNCI_LIST=[];
     document.getElementById('statusDb').textContent='❌ Gagal: '+e.message;
@@ -226,20 +191,8 @@ async function kirimChat(){
     setTimeout(function(){ tambahChat(hasil[0].rule.jawaban, 'bot'); }, 300);
     return;
   }
-  box.textContent=txt+'\n\n=== DATABASE NGGAK ADA -> LEMPAR KE INTERNET... ===';
-  tambahChat('Sebentar ya Kak, Mona cek ke internet dulu...', 'bot');
-  var jawabanInternet = await tanyaKeInternet(teks);
-  if(jawabanInternet === 'BELUM_ADA_KEY'){
-    tambahChat('Kak, kunci internetnya belum diisi 🙏<br>Klik tombol <b>🔑 GANTI / ISI API KEY</b> dibawah, terus paste kunci lu yang AQ.Ab8... itu Ko!', 'bot');
-    return;
-  }
-  if(jawabanInternet){
-    box.textContent=txt+'\n\n=== JAWABAN DARI INTERNET ===\n'+jawabanInternet;
-    setTimeout(function(){ tambahChat(jawabanInternet, 'bot'); }, 300);
-    try{ await sb.from('bot_antrian').insert([{pertanyaan:teks, status:'DARI_INTERNET - CEK NGARANG'}]); }catch(e){}
-    return;
-  }
-  tambahChat('Maaf kak, pertanyaan itu belum ada di database Mona 🙏<br>Internet juga belum nyambung, cek API KEY dulu ya Kak.', 'bot');
+  // DATABASE NGGAK ADA -> LANGSUNG MAAF, NGGAK USAH KE INTERNET
+  tambahChat('Maaf kak, pertanyaan itu belum ada di database Mona 🙏<br>Silakan tanya yang lain ya Kak.', 'bot');
   try{ await sb.from('bot_antrian').insert([{pertanyaan:teks, status:'MENUNGGU'}]); }catch(e){}
 }
 loadSemua();

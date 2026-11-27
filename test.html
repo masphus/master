@@ -1,137 +1,145 @@
 <!DOCTYPE html>
-<html lang="id">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>MONA - Chat</title>
+<html lang="id"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MONA - D' LUSSO</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-  *{margin:0;padding:0;box-sizing:border-box;font-family:sans-serif}
-  html,body{height:100%;height:100dvh;overflow:hidden}
-  body{background:#ece5dd;display:flex;flex-direction:column;height:100dvh}
-  #head{background:#111;padding:12px 16px;color:#fff;display:flex;align-items:center;gap:10px;flex-shrink:0}
-  #head img{width:40px;height:40px;border-radius:50%;object-fit:cover}
-  #head b{font-size:16px}
-  #head span{font-size:11px;color:#25d366}
-  #status{font-size:11px;color:#888;text-align:center;padding:5px;background:#fff3cd}
-  #chat{flex:1;overflow-y:auto;padding:14px;padding-bottom:90px;display:flex;flex-direction:column;gap:10px}
-  .row{display:flex;gap:8px;max-width:90%}
-  .row.me{justify-content:flex-end;align-self:flex-end}
-  .avatar{width:36px;height:36px;min-width:36px;border-radius:50%;object-fit:cover}
-  .msg{padding:10px 13px;border-radius:14px;font-size:14px;line-height:1.45;word-break:break-word}
-  .msg.bot{background:#fff;color:#111}
-  .msg.me{background:#dcf8c6;color:#111}
-  #box{position:fixed;left:0;right:0;bottom:0;display:flex;gap:8px;padding:10px;padding-bottom:calc(10px + env(safe-area-inset-bottom));background:#fff;border-top:1px solid #ddd;z-index:99}
-  #pesan{flex:1;padding:14px;border-radius:20px;border:1px solid #ddd;outline:none;font-size:15px;min-width:0}
-  button{padding:12px 18px;border:none;border-radius:20px;background:#111;color:#fff;font-weight:bold;cursor:pointer;flex-shrink:0}
-</style>
-</head>
-<body>
-<div id="head">
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial}
+body{background:#0a0a0a;color:#fff;padding:12px}
+h1{text-align:center;color:#E8C97A;font-size:18px;letter-spacing:2px;margin:8px 0 2px}
+.sub{text-align:center;color:#888;font-size:11px;margin-bottom:10px}
+.card{background:#151515;border:1px solid #C9A86A;border-radius:14px;padding:12px;margin-top:10px}
+.mona-head{display:flex;align-items:center;gap:10px;padding:8px 10px;background:#1a1a1a;border:1px solid #C9A86A;border-radius:12px;margin-bottom:10px}
+.mona-head img{width:48px;height:48px;border-radius:50%;object-fit:cover;border:2px solid #E8C97A}
+.chat{height:380px;overflow-y:auto;display:flex;flex-direction:column;gap:10px;padding:10px;background:#000;border-radius:10px;border:1px solid #333}
+.msg{padding:10px 12px;border-radius:14px;font-size:13px;line-height:1.4;max-width:92%}
+.me{align-self:flex-end;background:#C9A86A;color:#000;font-weight:700}
+.bot{align-self:flex-start;background:#222;color:#eee;border:1px solid #333}
+.bot b{color:#E8C97A}
+.row{display:flex;gap:8px}
+input{flex:1;background:#0a0a0a;border:1px solid #C9A86A;color:#fff;padding:12px;border-radius:10px;font-size:13px;outline:none}
+button{background:linear-gradient(180deg,#F5D98A,#C9A86A);border:none;padding:12px 16px;border-radius:10px;font-weight:900;font-size:13px;cursor:pointer;color:#000}
+.skorBox{background:#000;border:1px solid #FFD700;color:#FFD700;padding:10px;border-radius:10px;font-size:11px;white-space:pre-wrap;word-break:break-all;max-height:200px;overflow:auto;margin-top:8px}
+small{color:#888;font-size:11px}
+</style></head><body>
+<h1>👑 MONA - D' LUSSO</h1><div class="sub">100% MURNI DARI DATABASE | <span id="statusDb">Menghubungkan...</span></div>
+
+<div class="card">
+<div class="mona-head">
   <img src="mona.png" onerror="this.src='https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100'">
-  <div><b>MONA</b><br><span>● Online</span></div>
+  <div><b style="color:#E8C97A">Mona • D' LUSSO</b><br><span style="font-size:11px;color:#aaa">● Online • Hanya jawab dari database</span></div>
 </div>
-<div id="status">Memuat otak Mona...</div>
-<div id="chat"></div>
-<div id="box">
-  <input id="pesan" placeholder="Ketik pesan..." autocomplete="off">
-  <button onclick="kirim()">Kirim</button>
+<div id="chatBody" class="chat"><div class="msg bot">Halo kak, saya Mona dari D'Lusso 🙏<br>Silakan tanya, saya jawab sesuai yang sudah diajarkan di database.</div></div>
+<div class="row" style="margin-top:10px"><input id="chatInput" placeholder="Ketik pertanyaan..." onkeypress="if(event.key==='Enter') kirimChat()"><button onclick="kirimChat()">KIRIM →</button></div>
+<div id="skorHasil" class="skorBox" style="display:none"></div>
+<small>MONA tidak akan menjawab jika tidak ada di database. Tidak ada jawaban karangan.</small>
 </div>
+
 <script>
-const SUPABASE_URL = 'https://msfzsebownnsrpyjusoc.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_7VQcQXBLz4OYn_OJUzusSg_Zz1or9gq';
-const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-const chat = document.getElementById('chat');
-const input = document.getElementById('pesan');
-const statusEl = document.getElementById('status');
-let OTAK = [
-  {pertanyaan:'lokasi dimana?', jawaban:'Kita di Jl. Merdeka No. 10 Bandung, deket Alun-alun kak. Patokannya Indomaret depan gang. Mau aku kirimin shareloc?', penentu:'lokasi|alamat|tempat|dimana', persamaan:'lokasi|alamat|tempat|dimana|daerah|letak|posisi|lokasinya|alamatnya|tempatnya|dimanakah|di mana|address', frasa:'lokasi|dimana|alamat|tempat|daerah|letak|posisi|lokasinya|alamatnya|tempatnya|di mana', skor:10},
-  {pertanyaan:'jam buka jam berapa?', jawaban:'Kita buka tiap hari kak, jam 08.00 - 21.00 WIB. Mau mampir jam berapa? Biar aku siapin tempatnya!', penentu:'jam|buka|tutup', persamaan:'jam|buka|tutup|jadwal|operasional|buka jam|jam buka|jam berapa|open|close', frasa:'jam|buka|tutup|jadwal|operasional|jam berapa|buka jam berapa|jam kerja', skor:10},
-  {pertanyaan:'berapa harga?', jawaban:'Harganya mulai 100rb kak, ada paket 100rb / 175rb / 250rb. Semua udah termasuk pajak. Kakak mau yang mana? Biar aku bantu pilihin!', penentu:'harga|biaya', persamaan:'harga|biaya|ongkos|bayar|tarif|mahar|bandrol|nominal|harganya|berapaan|berapa|price', frasa:'berapa|harga|biaya|ongkos|bayar|tarif|mahar|bandrol|nominal|harganya|berapaan|price', skor:10},
-  {pertanyaan:'ada promo?', jawaban:'Lagi ada promo kak! Diskon 20% semua paket + beli 2 gratis 1. Promonya sampe Minggu aja. Mau aku amankan yang mana?', penentu:'promo|diskon', persamaan:'promo|diskon|potongan|murah|hemat|sale|voucher|kupon|obral|cuci gudang', frasa:'ada|promo|diskon|potongan|murah|hemat|sale|voucher|kupon|obral', skor:10},
-];
-let otakReady = false;
-function timeout(ms){ return new Promise(r=>setTimeout(()=>r(null), ms)); }
-async function getOtak(){
-  if(otakReady) return OTAK;
-  statusEl.textContent = 'Menghubungi Supabase...';
+// === API & URL UDAH DITEMPEL ===
+var SUPABASE_URL = 'https://msfzsebownnsrpyjusoc.supabase.co';
+var SUPABASE_KEY = 'sb_publishable_7VQcQXBLz4OYn_OJUzusSg_Zz1or9gq';
+var sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+var TABEL_BOT = 'bot_rules';
+var ATURAN = [];
+
+// === Normalisasi KITA ===
+function normalisasiTeks(t){
+  var s=' '+String(t||'').toLowerCase()+' ';
+  s=s.replace(/[^a-z0-9\s]/g,' ');
+  s=s.replace(/\s+/g,' ');
+  s=s.replace(/\bdi\s+([a-z]+)/g,'di$1');
+  s=s.replace(/\bke\s+([a-z]+)/g,'ke$1');
+  s=s.replace(/\s+/g,' ').trim();
+  return ' '+s+' ';
+}
+function escapeReg(s){ return s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'); }
+function kenaFrasa(chatNorm, frasaAsli){
+  var f=normalisasiTeks(frasaAsli).trim(); if(!f) return false;
+  var pola=f.split(/\s+/).map(function(w){ return escapeReg(w); }).join('\\s+');
+  return new RegExp('(?<![a-z0-9])'+pola+'(?![a-z0-9])').test(chatNorm);
+}
+function persamaanKena(chatNorm, persamaanStr){
+  var list=String(persamaanStr||'').split(',').map(function(x){ return x.trim().toLowerCase(); }).filter(Boolean);
+  var kena=[];
+  for(var i=0;i<list.length;i++){ if(kenaFrasa(chatNorm, list[i])) kena.push(list[i]); }
+  return kena;
+}
+function hitungSkor(chat, rule){
+  var n=normalisasiTeks(chat);
+  var skorPenentu=0, kenaPenentu=[];
+  var penentuList=String(rule.penentu||'').split(',').map(function(x){ return x.trim(); }).filter(Boolean);
+  for(var i=0;i<penentuList.length;i++){ if(kenaFrasa(n, penentuList[i])){ skorPenentu+=10; kenaPenentu.push(penentuList[i]+' (+10)'); } }
+  var skorGender=0, kenaGender=[];
+  var genderList=String(rule.penentu_gender||'').split(',').map(function(x){ return x.trim(); }).filter(Boolean);
+  for(var j=0;j<genderList.length;j++){ if(kenaFrasa(n, genderList[j])){ skorGender+=10; kenaGender.push(genderList[j]+' (+10)'); } }
+  var skorFrasa=0, kenaFrasaList=[];
+  var frasaList=String(rule.frasa||'').split(',').map(function(x){ return x.trim(); }).filter(Boolean);
+  for(var k=0;k<frasaList.length;k++){ if(kenaFrasa(n, frasaList[k])){ skorFrasa+=1; kenaFrasaList.push(frasaList[k]+' (+1)'); } }
+  var kenaPersamaan=persamaanKena(n, rule.persamaan||'');
+  var skorPersamaan=kenaPersamaan.length*1;
+  var total=skorPenentu+skorGender+skorFrasa+skorPersamaan;
+  var skorMaks = (penentuList.length*10) + (genderList.length*10) + (frasaList.length*1) + (String(rule.persamaan||'').split(',').filter(function(x){return x.trim();}).length*1);
+  var persen = skorMaks>0 ? (total/skorMaks*100) : 0;
+  return {total:total, skorMaks:skorMaks, persen:persen, skorPenentu:skorPenentu, kenaPenentu:kenaPenentu, skorGender:skorGender, kenaGender:kenaGender, skorFrasa:skorFrasa, kenaFrasa:kenaFrasaList, skorPersamaan:skorPersamaan, kenaPersamaan:kenaPersamaan};
+}
+function cariJawabanBot(chat){
+  var hasil=[];
+  for(var i=0;i<ATURAN.length;i++){ var h=hitungSkor(chat, ATURAN[i]); hasil.push({rule:ATURAN[i], skor:h}); }
+  hasil.sort(function(a,b){ return b.skor.total-a.skor.total; });
+  return hasil;
+}
+
+// === LOAD HANYA DARI DATABASE - TANPA CONTOH LOKAL ===
+async function loadSemua(){
+  document.getElementById('statusDb').textContent='Memuat dari database...';
   try{
-    let p1 = supabaseClient.from('bot_rules').select('pertanyaan,jawaban,penentu,penentu_gender,persamaan,frasa,skor');
-    let r1 = await Promise.race([p1, timeout(4000)]);
-    if(r1 && r1.data && r1.data.length){
-      OTAK = r1.data;
-      otakReady = true;
-      statusEl.textContent = 'Otak siap: ' + OTAK.length + ' aturan • Supabase ✅';
-      statusEl.style.background = '#d4edda';
-      return OTAK;
-    }
-    throw new Error('Data kosong: ' + JSON.stringify(r1?.error));
+    var r=await sb.from(TABEL_BOT).select('*').order('id');
+    if(r.error) throw r.error;
+    ATURAN=r.data||[];
+    document.getElementById('statusDb').textContent='✅ '+ATURAN.length+' aturan dari database';
   }catch(e){
-    console.log('Supabase gagal:', e);
-    statusEl.textContent = 'Supabase gagal, pake otak cadangan ⚠️ • ' + OTAK.length + ' aturan • ' + e.message;
-    statusEl.style.background = '#f8d7da';
-    otakReady = true;
-    return OTAK;
+    ATURAN=[];
+    document.getElementById('statusDb').textContent='❌ Gagal: '+e.message+' (Cek RLS / POLICY!)';
   }
 }
-function norm(s){ return (s||'').toLowerCase().replace(/[^a-z0-9 ]/g,' ').replace(/\s+/g,' ').trim(); }
-function cariJawaban(q, otak){
-  let nq = norm(q);
-  let sapaan = ['kakak','kak','bang','mas','mbak','bro','sis','min','mba'];
-  let kataUser = nq.split(' ').filter(w => w.length > 1 && !sapaan.includes(w));
-  let nqBersih = kataUser.join(' ');
-  let best = null, bestScore = -1;
-  for(let r of otak){
-    let skor = 0;
-    let penentuList = String(r.penentu||'').toLowerCase().split('|').map(x=>norm(x)).filter(Boolean);
-    let cocokPenentu = 0;
-    for(let p of penentuList){
-      if(nqBersih.includes(p) || kataUser.some(u => u.includes(p) || p.includes(u))) cocokPenentu++;
-    }
-    if(cocokPenentu > 0) skor += cocokPenentu * 50;
-    let persamaanList = String(r.persamaan||'').toLowerCase().split('|').map(x=>norm(x)).filter(Boolean);
-    for(let p of persamaanList){ if(nqBersih.includes(p)) skor += 10; }
-    let frasaList = String(r.frasa||'').toLowerCase().split('|').map(x=>norm(x)).filter(Boolean);
-    for(let f of frasaList){ if(nqBersih.includes(f)) skor += 15; if(nqBersih === f) skor += 30; }
-    skor += (r.skor || 0) * 0.1;
-    if(skor > bestScore){ bestScore = skor; best = r; }
-  }
-  if(best && bestScore >= 50) return best.jawaban;
-  return null;
+
+function tambahChat(teks, siapa){
+  var body=document.getElementById('chatBody');
+  var d=document.createElement('div'); d.className='msg '+(siapa==='me'?'me':'bot'); d.innerHTML=teks; body.appendChild(d); body.scrollTop=body.scrollHeight;
 }
-function tambah(teks, siapa){
-  let row = document.createElement('div');
-  row.className = 'row ' + (siapa==='me'?'me':'');
-  if(siapa==='bot'){
-    row.innerHTML = '<img src="mona.png" class="avatar" onerror="this.src=\'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100\'"><div class="msg bot"></div>';
-    row.querySelector('.msg').innerHTML = teks;
-  } else {
-    row.innerHTML = '<div class="msg me"></div>';
-    row.querySelector('.msg').textContent = teks;
+
+async function kirimChat(){
+  var inp=document.getElementById('chatInput'); var teks=inp.value.trim(); if(!teks) return;
+  tambahChat(teks, 'me'); inp.value='';
+
+  // Kalo database kosong / gagal load, MONA GAK BOLEH NGARANG
+  if(!ATURAN.length){
+    tambahChat('Maaf kak, database belum terhubung / belum ada aturan. Mona tidak bisa menjawab karena tidak ada di database 🙏', 'bot');
+    return;
   }
-  chat.appendChild(row);
-  chat.scrollTop = chat.scrollHeight;
-  return row;
-}
-async function kirim(){
-  let teks = input.value.trim();
-  if(!teks) return;
-  tambah(teks, 'me');
-  input.value = '';
-  let rowBot = tambah('Mona lagi mikir...', 'bot');
-  let botMsg = rowBot.querySelector('.msg');
-  let otak = OTAK;
-  if(!otakReady){ otak = await getOtak(); }
-  let jawaban = cariJawaban(teks, otak);
+
+  var hasil = cariJawabanBot(teks);
+  var box=document.getElementById('skorHasil'); box.style.display='block';
+  var txt='PERTANYAAN: '+teks+'\nNORMALISASI: '+normalisasiTeks(teks).trim()+'\n\n=== HASIL (80% dari JAWABAN) ===\n';
+  for(var i=0;i<hasil.length;i++){ var h=hasil[i].skor; txt+='\n['+(i+1)+'] TOTAL: '+h.total+' / Maks: '+h.skorMaks+' = '+h.persen.toFixed(1)+'% '+(h.persen>=80?'✅ LOLOS':'❌ GAK LOLOS')+'\nPenentu: '+h.skorPenentu+' - '+(h.kenaPenentu.length?h.kenaPenentu.join(', '):'(nggak kena)')+'\nGender: '+h.skorGender+' - '+(h.kenaGender.length?h.kenaGender.join(', '):'(nggak kena)')+'\nFrasa: '+h.skorFrasa+' - '+(h.kenaFrasa.length?h.kenaFrasa.join(', '):'(nggak kena)')+'\nPersamaan: '+h.skorPersamaan+' - '+(h.kenaPersamaan.length?h.kenaPersamaan.join(', '):'(nggak kena)')+'\nJawaban DB: '+hasil[i].rule.jawaban+'\n'; }
+  box.textContent=txt;
+
+  // === ATURAN MUTLAK: HANYA JAWAB KALO LOLOS 80% ===
+  var jawaban=null;
+  if(hasil.length && hasil[0].skor.persen>=80){
+    jawaban=hasil[0].rule.jawaban;
+  }
+
   if(!jawaban){
-    jawaban = 'Halo kak, aku Mona 🙏<br><br>Untuk "'+teks+'" aku belum nemu jawabannya. Boleh ceritain lebih detail nggak kak?';
+    // GAK BOLEH NGARANG. GAK BOLEH KASIH REKOMENDASI. GAK BOLEH KASIH PRODUK.
+    tambahChat('Maaf kak, pertanyaan itu belum ada di database Mona 🙏<br>Mona hanya menjawab sesuai yang sudah diajarkan.', 'bot');
+    // Catat ke antrian biar bisa diajarkan nanti, tapi JANGAN jawab
+    try{ await sb.from('bot_antrian').insert([{pertanyaan:teks, status:'MENUNGGU'}]); }catch(e){}
+    return;
   }
-  botMsg.innerHTML = jawaban;
-  chat.scrollTop = chat.scrollHeight;
+
+  setTimeout(function(){ tambahChat(jawaban, 'bot'); }, 300);
 }
-input.addEventListener('keydown', e=>{ if(e.key==='Enter') kirim(); });
-tambah('Halo kak, aku Mona 🙏<br>Ada yang bisa aku bantu?', 'bot');
-getOtak();
-</script>
-</body>
-</html>
+
+loadSemua();
+</script></body></html>

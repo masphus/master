@@ -45,10 +45,13 @@ small{color:#888;font-size:11px;line-height:1.4}
 .btnKembali{background:#1a170e;color:#E8C97A;border:1px solid #C9A86A}
 .judulHalaman{text-align:center;color:#E8C97A;font-size:18px;font-weight:900;letter-spacing:2px;margin:12px 0 4px}
 .infoProject{text-align:center;color:#8aff8a;font-size:12px;margin-bottom:6px}
+/* 3 KOLOM BERJEJER DI DEPAN */
+.menu3{display:flex;gap:8px}
+.menu3 button{flex:1;padding:14px 4px;font-size:12px;margin-top:10px}
+.menu3 button small{display:block;font-size:10px;font-weight:400;margin-top:3px;opacity:.8}
 </style></head><body>
 <h1>👑 MASTER</h1><div class="sub">D' LUSSO</div>
 
-<!-- MENU PINDAH HALAMAN - SELALU ADA DI ATAS -->
 <div class="tabs">
 <button class="tabBtn active" id="btnHome" onclick="pindahHalaman('home')">🏠 DEPAN</button>
 <button class="tabBtn" id="btnGithub" onclick="pindahHalaman('github')">📂 GITHUB</button>
@@ -73,11 +76,24 @@ small{color:#888;font-size:11px;line-height:1.4}
 <div class="row"><button onclick="simpanProjectKeDb()">💾 SIMPAN PROJECT INI</button><button class="sec" onclick="salin3Kolom()">📋 SALIN 3 KOLOM</button></div>
 <div id="topStatus" style="font-size:12px;margin-top:8px;text-align:center;color:#8aff8a"></div>
 </div>
+
+<!-- GITHUB / SUPABASE / BOT - 3 KOLOM BERJEJER -->
 <div class="card"><b style="color:#E8C97A">🚀 MAU KEMANA KO?</b>
-<button onclick="pindahHalaman('github')">📂 BUKA GITHUB - EDIT FILE</button>
-<button onclick="pindahHalaman('supabase')">🗄️ BUKA SUPABASE - BACKUP / RESTORE</button>
-<button class="botBtn" onclick="pindahHalaman('bot')">🤖 BUKA BOT - FAQ / ANTRIAN</button>
-<small><br>1. Pilih project dulu di atas<br>2. Terus pencet salah satu tombol ini<br>3. Nanti pindah ke halaman sendiri, leluasa editnya</small></div>
+<div class="menu3">
+<button onclick="pindahHalaman('github')">📂<br>GITHUB<small>EDIT FILE</small></button>
+<button onclick="pindahHalaman('supabase')">🗄️<br>SUPABASE<small>BACKUP</small></button>
+<button class="botBtn" onclick="pindahHalaman('bot')">🤖<br>BOT<small>FAQ</small></button>
+</div>
+<small><br>Pilih project dulu di atas, terus pencet salah satu.</small></div>
+
+<!-- PULIHKAN + BACKUP TETEP DI DEPAN -->
+<div class="card"><b style="color:#E8C97A">⚡ CEPAT - DI DEPAN AJA</b>
+<button class="sec" onclick="pulihkanDariHP()">♻️ PULIHKAN DARI HP</button>
+<div id="status">Belum load...</div>
+<label>NAMA TABEL UNTUK BACKUP CEPAT</label><input id="sbTableDepan" class="kecil" value="products" oninput="document.getElementById('sbTable').value=this.value">
+<div class="row"><button class="sec" onclick="backupDatabase()">⬇️ BACKUP 1 TABEL</button><button onclick="backupSemuaTabel()">⬇️ BACKUP SEMUA</button></div>
+<div id="sbStatus"></div>
+<small><br>Jadi kalo cuma mau pulihin file / backup, gak usah masuk halaman GITHUB / SUPABASE dulu. Langsung dari depan.</small></div>
 </div>
 
 <!-- ===== HALAMAN GITHUB ===== -->
@@ -90,7 +106,7 @@ small{color:#888;font-size:11px;line-height:1.4}
 <label>NAMA FILE</label><input id="fileName" class="kecil" value="index.html">
 <button class="sec" onclick="loadFile()">📥 LOAD FILE</button>
 <button class="sec" onclick="isiTemplate()">✨ TEMPLATE</button>
-<div id="status">Belum load...</div><div id="debugBox" class="debug" style="display:none"></div>
+<div id="debugBox" class="debug" style="display:none"></div>
 <button class="sec" onclick="pulihkanDariHP()">♻️ PULIHKAN DARI HP</button></div>
 <div class="card"><b style="color:#E8C97A">📝 ISI FILE</b>
 <div class="eTabs"><button class="tabBtn active" id="eBtnStyle" onclick="tampilEditor('style')">🎨 STYLE</button><button class="tabBtn" id="eBtnBody" onclick="tampilEditor('body')">📝 BODY</button><button class="tabBtn" id="eBtnScript" onclick="tampilEditor('script')">🧠 SCRIPT</button><button class="tabBtn" id="eBtnHead" onclick="tampilEditor('head')">🏷️ HEAD</button><button class="tabBtn" id="eBtnFull" onclick="tampilEditor('full')">📄 FULL</button></div>
@@ -107,10 +123,10 @@ small{color:#888;font-size:11px;line-height:1.4}
 <button class="btnKembali" onclick="pindahHalaman('home')">⬅️ KEMBALI KE DEPAN</button>
 <div class="judulHalaman">🗄️ SUPABASE</div><div class="infoProject" id="infoProjSupabase">Belum pilih project</div>
 <div class="card"><b style="color:#E8C97A">🗄️ SUPABASE - BACKUP</b>
-<label>NAMA TABEL</label><input id="sbTable" class="kecil" value="products">
+<label>NAMA TABEL</label><input id="sbTable" class="kecil" value="products" oninput="document.getElementById('sbTableDepan').value=this.value">
 <button class="sec" onclick="backupDatabase()">⬇️ BACKUP 1 TABEL</button>
 <label>TABEL TAMBAHAN (PISAH KOMA)</label><input id="tabelTambahan" class="kecil" placeholder="promo,diskon,voucher">
-<button onclick="backupSemuaTabel()">⬇️ BACKUP SEMUA - 1 FILE JSON</button><div id="sbStatus"></div></div>
+<button onclick="backupSemuaTabel()">⬇️ BACKUP SEMUA - 1 FILE JSON</button></div>
 <div class="card"><b style="color:#E8C97A">🗄️ RESTORE</b><input type="file" id="backupHP" accept=".json" style="padding:10px"><div id="backupHPInfo" style="font-size:11px;color:#888;margin-top:6px">Belum ada backup dipilih.</div><button onclick="kirimBackupKeSupabase()">🗄️ KIRIM 1 TABEL</button><button class="sec" onclick="kirimBackupSemuaKeSupabase()">🗄️ KIRIM SEMUA TABEL</button></div>
 <button class="btnKembali" onclick="pindahHalaman('home')">⬅️ KEMBALI KE DEPAN</button>
 </div>
@@ -129,7 +145,6 @@ small{color:#888;font-size:11px;line-height:1.4}
 </div>
 
 <script>
-// ===== MASTER DB - UDAH DITANAM PERMANEN =====
 var MASTER_DB_URL = "https://lrnnosiewovhaoyyvsmc.supabase.co";
 var MASTER_DB_KEY = "sb_publishable_2tzMRe0rQriqi4q3GLYWkQ_8A2scdc5";
 function updateInfoProject(){ var n=document.getElementById('projName').value||document.getElementById('project').value||"Belum pilih project"; var t="✅ Lagi ngerjain: "+n; ['infoProjGithub','infoProjSupabase','infoProjBot'].forEach(function(id){ var el=document.getElementById(id); if(el) el.textContent=t; }); }
@@ -144,7 +159,7 @@ function bukaProjectBaru(){ _editId=null; ['topUrl','topApi','topToken','projNam
 function salin3Kolom(){ var t="URL: "+document.getElementById('topUrl').value+"\nAPI: "+document.getElementById('topApi').value+"\nTOKEN: "+document.getElementById('topToken').value; try{ navigator.clipboard.writeText(t); document.getElementById('topStatus').textContent="✅ Tersalin!"; }catch(e){ alert(t); } }
 function v(id){ return (document.getElementById(id).value||'').trim(); }
 function getGithub(){ var u=v('topUrl'); var m=u.match(/github\.com\/([^\/]+)\/([^\/\s]+)/)||u.match(/^([^\/\s]+)\/([^\/\s]+)$/); var owner='',repo=v('project'); if(m){ owner=m[1]; repo=m[2].replace('.git',''); document.getElementById('project').value=repo; } return {owner:owner,repo:repo,token:v('topToken'),file:v('fileName')||'index.html',branch:v('branch')||'main'}; }
-function getSb(){ return {url:v('topApi'), key:v('topToken')}; }
+function getSb(){ var tabel=v('sbTableDepan')||v('sbTable')||"products"; return {url:v('topApi'), key:v('topToken'), tabel:tabel}; }
 function simpanCacheKeHP(){ try{ localStorage.setItem('master_cache',cacheFull); }catch(e){} updateBotInfo(); }
 function pulihkanDariHP(){ try{ var c=localStorage.getItem('master_cache')||""; if(!c){ alert("Di HP nggak ada file! LOAD dulu!"); return; } cacheFull=c; document.getElementById('content').value=c; editorMode='full'; document.getElementById('status').textContent="✅ Dipulihkan dari HP! "+c.length+" karakter!"; tampilEditor('full'); }catch(e){ alert(e.message); } }
 function updateBotInfo(){ var el=document.getElementById('botInfo'); if(!el) return; if(cacheFull){ el.textContent="✅ File di HP: ADA! "+cacheFull.length+" karakter"; el.style.color="#8aff8a"; } else { el.textContent="❌ File belum ada. LOAD dulu di GITHUB."; el.style.color="#ff9999"; } }
@@ -164,7 +179,7 @@ async function loadAntrian(){ var s=getSb(); if(!s.url||!s.key){ alert("Klik pro
 function getMaster(){ return {url:MASTER_DB_URL, key:MASTER_DB_KEY}; }
 async function loadProjectsDariDb(){ var m=getMaster(); document.getElementById('list').innerHTML='<p>⏳ Loading...</p>'; try{ var r=await fetch(m.url+"/rest/v1/projects?select=*&order=created_at.desc",{headers:{apikey:m.key,Authorization:"Bearer "+m.key}}); var j=await r.json(); if(!Array.isArray(j)) throw new Error(JSON.stringify(j)); daftarDb=j; renderDb(); }catch(e){ document.getElementById('list').innerHTML='❌ '+e.message; } }
 function renderDb(){ var box=document.getElementById('list'); if(!daftarDb.length){ box.innerHTML='<p style="color:#888">Belum ada project.</p>'; return; } var html=""; for(var i=0;i<daftarDb.length;i++){ var p=daftarDb[i]; html+='<div class="proj" onclick="pilihDb('+i+')"><div><b>📁 '+(p.name||'-')+'</b><small>'+(p.github_repo||'')+'<br>API: '+(p.api_url||'')+'</small></div><button class="del" onclick="event.stopPropagation();hapusDb('+p.id+')">✕</button></div>'; } box.innerHTML=html; }
-function pilihDb(i){ var p=daftarDb[i]; if(!p) return; _editId=p.id; document.getElementById('projName').value=p.name||''; document.getElementById('topUrl').value=p.github_repo||''; document.getElementById('topApi').value=p.api_url||''; document.getElementById('topToken').value=p.token||p.github_token||''; var m=(p.github_repo||'').match(/github\.com\/([^\/]+)\/([^\/\s]+)/); if(m) document.getElementById('project').value=m[2].replace('.git',''); setKunci(true); document.getElementById('topStatus').textContent="✅ "+(p.name||'')+" dipilih! 3 kolom terisi + terkunci 🔒"; document.getElementById('status').textContent="✅ "+(p.name||'')+" dipilih!"; document.getElementById('dropdownProject').classList.remove('show'); dropdownBuka=false; updateInfoProject(); }
+function pilihDb(i){ var p=daftarDb[i]; if(!p) return; _editId=p.id; document.getElementById('projName').value=p.name||''; document.getElementById('topUrl').value=p.github_repo||''; document.getElementById('topApi').value=p.api_url||''; document.getElementById('topToken').value=p.token||p.github_token||''; var m=(p.github_repo||'').match(/github\.com\/([^\/]+)\/([^\/\s]+)/); if(m) document.getElementById('project').value=m[2].replace('.git',''); setKunci(true); document.getElementById('topStatus').textContent="✅ "+(p.name||'')+" dipilih!"; document.getElementById('status').textContent="✅ "+(p.name||'')+" dipilih!"; document.getElementById('dropdownProject').classList.remove('show'); dropdownBuka=false; updateInfoProject(); }
 async function simpanProjectKeDb(){ var m=getMaster(); var data={ name:v('projName')||v('project')||"Project Baru", github_repo:v('topUrl'), github_token:v('topToken'), api_url:v('topApi'), token:v('topToken') }; if(!data.github_repo && !data.api_url){ alert("Isi URL / API dulu Ko!"); return; } try{ var url=m.url+"/rest/v1/projects", headers={apikey:m.key,Authorization:"Bearer "+m.key,"Content-Type":"application/json",Prefer:"return=representation"}; var r; if(_editId) r=await fetch(url+"?id=eq."+_editId,{method:"PATCH",headers:headers,body:JSON.stringify(data)}); else r=await fetch(url,{method:"POST",headers:headers,body:JSON.stringify(data)}); var j=await r.json(); if(!r.ok) throw new Error(JSON.stringify(j)); alert("✅ Tersimpan!"); setKunci(true); }catch(e){ alert("Gagal: "+e.message); } }
 async function hapusDb(id){ if(!confirm("Hapus project ini?")) return; var m=getMaster(); await fetch(m.url+"/rest/v1/projects?id=eq."+id,{method:"DELETE",headers:{apikey:m.key,Authorization:"Bearer "+m.key}}); loadProjectsDariDb(); }
 function tambahManual(){ var n=v('newProj'); if(!n){ alert("Isi Nama Project!"); return; } document.getElementById('projName').value=n; document.getElementById('project').value=n; document.getElementById('dropdownProject').classList.remove('show'); dropdownBuka=false; updateInfoProject(); alert("Siap isi URL / API / TOKEN untuk "+n); }
@@ -176,8 +191,8 @@ document.getElementById('content').addEventListener('input',function(e){ documen
 document.getElementById('fileHP').addEventListener('change',function(e){ var f=e.target.files[0]; if(!f) return; var rd=new FileReader(); rd.onload=function(ev){ isiFileHP=ev.target.result; document.getElementById('fileHPInfo').textContent="✅ "+f.name+" siap!"; document.getElementById('fileName').value=f.name; }; rd.readAsText(f); });
 async function kirimFileHPKeGithub(){ var a=getGithub(); if(!isiFileHP){ alert("Pilih file dulu!"); return; } if(!confirm("Kirim ke "+a.owner+"/"+a.repo+" ?")) return; try{ var cek=await fetch("https://api.github.com/repos/"+a.owner+"/"+a.repo+"/contents/"+a.file+"?ref="+a.branch,{headers:{Authorization:"Bearer "+a.token}}); var cekJ=await cek.json(); var body={message:"Upload dari HP via MASTER",content:btoa(unescape(encodeURIComponent(isiFileHP))),branch:a.branch}; if(cekJ.sha) body.sha=cekJ.sha; var r=await fetch("https://api.github.com/repos/"+a.owner+"/"+a.repo+"/contents/"+a.file,{method:"PUT",headers:{Authorization:"Bearer "+a.token,"Content-Type":"application/json"},body:JSON.stringify(body)}); var j=await r.json(); if(j.message && !j.content){ alert(j.message); return; } alert("BERHASIL! ✅"); }catch(e){ alert(e.message); } }
 document.getElementById('backupHP').addEventListener('change',function(e){ var f=e.target.files[0]; if(!f) return; var rd=new FileReader(); rd.onload=function(ev){ try{ isiBackup=JSON.parse(ev.target.result); document.getElementById('backupHPInfo').textContent="✅ "+f.name+" terbaca!"; }catch(err){ alert("File JSON rusak!"); } }; rd.readAsText(f); });
-async function kirimBackupKeSupabase(){ var s=getSb(),tabel=v('sbTable')||"products"; if(!isiBackup){ alert("Pilih backup.json dulu!"); return; } var dataKirim=Array.isArray(isiBackup)?isiBackup:(isiBackup[tabel]||[isiBackup]); if(!confirm("Kirim "+dataKirim.length+" data ke "+tabel+" ?")) return; try{ var sukses=0; for(var i=0;i<dataKirim.length;i+=100){ var potong=dataKirim.slice(i,i+100); var r=await fetch(s.url+"/rest/v1/"+tabel,{method:"POST",headers:{apikey:s.key,Authorization:"Bearer "+s.key,"Content-Type":"application/json",Prefer:"resolution=merge-duplicates"},body:JSON.stringify(potong)}); if(r.ok) sukses+=potong.length; } document.getElementById('sbStatus').textContent="✅ Selesai! Sukses: "+sukses; alert("BERHASIL! ✅"); }catch(e){ alert(e.message); } }
-async function backupDatabase(){ var s=getSb(),tabel=v('sbTable')||"products"; try{ var r=await fetch(s.url+"/rest/v1/"+tabel+"?select=*",{headers:{apikey:s.key,Authorization:"Bearer "+s.key}}); var j=await r.json(); var blob=new Blob([JSON.stringify(j,null,2)],{type:"application/json"}); var a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download="backup-"+tabel+"-"+new Date().toISOString().slice(0,10)+".json"; a.click(); alert("Berhasil! Cek Download!"); }catch(e){ alert(e.message); } }
+async function kirimBackupKeSupabase(){ var s=getSb(),tabel=getSb().tabel; if(!isiBackup){ alert("Pilih backup.json dulu!"); return; } var dataKirim=Array.isArray(isiBackup)?isiBackup:(isiBackup[tabel]||[isiBackup]); if(!confirm("Kirim "+dataKirim.length+" data ke "+tabel+" ?")) return; try{ var sukses=0; for(var i=0;i<dataKirim.length;i+=100){ var potong=dataKirim.slice(i,i+100); var r=await fetch(s.url+"/rest/v1/"+tabel,{method:"POST",headers:{apikey:s.key,Authorization:"Bearer "+s.key,"Content-Type":"application/json",Prefer:"resolution=merge-duplicates"},body:JSON.stringify(potong)}); if(r.ok) sukses+=potong.length; } document.getElementById('sbStatus').textContent="✅ Selesai! Sukses: "+sukses; alert("BERHASIL! ✅"); }catch(e){ alert(e.message); } }
+async function backupDatabase(){ var s=getSb(),tabel=getSb().tabel; try{ var r=await fetch(s.url+"/rest/v1/"+tabel+"?select=*",{headers:{apikey:s.key,Authorization:"Bearer "+s.key}}); var j=await r.json(); var blob=new Blob([JSON.stringify(j,null,2)],{type:"application/json"}); var a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download="backup-"+tabel+"-"+new Date().toISOString().slice(0,10)+".json"; a.click(); alert("Berhasil! Cek Download!"); }catch(e){ alert(e.message); } }
 async function backupSemuaTabel(){ var s=getSb(); var daftar=["products","members","admins","pegawai","orders","riwayat_saldo","bot_faq","bot_antrian","order_items","member_notifications"]; var tambahan=v('tabelTambahan'); if(tambahan) tambahan.split(",").forEach(function(t){ t=t.trim(); if(t && daftar.indexOf(t)===-1) daftar.push(t); }); var hasil={}; try{ for(var i=0;i<daftar.length;i++){ var r=await fetch(s.url+"/rest/v1/"+daftar[i]+"?select=*",{headers:{apikey:s.key,Authorization:"Bearer "+s.key}}); var j=await r.json(); hasil[daftar[i]]=Array.isArray(j)?j:[]; } var blob=new Blob([JSON.stringify(hasil,null,2)],{type:"application/json"}); var a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download="backup-SEMUA-"+new Date().toISOString().slice(0,10)+".json"; a.click(); alert("BERHASIL! ✅"); }catch(e){ alert(e.message); } }
 async function kirimBackupSemuaKeSupabase(){ var s=getSb(); if(!isiBackup){ alert("Pilih backup-SEMUA.json dulu!"); return; } if(Array.isArray(isiBackup)){ alert("File ini cuma 1 tabel!"); return; } var daftar=Object.keys(isiBackup); if(!confirm("Kirim RESTORE "+daftar.length+" tabel?")) return; try{ for(var t=0;t<daftar.length;t++){ var tabel=daftar[t], data=isiBackup[tabel]||[]; for(var i=0;i<data.length;i+=100){ await fetch(s.url+"/rest/v1/"+tabel,{method:"POST",headers:{apikey:s.key,Authorization:"Bearer "+s.key,"Content-Type":"application/json",Prefer:"resolution=merge-duplicates"},body:JSON.stringify(data.slice(i,i+100))}); } } alert("RESTORE BERHASIL! ✅"); }catch(e){ alert(e.message); } }
 loadSettingBot(); setKunci(false); pindahHalaman('home');

@@ -46,7 +46,7 @@ small{color:#888;font-size:11px;line-height:1.4}
 .menu3 button{flex:1;padding:14px 4px;font-size:12px;margin-top:10px}
 .menu3 button small{display:block;font-size:10px;font-weight:400;margin-top:3px;opacity:.8}
 </style></head><body>
-<h1>👑 MASTER</h1><div class="sub">D' LUSSO - BERSIH 7 KOLOM - PENGAMAN OFF</div>
+<h1>👑 MASTER</h1><div class="sub">D' LUSSO - BERSIH 7 KOLOM - BACKUP ISI FULL</div>
 <div class="tabs">
 <button class="tabBtn active" id="btnHome" onclick="pindahHalaman('home')">🏠 HOME</button>
 <button class="tabBtn" id="btnDaftar" onclick="toggleDaftarProject()">📂 DAFTAR PROJECT</button>
@@ -74,7 +74,7 @@ small{color:#888;font-size:11px;line-height:1.4}
 <div class="card"><b style="color:#E8C97A">🚀 MAU KEMANA KO?</b>
 <div class="menu3">
 <button onclick="pindahHalaman('github')">📂<br>GITHUB<small>EDIT FILE</small></button>
-<button onclick="pindahHalaman('supabase')">🗄️<br>SUPABASE<small>BACKUP</small></button>
+<button onclick="pindahHalaman('supabase')">🗄️<br>SUPABASE<small>BACKUP ISI</small></button>
 <button class="botBtn" onclick="pindahHalaman('bot')">🤖<br>BOT<small>FAQ</small></button>
 </div>
 <small><br>Pilih project dulu di atas, terus pencet salah satu.</small></div>
@@ -82,9 +82,9 @@ small{color:#888;font-size:11px;line-height:1.4}
 <button class="sec" onclick="pulihkanDariHP()">♻️ PULIHKAN DARI HP</button>
 <div id="status">Belum load...</div>
 <label>NAMA TABEL UNTUK BACKUP CEPAT</label><input id="sbTableDepan" class="kecil" value="products" oninput="document.getElementById('sbTable').value=this.value">
-<div class="row"><button class="sec" onclick="backupDatabase()">⬇️ BACKUP 1 TABEL</button><button onclick="backupSemuaTabel()">⬇️ BACKUP SEMUA</button></div>
+<div class="row"><button class="sec" onclick="backupDatabase()">⬇️ BACKUP 1 TABEL + ISI</button><button onclick="backupSemuaTabel()">⬇️ BACKUP SEMUA + ISI</button></div>
 <div id="sbStatus"></div>
-<small><br>Jadi kalo cuma mau pulihin file / backup, gak usah masuk halaman GITHUB / SUPABASE dulu. Langsung dari depan.</small></div>
+<small><br>Backup baru sudah termasuk ISI, bukan cuma tabel + kolom. Cek file-nya ada jumlah + data.</small></div>
 </div>
 <div id="page-github" class="page">
 <button class="btnKembali" onclick="pindahHalaman('home')">⬅️ KEMBALI KE DEPAN</button>
@@ -111,12 +111,19 @@ small{color:#888;font-size:11px;line-height:1.4}
 <div id="page-supabase" class="page">
 <button class="btnKembali" onclick="pindahHalaman('home')">⬅️ KEMBALI KE DEPAN</button>
 <div class="judulHalaman">🗄️ SUPABASE</div><div class="infoProject" id="infoProjSupabase">Belum pilih project</div>
-<div class="card"><b style="color:#E8C97A">🗄️ SUPABASE - BACKUP</b>
+<div class="card"><b style="color:#E8C97A">🗄️ SUPABASE - BACKUP ISI</b>
 <label>NAMA TABEL</label><input id="sbTable" class="kecil" value="products" oninput="document.getElementById('sbTableDepan').value=this.value">
-<button class="sec" onclick="backupDatabase()">⬇️ BACKUP 1 TABEL</button>
+<button class="sec" onclick="backupDatabase()">⬇️ BACKUP 1 TABEL + ISI</button>
 <label>TABEL TAMBAHAN (PISAH KOMA)</label><input id="tabelTambahan" class="kecil" placeholder="promo,diskon,voucher">
-<button onclick="backupSemuaTabel()">⬇️ BACKUP SEMUA - 1 FILE JSON</button></div>
-<div class="card"><b style="color:#E8C97A">🗄️ RESTORE</b><input type="file" id="backupHP" accept=".json" style="padding:10px"><div id="backupHPInfo" style="font-size:11px;color:#888;margin-top:6px">Belum ada backup dipilih.</div><button onclick="kirimBackupKeSupabase()">🗄️ KIRIM 1 TABEL</button><button class="sec" onclick="kirimBackupSemuaKeSupabase()">🗄️ KIRIM SEMUA TABEL</button></div>
+<button onclick="backupSemuaTabel()">⬇️ BACKUP SEMUA - 1 FILE JSON + ISI</button></div>
+<div class="card"><b style="color:#E8C97A">🗄️ RESTORE - BISA BACA FORMAT LAMA & BARU</b><input type="file" id="backupHP" accept=".json" style="padding:10px"><div id="backupHPInfo" style="font-size:11px;color:#888;margin-top:6px">Belum ada backup dipilih.</div><button onclick="kirimBackupKeSupabase()">🗄️ KIRIM 1 TABEL</button><button class="sec" onclick="kirimBackupSemuaKeSupabase()">🗄️ KIRIM SEMUA TABEL</button></div>
+<div class="card"><b style="color:#E8C97A">🔧 KELOLA TABEL & KOLOM - LIHAT ISI</b>
+<label>NAMA TABEL</label><input id="kelolaTabel" class="kecil" value="products">
+<button class="sec" onclick="lihatStrukturTabel()">👁️ LIHAT KOLOM + ISI 5 BARIS</button>
+<div id="strukturBox" style="font-size:11px;color:#ccc;margin-top:8px;white-space:pre-wrap;word-break:break-all;background:#000;border:1px solid #333;border-radius:10px;padding:10px;max-height:300px;overflow:auto">Belum dicek. Pencet tombol di atas.</div>
+<label>NAMA KOLOM BARU (INFO SAJA)</label><input id="kolomBaru" class="kecil" placeholder="misal: harga_baru">
+<label>TIPE KOLOM</label><input id="tipeKolom" class="kecil" value="text">
+<small><br>⚠️ Tambah kolom harus dari Supabase Dashboard > Table Editor > Add Column. API Supabase nggak ngizinin bikin kolom lewat MASTER, kalo dipaksain database bisa jebol. Di sini buat LIHAT dulu kolomnya apa aja.</small></div>
 <button class="btnKembali" onclick="pindahHalaman('home')">⬅️ KEMBALI KE DEPAN</button>
 </div>
 <div id="page-bot" class="page">
@@ -221,9 +228,33 @@ document.getElementById('content').addEventListener('input',function(e){ documen
 document.getElementById('fileHP').addEventListener('change',function(e){ var f=e.target.files[0]; if(!f) return; var rd=new FileReader(); rd.onload=function(ev){ isiFileHP=ev.target.result; document.getElementById('fileHPInfo').textContent="✅ "+f.name+" siap!"; document.getElementById('fileName').value=f.name; }; rd.readAsText(f); });
 async function kirimFileHPKeGithub(){ var a=getGithub(); if(!isiFileHP){ alert("Pilih file dulu!"); return; } if(!confirm("Kirim ke "+a.owner+"/"+a.repo+" ?")) return; try{ var cek=await fetch("https://api.github.com/repos/"+a.owner+"/"+a.repo+"/contents/"+a.file+"?ref="+a.branch,{headers:{Authorization:"Bearer "+a.token}}); var cekJ=await cek.json(); var body={message:"Upload dari HP via MASTER",content:btoa(unescape(encodeURIComponent(isiFileHP))),branch:a.branch}; if(cekJ.sha) body.sha=cekJ.sha; var r=await fetch("https://api.github.com/repos/"+a.owner+"/"+a.repo+"/contents/"+a.file,{method:"PUT",headers:{Authorization:"Bearer "+a.token,"Content-Type":"application/json"},body:JSON.stringify(body)}); var j=await r.json(); if(j.message && !j.content){ alert(j.message); return; } alert("BERHASIL! ✅"); }catch(e){ alert(e.message); } }
 document.getElementById('backupHP').addEventListener('change',function(e){ var f=e.target.files[0]; if(!f) return; var rd=new FileReader(); rd.onload=function(ev){ try{ isiBackup=JSON.parse(ev.target.result); document.getElementById('backupHPInfo').textContent="✅ "+f.name+" terbaca!"; }catch(err){ alert("File JSON rusak!"); } }; rd.readAsText(f); });
-async function kirimBackupKeSupabase(){ var s=getSb(),tabel=getSb().tabel; if(!isiBackup){ alert("Pilih backup.json dulu!"); return; } var dataKirim=Array.isArray(isiBackup)?isiBackup:(isiBackup[tabel]||[isiBackup]); if(!confirm("Kirim "+dataKirim.length+" data ke "+tabel+" ?")) return; try{ var sukses=0; for(var i=0;i<dataKirim.length;i+=100){ var potong=dataKirim.slice(i,i+100); var r=await fetch(s.url+"/rest/v1/"+tabel,{method:"POST",headers:{apikey:s.key,Authorization:"Bearer "+s.key,"Content-Type":"application/json",Prefer:"resolution=merge-duplicates"},body:JSON.stringify(potong)}); if(r.ok) sukses+=potong.length; } document.getElementById('sbStatus').textContent="✅ Selesai! Sukses: "+sukses; alert("BERHASIL! ✅"); }catch(e){ alert(e.message); } }
-async function backupDatabase(){ var s=getSb(),tabel=getSb().tabel; try{ var r=await fetch(s.url+"/rest/v1/"+tabel+"?select=*",{headers:{apikey:s.key,Authorization:"Bearer "+s.key}}); var j=await r.json(); var blob=new Blob([JSON.stringify(j,null,2)],{type:"application/json"}); var a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download="backup-"+tabel+"-"+new Date().toISOString().slice(0,10)+".json"; a.click(); alert("Berhasil! Cek Download!"); }catch(e){ alert(e.message); } }
-async function backupSemuaTabel(){ var s=getSb(); var daftar=["products","members","admins","pegawai","orders","riwayat_saldo","bot_faq","bot_antrian","order_items","member_notifications"]; var tambahan=v('tabelTambahan'); if(tambahan) tambahan.split(",").forEach(function(t){ t=t.trim(); if(t && daftar.indexOf(t)===-1) daftar.push(t); }); var hasil={}; try{ for(var i=0;i<daftar.length;i++){ var r=await fetch(s.url+"/rest/v1/"+daftar[i]+"?select=*",{headers:{apikey:s.key,Authorization:"Bearer "+s.key}}); var j=await r.json(); hasil[daftar[i]]=Array.isArray(j)?j:[]; } var blob=new Blob([JSON.stringify(hasil,null,2)],{type:"application/json"}); var a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download="backup-SEMUA-"+new Date().toISOString().slice(0,10)+".json"; a.click(); alert("BERHASIL! ✅"); }catch(e){ alert(e.message); } }
-async function kirimBackupSemuaKeSupabase(){ var s=getSb(); if(!isiBackup){ alert("Pilih backup-SEMUA.json dulu!"); return; } if(Array.isArray(isiBackup)){ alert("File ini cuma 1 tabel!"); return; } var daftar=Object.keys(isiBackup); if(!confirm("Kirim RESTORE "+daftar.length+" tabel?")) return; try{ for(var t=0;t<daftar.length;t++){ var tabel=daftar[t], data=isiBackup[tabel]||[]; for(var i=0;i<data.length;i+=100){ await fetch(s.url+"/rest/v1/"+tabel,{method:"POST",headers:{apikey:s.key,Authorization:"Bearer "+s.key,"Content-Type":"application/json",Prefer:"resolution=merge-duplicates"},body:JSON.stringify(data.slice(i,i+100))}); } } alert("RESTORE BERHASIL! ✅"); }catch(e){ alert(e.message); } }
+// ===== BARU: AMBIL SEMUA BARIS PAKE PAGINATION BIAR ISI KESEDOT SEMUA =====
+async function ambilSemuaBaris(s,tabel){
+  var semua=[]; var dari=0; var step=1000;
+  while(true){
+    try{
+      var r=await fetch(s.url+"/rest/v1/"+tabel+"?select=*&limit="+step+"&offset="+dari,{headers:{apikey:s.key,Authorization:"Bearer "+s.key}});
+      var j=await r.json();
+      if(!Array.isArray(j)||!j.length) break;
+      semua=semua.concat(j);
+      if(j.length<step) break;
+      dari+=step;
+      if(dari>20000) break;
+    }catch(e){ break; }
+  }
+  return semua;
+}
+function ambilDataDariBackup(isiBackup,tabel){
+  if(Array.isArray(isiBackup)) return isiBackup;
+  if(isiBackup.data && Array.isArray(isiBackup.data)) return isiBackup.data;
+  if(isiBackup.tabel && isiBackup.tabel[tabel]){ var o=isiBackup.tabel[tabel]; return Array.isArray(o)?o:(o.data||[]); }
+  if(isiBackup[tabel]){ var o2=isiBackup[tabel]; return Array.isArray(o2)?o2:(o2.data||[]); }
+  return [isiBackup];
+}
+async function kirimBackupKeSupabase(){ var s=getSb(),tabel=getSb().tabel; if(!isiBackup){ alert("Pilih backup.json dulu!"); return; } var dataKirim=ambilDataDariBackup(isiBackup,tabel); if(!confirm("Kirim "+dataKirim.length+" data ke "+tabel+" ?")) return; try{ var sukses=0; for(var i=0;i<dataKirim.length;i+=100){ var potong=dataKirim.slice(i,i+100); var r=await fetch(s.url+"/rest/v1/"+tabel,{method:"POST",headers:{apikey:s.key,Authorization:"Bearer "+s.key,"Content-Type":"application/json",Prefer:"resolution=merge-duplicates"},body:JSON.stringify(potong)}); if(r.ok) sukses+=potong.length; } document.getElementById('sbStatus').textContent="✅ Selesai! Sukses: "+sukses; alert("BERHASIL! ✅"); }catch(e){ alert(e.message); } }
+async function backupDatabase(){ var s=getSb(),tabel=getSb().tabel; document.getElementById('sbStatus').textContent="⏳ Nyedot isi "+tabel+"..."; try{ var j=await ambilSemuaBaris(s,tabel); var paket={tabel:tabel,tanggal:new Date().toISOString(),jumlah:j.length,kolom:j.length?Object.keys(j[0]):[],data:j}; var blob=new Blob([JSON.stringify(paket,null,2)],{type:"application/json"}); var a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download="backup-ISI-"+tabel+"-"+new Date().toISOString().slice(0,10)+".json"; a.click(); document.getElementById('sbStatus').textContent="✅ Berhasil! "+j.length+" baris kesedot!"; alert("Berhasil! "+j.length+" baris! Cek Download!"); }catch(e){ alert(e.message); } }
+async function backupSemuaTabel(){ var s=getSb(); var daftar=["products","members","admins","pegawai","orders","riwayat_saldo","bot_faq","bot_antrian","order_items","member_notifications"]; var tambahan=v('tabelTambahan'); if(tambahan) tambahan.split(",").forEach(function(t){ t=t.trim(); if(t && daftar.indexOf(t)===-1) daftar.push(t); }); var hasil={tanggal:new Date().toISOString(),tabel:{}}; try{ for(var i=0;i<daftar.length;i++){ var data=await ambilSemuaBaris(s,daftar[i]); hasil.tabel[daftar[i]]={jumlah:data.length,kolom:data.length?Object.keys(data[0]):[],data:data}; } var blob=new Blob([JSON.stringify(hasil,null,2)],{type:"application/json"}); var a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download="backup-SEMUA-ISI-"+new Date().toISOString().slice(0,10)+".json"; a.click(); alert("BERHASIL! ✅ Isi semua tabel kesedot!"); }catch(e){ alert(e.message); } }
+async function kirimBackupSemuaKeSupabase(){ var s=getSb(); if(!isiBackup){ alert("Pilih backup-SEMUA.json dulu!"); return; } if(Array.isArray(isiBackup)){ alert("File ini cuma 1 tabel! Pake tombol KIRIM 1 TABEL!"); return; } var isi=isiBackup.tabel||isiBackup; var daftar=Object.keys(isi); if(!confirm("Kirim RESTORE "+daftar.length+" tabel?")) return; try{ for(var t=0;t<daftar.length;t++){ var tabel=daftar[t]; var data=ambilDataDariBackup(isiBackup,tabel); for(var i=0;i<data.length;i+=100){ await fetch(s.url+"/rest/v1/"+tabel,{method:"POST",headers:{apikey:s.key,Authorization:"Bearer "+s.key,"Content-Type":"application/json",Prefer:"resolution=merge-duplicates"},body:JSON.stringify(data.slice(i,i+100))}); } } alert("RESTORE BERHASIL! ✅"); }catch(e){ alert(e.message); } }
+async function lihatStrukturTabel(){ var s=getSb(); var tabel=document.getElementById('kelolaTabel').value||"products"; document.getElementById('strukturBox').textContent="⏳ Loading "+tabel+"..."; try{ var data=await ambilSemuaBaris(s,tabel); var kolom=data.length?Object.keys(data[0]):[]; var txt="TABEL: "+tabel+"\nJUMLAH ISI: "+data.length+" baris\nKOLOM: "+(kolom.length?kolom.join(", "):"(kosong / tabel belum ada kolom / RLS lock)")+"\n\nCONTOH 5 BARIS PERTAMA:\n"+JSON.stringify(data.slice(0,5),null,2); document.getElementById('strukturBox').textContent=txt; }catch(e){ document.getElementById('strukturBox').textContent="❌ "+e.message; } }
 loadSettingBot(); loadSementara(); pindahHalaman('home');
 </script></body></html>

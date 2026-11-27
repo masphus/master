@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="id"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>MONA - D' LUSSO - DATABASE ONLY</title>
+<title>MONA - D' LUSSO - FIX HARGA</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:Arial}
@@ -18,10 +18,10 @@ h1{text-align:center;color:#E8C97A;font-size:18px;letter-spacing:2px;margin:8px 
 .row{display:flex;gap:8px}
 input{flex:1;background:#0a0a0a;border:1px solid #C9A86A;color:#fff;padding:12px;border-radius:10px;font-size:13px;outline:none}
 button{background:linear-gradient(180deg,#F5D98A,#C9A86A);border:none;padding:12px 16px;border-radius:10px;font-weight:900;font-size:13px;cursor:pointer;color:#000}
-.skorBox{background:#000;border:1px solid #FFD700;color:#FFD700;padding:10px;border-radius:10px;font-size:11px;white-space:pre-wrap;word-break:break-all;max-height:200px;overflow:auto;margin-top:8px}
+.skorBox{background:#000;border:1px solid #FFD700;color:#FFD700;padding:10px;border-radius:10px;font-size:11px;white-space:pre-wrap;word-break:break-all;max-height:220px;overflow:auto;margin-top:8px}
 small{color:#888;font-size:11px}
 </style></head><body>
-<h1>👑 MONA - D' LUSSO - DATABASE ONLY</h1><div class="sub">DATABASE DOANG, TANPA INTERNET, TANPA API KEY | <span id="statusDb">Menghubungkan...</span></div>
+<h1>👑 MONA - D' LUSSO - FIX HARGA</h1><div class="sub">DATABASE ONLY - SPESIFIK MENANG | <span id="statusDb">Menghubungkan...</span></div>
 <div class="card">
 <div class="mona-head">
   <img src="mona.png" onerror="this.src='https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100'">
@@ -30,7 +30,7 @@ small{color:#888;font-size:11px}
 <div id="chatBody" class="chat"><div class="msg bot">Halo kak, saya Mona dari D'Lusso 🙏<br>Silakan tanya, saya jawab dari database.</div></div>
 <div class="row" style="margin-top:10px"><input id="chatInput" placeholder="Ketik pertanyaan..." onkeypress="if(event.key==='Enter') kirimChat()"><button onclick="kirimChat()">KIRIM →</button></div>
 <div id="skorHasil" class="skorBox" style="display:none"></div>
-<small>DATABASE DOANG. TEST DULU, NGARANG BELAKANGAN.</small>
+<small>FIX: kata_kunci yang ada kata2 nya menang, yang kata2 kosong kalah.</small>
 </div>
 <script>
 var SUPABASE_URL = 'https://msfzsebownnsrpyjusoc.supabase.co';
@@ -74,6 +74,7 @@ function kataMirip(kataChat, kataFrasa){
 function ambilTeksFrasa(row){
   return row.teks || row.frasa || row.kata || row.kalimat || row.isi || row.pertanyaan || row.text || '';
 }
+// ===== FIX UTAMA DISINI KO! =====
 function cekKataKunci(chatNorm){
   var kataChat = chatNorm.trim().split(/\s+/);
   var best = null; var bestSkor = 0;
@@ -88,8 +89,16 @@ function cekKataKunci(chatNorm){
     }
     if(!ada1) continue;
     if(k2 && !ada2) continue;
-    var skor = k2 ? 1000 : 100;
-    skor += k1.length + (k2 ? k2.length : 0);
+    // YANG ADA KATA2 (SPESIFIK) SKOR GEDE, YANG KATA2 KOSONG (GENERIK) SKOR KECIL
+    var skor = 0;
+    if(k2){
+      skor = 10000 + (k1.length*10) + (k2.length*10);
+    } else {
+      // Generik cuma menang kalo chat cuma 1-2 kata doang, misal cuma "harga"
+      // Kalo chat panjang kayak "harga baju kaos", generik nggak boleh menang!
+      if(kataChat.length > 2) continue;
+      skor = 100;
+    }
     if(skor > bestSkor){ bestSkor = skor; best = KATA_KUNCI_LIST[i]; }
   }
   return best ? best.kategori : null;
@@ -97,7 +106,7 @@ function cekKataKunci(chatNorm){
 function hitungSkorBaru(chat){
   var n = normalisasiTeks(chat).trim();
   var kataChat = n.split(/\s+/);
-  var STOPWORD = ['apa','dimana','kapan','gimana','bagaimana','berapa','yang','ada','kah','sih','dong','kak','ya','nih','kok'];
+  var STOPWORD = ['apa','dimana','kapan','gimana','bagaimana','berapa','yang','ada','kah','sih','dong','kak','ya','nih','kok','harga','baju'];
   var hasil = [];
   for(var i=0;i<FRASA_LIST.length;i++){
     var kat = FRASA_LIST[i].kategori || 'lain';
@@ -174,24 +183,25 @@ async function kirimChat(){
   }
   var norm = normalisasiTeks(teks).trim();
   var box=document.getElementById('skorHasil'); box.style.display='block';
-  var katKunci = cekKataKunci(norm);
-  if(katKunci){
-    var ruleKunci = cariRule(katKunci);
-    if(ruleKunci){
-      box.textContent='PERTANYAAN: '+teks+'\n=== KENA KATA KUNCI (DATABASE) ===\nKategori: '+katKunci+' ✅\nJawaban DB: '+ruleKunci.jawaban;
-      setTimeout(function(){ tambahChat(ruleKunci.jawaban, 'bot'); }, 300);
-      return;
-    }
-  }
+  // 1. COBA FRASA DULU (LEBIH SPESIFIK), BARU KATA KUNCI
+  // Dulu kata_kunci duluan, makanya yang generik menang terus. Sekarang dibalik!
   var hasil = hitungSkorBaru(teks);
-  var txt='PERTANYAAN: '+teks+'\nNORMALISASI: '+norm+'\n\n=== HASIL DATABASE ===\n';
+  var txt='PERTANYAAN: '+teks+'\nNORMALISASI: '+norm+'\n\n=== HASIL FRASA ===\n';
   for(var i=0;i<hasil.length;i++){ var h=hasil[i].skor; txt+='\n['+(i+1)+'] '+hasil[i].kategori+' | NILAI: '+h.nilai+' '+(h.nilai>=50?'✅ LOLOS':'❌ GAK LOLOS')+'\nFrasa kena: '+(h.kenaFrasa.length?h.kenaFrasa.join(', '):'(nggak kena)')+'\n'; }
   box.textContent=txt;
   if(hasil.length && hasil[0].skor.nilai>=50){
     setTimeout(function(){ tambahChat(hasil[0].rule.jawaban, 'bot'); }, 300);
     return;
   }
-  // DATABASE NGGAK ADA -> LANGSUNG MAAF, NGGAK USAH KE INTERNET
+  var katKunci = cekKataKunci(norm);
+  if(katKunci){
+    var ruleKunci = cariRule(katKunci);
+    if(ruleKunci){
+      box.textContent=txt+'\n\n=== KENA KATA KUNCI (DATABASE) ===\nKategori: '+katKunci+' ✅\nJawaban DB: '+ruleKunci.jawaban;
+      setTimeout(function(){ tambahChat(ruleKunci.jawaban, 'bot'); }, 300);
+      return;
+    }
+  }
   tambahChat('Maaf kak, pertanyaan itu belum ada di database Mona 🙏<br>Silakan tanya yang lain ya Kak.', 'bot');
   try{ await sb.from('bot_antrian').insert([{pertanyaan:teks, status:'MENUNGGU'}]); }catch(e){}
 }

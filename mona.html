@@ -38,7 +38,6 @@
   <button onclick="kirim()">Kirim</button>
 </div>
 <script>
-// === DIGANTI KE PROJECT BARU ===
 const SUPABASE_URL = 'https://msfzsebownnsrpyjusoc.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_7VQcQXBLz4OYn_OJUzusSg_Zz1or9gq';
 const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -46,7 +45,6 @@ const chat = document.getElementById('chat');
 const input = document.getElementById('pesan');
 const statusEl = document.getElementById('status');
 
-// OTAK CADANGAN: Biar Mona bisa jawab walau Supabase lemot / gagal!
 let OTAK_CADANGAN = [
   {kategori:'salam', jawaban:'Halo kak, aku Mona 🙏<br>Ada yang bisa aku bantu?'},
   {kategori:'alamat', jawaban:'Alamat kita di Jl. Braga No.88, Bandung kak 🙏<br>Buka setiap hari 09.00 - 21.00'},
@@ -105,13 +103,14 @@ function cariJawaban(q){
     }
   }
   let skorKategori = {};
+  // === SKOR BARU: PENENTU = 2, SELAIN ITU = 1 ===
   for(let p of DB.penentu){
-    if(p.kata && nq.includes(' '+norm(p.kata)+' ')) skorKategori[p.kategori] = (skorKategori[p.kategori]||0) + 10;
+    if(p.kata && nq.includes(' '+norm(p.kata)+' ')) skorKategori[p.kategori] = (skorKategori[p.kategori]||0) + 2;
   }
   for(let k of DB.kunci){
     let k1 = norm(k.kata1), k2 = norm(k.kata2);
-    if(k1 && nq.includes(' '+k1+' ')) skorKategori[k.kategori] = (skorKategori[k.kategori]||0) + 2;
-    if(k2 && nq.includes(' '+k2+' ')) skorKategori[k.kategori] = (skorKategori[k.kategori]||0) + 3;
+    if(k1 && nq.includes(' '+k1+' ')) skorKategori[k.kategori] = (skorKategori[k.kategori]||0) + 1;
+    if(k2 && nq.includes(' '+k2+' ')) skorKategori[k.kategori] = (skorKategori[k.kategori]||0) + 1;
   }
   for(let f of DB.frasa){
     if(f.teks && nq.includes(' '+norm(f.teks)+' ')) skorKategori[f.kategori] = (skorKategori[f.kategori]||0) + 1;

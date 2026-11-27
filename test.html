@@ -73,49 +73,61 @@ function kataMirip(kataChat, kataFrasa){
 function ambilTeksFrasa(row){
   return row.teks || row.frasa || row.kata || row.kalimat || row.isi || row.pertanyaan || row.text || '';
 }
+// ===== OTAK BARU MONA - JANGAN HAPUS FRASA, UBAH CARA BERFIKIR! =====
 function hitungSkorBaru(chat){
-  var n=normalisasiTeks(chat);
-  var perKategori={};
-  var STOPWORD=['apa','dimana','kapan','gimana','bagaimana','berapa','yang','ada','kah','sih','dong','kak','ya','nih','kok'];
+  var n = normalisasiTeks(chat).trim();
+  var kataChat = n.split(/\s+/);
+  var STOPWORD = ['apa','dimana','kapan','gimana','bagaimana','berapa','yang','ada','kah','sih','dong','kak','ya','nih','kok'];
+  var hasil = [];
   for(var i=0;i<FRASA_LIST.length;i++){
-    var kat=FRASA_LIST[i].kategori||'lain';
-    if(!perKategori[kat]) perKategori[kat]={total:0, maks:0, kena:[], nilai:0};
-    perKategori[kat].maks+=1;
-    var teks=ambilTeksFrasa(FRASA_LIST[i]);
-    var f=normalisasiTeks(teks).trim(); if(!f) continue;
-    var kataFrasa=f.split(/\s+/);
-    var kataChat=n.trim().split(/\s+/);
-    var kena=0, nilaiFrasa=0;
-    for(var k=0;k<kataFrasa.length;k++){
-      for(var j=0;j<kataChat.length;j++){
-        if(kataMirip(kataChat[j], kataFrasa[k])){
-          kena++;
-          if(STOPWORD.indexOf(kataFrasa[k])!==-1) nilaiFrasa+=1;
-          else nilaiFrasa+=10;
-          break;
+    var kat = FRASA_LIST[i].kategori || 'lain';
+    var teks = ambilTeksFrasa(FRASA_LIST[i]);
+    var f = normalisasiTeks(teks).trim(); if(!f) continue;
+    var kataFrasa = f.split(/\s+/);
+    var nilai = 0;
+    var kena = 0;
+    // 1. KALO FRASA UTUH ADA DI CHAT -> PALING BENAR, MENANG!
+    if((' '+n+' ').indexOf(' '+f+' ') !== -1){
+      nilai = 1000 + (f.length * 20) + (kataFrasa.length * 100);
+      kena = kataFrasa.length;
+    } else {
+      // 2. KALO NGGAK UTUH, HITUNG KATA PER KATA - HARUS 100% KENA!
+      for(var k=0;k<kataFrasa.length;k++){
+        for(var j=0;j<kataChat.length;j++){
+          if(kataMirip(kataChat[j], kataFrasa[k])){
+            kena++;
+            if(STOPWORD.indexOf(kataFrasa[k])!==-1) nilai += 1;
+            else nilai += 10;
+            break;
+          }
         }
       }
+      if(kena !== kataFrasa.length) continue;
+      nilai += 50 + (f.length * 5);
     }
-    var lolos=false;
-    if(kataFrasa.length===1) lolos=kena>=1;
-    else if(kataFrasa.length===2) lolos=kena>=1;
-    else lolos=kena>=Math.ceil(kataFrasa.length/2);
-    if(lolos){
-      perKategori[kat].total+=1;
-      perKategori[kat].kena.push(teks);
-      perKategori[kat].nilai+=nilaiFrasa;
-      if(kena===kataFrasa.length) perKategori[kat].nilai+=5;
+    // 3. HUKUMAN BUAT FRASA 1 KATA - BIAR NGGAK NYOLONG KALIMAT PANJANG!
+    if(kataFrasa.length === 1 && kataChat.length > 2){
+      nilai = nilai * 0.1;
+    }
+    if(kataFrasa.length === 2 && kataChat.length > 4){
+      nilai = nilai * 0.5;
+    }
+    // Simpan skor TERBAIK per kategori, bukan dijumlah!
+    var sudah = null;
+    for(var h=0;h<hasil.length;h++){ if(hasil[h].kategori===kat){ sudah=hasil[h]; break; } }
+    if(!sudah){
+      var rule=null;
+      for(var j=0;j<ATURAN.length;j++){ if(ATURAN[j].kategori===kat){ rule=ATURAN[j]; break; } }
+      if(!rule) continue;
+      hasil.push({kategori:kat, rule:rule, skor:{total:1, skorMaks:1, persen:100, kenaFrasa:[teks], nilai:nilai}});
+    } else {
+      if(nilai > sudah.skor.nilai){
+        sudah.skor.nilai = nilai;
+        sudah.skor.kenaFrasa = [teks];
+      }
     }
   }
-  var hasil=[];
-  for(var k in perKategori){
-    var d=perKategori[k];
-    var persen=d.maks>0?(d.total/d.maks*100):0;
-    var rule=null;
-    for(var j=0;j<ATURAN.length;j++){ if(ATURAN[j].kategori===k){ rule=ATURAN[j]; break; } }
-    if(rule) hasil.push({kategori:k, rule:rule, skor:{total:d.total, skorMaks:d.maks, persen:persen, kenaFrasa:d.kena, nilai:d.nilai}});
-  }
-  hasil.sort(function(a,b){ if(b.skor.nilai!==a.skor.nilai) return b.skor.nilai-a.skor.nilai; return b.skor.total-a.skor.total; });
+  hasil.sort(function(a,b){ return b.skor.nilai - a.skor.nilai; });
   return hasil;
 }
 async function loadSemua(){
@@ -146,11 +158,11 @@ async function kirimChat(){
   }
   var hasil = hitungSkorBaru(teks);
   var box=document.getElementById('skorHasil'); box.style.display='block';
-  var txt='PERTANYAAN: '+teks+'\nNORMALISASI: '+normalisasiTeks(teks).trim()+'\n\n=== HASIL ANTI-TYPO + ANTI-NYASAR ===\n';
-  for(var i=0;i<hasil.length;i++){ var h=hasil[i].skor; txt+='\n['+(i+1)+'] '+hasil[i].kategori+' | NILAI: '+h.nilai+' | TOTAL: '+h.total+' / Maks: '+h.skorMaks+' = '+h.persen.toFixed(1)+'% '+(h.nilai>=10?'✅ LOLOS':'❌ GAK LOLOS')+'\nFrasa kena: '+(h.kenaFrasa.length?h.kenaFrasa.join(', '):'(nggak kena)')+'\nJawaban DB: '+hasil[i].rule.jawaban+'\n'; }
+  var txt='PERTANYAAN: '+teks+'\nNORMALISASI: '+normalisasiTeks(teks).trim()+'\n\n=== HASIL OTAK BARU - ANTI-NYASAR ===\n';
+  for(var i=0;i<hasil.length;i++){ var h=hasil[i].skor; txt+='\n['+(i+1)+'] '+hasil[i].kategori+' | NILAI: '+h.nilai+' | TOTAL: '+h.total+' / Maks: '+h.skorMaks+' = '+h.persen.toFixed(1)+'% '+(h.nilai>=50?'✅ LOLOS':'❌ GAK LOLOS')+'\nFrasa kena: '+(h.kenaFrasa.length?h.kenaFrasa.join(', '):'(nggak kena)')+'\nJawaban DB: '+hasil[i].rule.jawaban+'\n'; }
   box.textContent=txt;
   var jawaban=null;
-  if(hasil.length && hasil[0].skor.nilai>=10){ jawaban=hasil[0].rule.jawaban; }
+  if(hasil.length && hasil[0].skor.nilai>=50){ jawaban=hasil[0].rule.jawaban; }
   if(!jawaban){
     tambahChat('Maaf kak, pertanyaan itu belum ada di database Mona 🙏<br>Mona hanya menjawab sesuai yang sudah diajarkan.', 'bot');
     try{ await sb.from('bot_antrian').insert([{pertanyaan:teks, status:'MENUNGGU'}]); }catch(e){}

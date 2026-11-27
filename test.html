@@ -38,14 +38,12 @@
   <button onclick="kirim()">Kirim</button>
 </div>
 <script>
-const SUPABASE_URL = 'https://kkydbnjxbcxpcpor.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_Z-EI-4pmMWd8qhArrEvJdw_ZN8R6WAx';
+const SUPABASE_URL = 'https://msfzsebownnsrpyjusoc.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_7VQcQXBLz4OYn_OJUzusSg_Zz1or9gq';
 const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 const chat = document.getElementById('chat');
 const input = document.getElementById('pesan');
 const statusEl = document.getElementById('status');
-
-// OTAK CADANGAN - pake data asli dari SS lu!
 let OTAK = [
   {pertanyaan:'lokasi dimana?', jawaban:'Kita di Jl. Merdeka No. 10 Bandung, deket Alun-alun kak. Patokannya Indomaret depan gang. Mau aku kirimin shareloc?', penentu:'lokasi|alamat|tempat|dimana', persamaan:'lokasi|alamat|tempat|dimana|daerah|letak|posisi|lokasinya|alamatnya|tempatnya|dimanakah|di mana|address', frasa:'lokasi|dimana|alamat|tempat|daerah|letak|posisi|lokasinya|alamatnya|tempatnya|di mana', skor:10},
   {pertanyaan:'jam buka jam berapa?', jawaban:'Kita buka tiap hari kak, jam 08.00 - 21.00 WIB. Mau mampir jam berapa? Biar aku siapin tempatnya!', penentu:'jam|buka|tutup', persamaan:'jam|buka|tutup|jadwal|operasional|buka jam|jam buka|jam berapa|open|close', frasa:'jam|buka|tutup|jadwal|operasional|jam berapa|buka jam berapa|jam kerja', skor:10},
@@ -54,12 +52,10 @@ let OTAK = [
 ];
 let otakReady = false;
 function timeout(ms){ return new Promise(r=>setTimeout(()=>r(null), ms)); }
-
 async function getOtak(){
   if(otakReady) return OTAK;
   statusEl.textContent = 'Menghubungi Supabase...';
   try{
-    // CUMA AMBIL DARI bot_rules! NGGAK ADA bot_faq / bot_antrian!
     let p1 = supabaseClient.from('bot_rules').select('pertanyaan,jawaban,penentu,penentu_gender,persamaan,frasa,skor');
     let r1 = await Promise.race([p1, timeout(4000)]);
     if(r1 && r1.data && r1.data.length){
@@ -81,36 +77,25 @@ async function getOtak(){
 function norm(s){ return (s||'').toLowerCase().replace(/[^a-z0-9 ]/g,' ').replace(/\s+/g,' ').trim(); }
 function cariJawaban(q, otak){
   let nq = norm(q);
-  // Buang sapaan: kak, bang, mas, mbak, bro, sis, kakak
   let sapaan = ['kakak','kak','bang','mas','mbak','bro','sis','min','mba'];
   let kataUser = nq.split(' ').filter(w => w.length > 1 && !sapaan.includes(w));
   let nqBersih = kataUser.join(' ');
   let best = null, bestScore = -1;
   for(let r of otak){
     let skor = 0;
-    // 1. PENENTU = paling penting! Harus ada!
     let penentuList = String(r.penentu||'').toLowerCase().split('|').map(x=>norm(x)).filter(Boolean);
     let cocokPenentu = 0;
     for(let p of penentuList){
       if(nqBersih.includes(p) || kataUser.some(u => u.includes(p) || p.includes(u))) cocokPenentu++;
     }
     if(cocokPenentu > 0) skor += cocokPenentu * 50;
-    // 2. PERSAMAAN = sinonim
     let persamaanList = String(r.persamaan||'').toLowerCase().split('|').map(x=>norm(x)).filter(Boolean);
-    for(let p of persamaanList){
-      if(nqBersih.includes(p)) skor += 10;
-    }
-    // 3. FRASA = kalimat lengkap
+    for(let p of persamaanList){ if(nqBersih.includes(p)) skor += 10; }
     let frasaList = String(r.frasa||'').toLowerCase().split('|').map(x=>norm(x)).filter(Boolean);
-    for(let f of frasaList){
-      if(nqBersih.includes(f)) skor += 15;
-      if(nqBersih === f) skor += 30;
-    }
-    // 4. Tambah skor dari database (yang 90 lebih diprioritaskan)
+    for(let f of frasaList){ if(nqBersih.includes(f)) skor += 15; if(nqBersih === f) skor += 30; }
     skor += (r.skor || 0) * 0.1;
     if(skor > bestScore){ bestScore = skor; best = r; }
   }
-  // Harus minimal kena 1 penentu!
   if(best && bestScore >= 50) return best.jawaban;
   return null;
 }

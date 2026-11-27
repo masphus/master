@@ -12,7 +12,7 @@ h1{text-align:center;font-family:Georgia;font-size:26px;letter-spacing:4px;color
 label{display:block;font-size:11px;letter-spacing:1px;color:#E8C97A;margin:10px 0 4px;font-weight:800}
 label.mini{font-size:10px;margin:8px 0 4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 input{width:100%;background:#0a0a0a;border:1px solid #3a2f14;color:#fff;padding:11px 10px;border-radius:10px;outline:none;font-size:13px}
-input.kecil{font-size:12px;padding:9px 8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+input.kecil{font-size:12px;padding:9px 8px}
 input.mini{font-size:11px;padding:9px 6px}
 textarea{width:100%;height:320px;background:#000;border:1px solid #3a2f14;color:#7CFC00;padding:10px;border-radius:10px;font-family:monospace;font-size:11px;outline:none}
 textarea.botArea{border-color:#00E5FF;color:#7DF9FF;height:220px}
@@ -29,114 +29,66 @@ small{color:#888;font-size:11px;line-height:1.4}
 .tabs{display:flex;gap:8px;position:sticky;top:0;z-index:99;background:#0a0a0a;padding:8px 0}
 .tabBtn{flex:1;padding:12px;border-radius:12px;font-weight:900;font-size:13px;cursor:pointer;border:1px solid #3a2f14;background:#1a170e;color:#aaa;margin:0}
 .tabBtn.active{background:linear-gradient(180deg,#F5D98A,#C9A86A);color:#000}
-.tabBtn.botActive{background:linear-gradient(180deg,#7DF9FF,#00A8C9);color:#000}
 .page{display:none}.page.active{display:block}
 .eTabs{display:flex;flex-wrap:wrap;gap:6px;padding:6px 0}.eTabs .tabBtn{flex:1;min-width:80px;padding:10px;font-size:11px}
 .faqItem{background:#0a0a0a;border:1px solid #333;border-radius:10px;padding:10px;margin-top:8px}
 .faqItem b{color:#7DF9FF;font-size:12px}.faqItem p{color:#ccc;font-size:12px;margin-top:3px}
 .debug{background:#000;border:1px solid #ffcc00;color:#ffcc00;padding:8px;border-radius:8px;font-size:11px;margin-top:8px;white-space:pre-wrap;word-break:break-all;max-height:120px;overflow:auto}
-.btnPanjang{padding:16px;font-size:15px;letter-spacing:1px}
-.dropdown{display:none;background:#0a0a0a;border:1px solid #C9A86A;border-radius:12px;margin-top:10px;max-height:300px;overflow:auto;padding:6px}
-.dropdown.show{display:block}
-.dropdown .proj{margin-top:6px}
 .btnKembali{background:#1a170e;color:#E8C97A;border:1px solid #C9A86A}
 .judulHalaman{text-align:center;color:#E8C97A;font-size:18px;font-weight:900;letter-spacing:2px;margin:12px 0 4px}
 .infoProject{text-align:center;color:#8aff8a;font-size:12px;margin-bottom:6px}
 .menu3{display:flex;gap:8px}
 .menu3 button{flex:1;padding:14px 4px;font-size:12px;margin-top:10px}
 .menu3 button small{display:block;font-size:10px;font-weight:400;margin-top:3px;opacity:.8}
+select{width:100%;background:#0a0a0a;border:1px solid #3a2f14;color:#fff;padding:11px;border-radius:10px;font-size:13px}
 </style></head><body>
-<h1>👑 MASTER</h1><div class="sub">D' LUSSO - BERSIH 7 KOLOM - BACKUP ISI FULL</div>
-<div class="tabs">
-<button class="tabBtn active" id="btnHome" onclick="pindahHalaman('home')">🏠 HOME</button>
-<button class="tabBtn" id="btnDaftar" onclick="toggleDaftarProject()">📂 DAFTAR PROJECT</button>
-</div>
-<div id="dropdownProject" class="dropdown">
-<div id="list"><p style="color:#888;font-size:12px;padding:8px">⏳ Loading...</p></div>
-<div class="row" style="padding:0 4px 4px"><input id="newProj" class="kecil" placeholder="Nama project baru"><button class="sec" style="width:90px" onclick="tambahManual()">+ TAMBAH</button></div>
-</div>
+<h1>👑 MASTER</h1><div class="sub">D' LUSSO - FULL + AJAIB TABEL & KOLOM + OBAT TIDUR POLISI 😂</div>
+<div class="tabs"><button class="tabBtn active" id="btnHome" onclick="pindahHalaman('home')">🏠 HOME</button><button class="tabBtn" id="btnDaftar" onclick="toggleDaftarProject()">📂 DAFTAR PROJECT</button></div>
+<div id="dropdownProject" class="dropdown"><div id="list"><p style="color:#888;font-size:12px;padding:8px">⏳ Loading...</p></div><div class="row" style="padding:0 4px 4px"><input id="newProj" class="kecil" placeholder="Nama project baru"><button class="sec" style="width:90px" onclick="tambahManual()">+ TAMBAH</button></div></div>
 <div id="page-home" class="page active">
-<div class="card top3">
-<label>📁 NAMA</label>
-<input id="topNama" placeholder="Fashion-gw" autocomplete="off" oninput="simpanSementara()">
-<div class="row">
-<div><label class="mini">🌐 URL GH</label><input id="topUrl" class="mini" placeholder="github.com/..." autocomplete="off" oninput="simpanSementara()"></div>
-<div><label class="mini">🗄️ API SB</label><input id="topApi" class="mini" placeholder="https://xxx..." autocomplete="off" oninput="simpanSementara()"></div>
+<div class="card top3"><label>📁 NAMA</label><input id="topNama" placeholder="Fashion-gw" autocomplete="off" oninput="simpanSementara()"><div class="row"><div><label class="mini">🌐 URL GH</label><input id="topUrl" class="mini" placeholder="github.com/..." autocomplete="off" oninput="simpanSementara()"></div><div><label class="mini">🗄️ API SB</label><input id="topApi" class="mini" placeholder="https://xxx..." autocomplete="off" oninput="simpanSementara()"></div></div><div class="row"><div><label class="mini">🔑 TOKEN GH</label><input id="topTokenGH" class="mini" placeholder="ghp_..." autocomplete="off" oninput="simpanSementara()"></div><div><label class="mini">🔑 TOKEN SB</label><input id="topTokenSB" class="mini" placeholder="sb_... / eyJ..." autocomplete="off" oninput="simpanSementara()"></div></div><div class="row"><button class="sec" onclick="bukaProjectBaru()">➕ PROJECT BARU</button><button class="sec" onclick="salin5Kolom()">📋 SALIN</button></div><div class="row"><button onclick="simpanProjectKeDb()">💾 SIMPAN PROJECT INI</button></div><div id="topStatus" style="font-size:12px;margin-top:8px;text-align:center;color:#8aff8a"></div></div>
+<div class="card"><b style="color:#E8C97A">🚀 MAU KEMANA KO?</b><div class="menu3"><button onclick="pindahHalaman('github')">📂<br>GITHUB<small>EDIT FILE</small></button><button onclick="pindahHalaman('supabase')">🗄️<br>SUPABASE<small>BACKUP ISI</small></button><button class="botBtn" onclick="pindahHalaman('bot')">🤖<br>BOT<small>FAQ</small></button></div><small><br>Pilih project dulu di atas, terus pencet salah satu.</small></div>
+<div class="card"><b style="color:#E8C97A">⚡ CEPAT - DI DEPAN AJA</b><button class="sec" onclick="pulihkanDariHP()">♻️ PULIHKAN DARI HP</button><div id="status">Belum load...</div><label>NAMA TABEL UNTUK BACKUP CEPAT</label><input id="sbTableDepan" class="kecil" value="products" oninput="document.getElementById('sbTable').value=this.value"><div class="row"><button class="sec" onclick="backupDatabase()">⬇️ BACKUP 1 TABEL + ISI</button><button onclick="backupSemuaTabel()">⬇️ BACKUP SEMUA + ISI</button></div><div id="sbStatus"></div></div>
 </div>
-<div class="row">
-<div><label class="mini">🔑 TOKEN GH</label><input id="topTokenGH" class="mini" placeholder="ghp_..." autocomplete="off" oninput="simpanSementara()"></div>
-<div><label class="mini">🔑 TOKEN SB</label><input id="topTokenSB" class="mini" placeholder="sb_... / eyJ..." autocomplete="off" oninput="simpanSementara()"></div>
+<div id="page-github" class="page"><button class="btnKembali" onclick="pindahHalaman('home')">⬅️ KEMBALI KE DEPAN</button><div class="judulHalaman">📂 GITHUB</div><div class="infoProject" id="infoProjGithub">Belum pilih project</div><div class="card"><b style="color:#E8C97A">📂 GITHUB</b><label>NAMA PROJECT / PEMBELI</label><input id="projName" class="kecil" placeholder="Ammo Travel - Si A" oninput="document.getElementById('topNama').value=this.value;simpanSementara()"><div class="row"><div><label>NAMA REPO</label><input id="project" class="kecil" placeholder="nama-repo"></div><div><label>BRANCH</label><input id="branch" class="kecil" value="main"></div></div><label>NAMA FILE</label><input id="fileName" class="kecil" value="index.html"><button class="sec" onclick="listFiles()">📂 LIHAT FILE DI REPO</button><div id="listFile" style="margin-top:8px"></div><button class="sec" onclick="loadFile()">📥 LOAD FILE</button><button class="sec" onclick="isiTemplate()">✨ TEMPLATE</button><div id="debugBox" class="debug" style="display:none"></div><button class="sec" onclick="pulihkanDariHP()">♻️ PULIHKAN DARI HP</button></div><div class="card"><b style="color:#E8C97A">📝 ISI FILE</b><div class="eTabs"><button class="tabBtn active" id="eBtnStyle" onclick="tampilEditor('style')">🎨 STYLE</button><button class="tabBtn" id="eBtnBody" onclick="tampilEditor('body')">📝 BODY</button><button class="tabBtn" id="eBtnScript" onclick="tampilEditor('script')">🧠 SCRIPT</button><button class="tabBtn" id="eBtnHead" onclick="tampilEditor('head')">🏷️ HEAD</button><button class="tabBtn" id="eBtnFull" onclick="tampilEditor('full')">📄 FULL</button></div><div id="editorInfo" style="font-size:12px;color:#E8C97A;text-align:center;padding:8px;background:#0a0a0a;border-radius:10px;border:1px solid #3a2f14">🎨 Lagi edit: STYLE</div><textarea id="content" placeholder="Klik LOAD FILE dulu..."></textarea><div id="info" style="font-size:11px;color:#888;margin-top:6px">Karakter: 0</div><button onclick="saveFile()">💾 SAVE KE GITHUB</button></div><div class="card"><b style="color:#E8C97A">⚡ GANTI CEPAT</b><label>CARI</label><input id="findTxt" class="kecil" placeholder="628..."><label>GANTI JADI</label><input id="replaceTxt" class="kecil" placeholder="628..."><button class="sec" onclick="doReplace()">🔄 GANTI SEMUA</button></div><div class="card"><b style="color:#E8C97A">📱 FILE HP → GITHUB</b><input type="file" id="fileHP" accept=".html,.css,.js,.txt,.json" style="padding:10px"><div id="fileHPInfo" style="font-size:11px;color:#888;margin-top:6px">Belum ada file dipilih</div><button class="sec" onclick="kirimFileHPKeGithub()">📤 KIRIM FILE HP KE GITHUB</button></div><button class="btnKembali" onclick="pindahHalaman('home')">⬅️ KEMBALI KE DEPAN</button></div>
+<div id="page-supabase" class="page"><button class="btnKembali" onclick="pindahHalaman('home')">⬅️ KEMBALI KE DEPAN</button><div class="judulHalaman">🗄️ SUPABASE</div><div class="infoProject" id="infoProjSupabase">Belum pilih project</div>
+<div class="card"><b style="color:#E8C97A">🗄️ SUPABASE - BACKUP ISI</b><label>NAMA TABEL</label><input id="sbTable" class="kecil" value="products" oninput="document.getElementById('sbTableDepan').value=this.value"><button class="sec" onclick="backupDatabase()">⬇️ BACKUP 1 TABEL + ISI</button><label>TABEL TAMBAHAN (PISAH KOMA)</label><input id="tabelTambahan" class="kecil" placeholder="promo,diskon,voucher"><button onclick="backupSemuaTabel()">⬇️ BACKUP SEMUA - 1 FILE JSON + ISI</button></div>
+<div class="card"><b style="color:#E8C97A">🗄️ RESTORE</b><input type="file" id="backupHP" accept=".json" style="padding:10px"><div id="backupHPInfo" style="font-size:11px;color:#888;margin-top:6px">Belum ada backup dipilih.</div><button onclick="kirimBackupKeSupabase()">🗄️ KIRIM 1 TABEL</button><button class="sec" onclick="kirimBackupSemuaKeSupabase()">🗄️ KIRIM SEMUA TABEL</button></div>
+<div class="card"><b style="color:#E8C97A">🔧 KELOLA TABEL & KOLOM</b><label>NAMA TABEL</label><input id="kelolaTabel" class="kecil" value="products"><button class="sec" onclick="lihatStrukturTabel()">👁️ LIHAT KOLOM + ISI 5 BARIS</button><div id="strukturBox" style="font-size:11px;color:#ccc;margin-top:8px;white-space:pre-wrap;word-break:break-all;background:#000;border:1px solid #333;border-radius:10px;padding:10px;max-height:300px;overflow:auto">Belum dicek.</div></div>
+<div class="card" style="border-color:#00E5FF"><b style="color:#7DF9FF">🪄 TOMBOL AJAIB - TABEL + KOLOM - TINGGAL ISI, LANGSUNG JALAN!</b>
+<label>1. NAMA TABEL</label><input id="ajaibTabel" class="kecil" value="products" oninput="document.getElementById('kelolaTabel').value=this.value">
+<label>2. NAMA KOLOM (KALO SCRIPT-nya BUTUH KOLOM)</label><input id="ajaibKolom" class="kecil" placeholder="misal: harga / nama / stok / deskripsi">
+<label>3. ISI BARU (KALO MAU ISI / GANTI ISI KOLOM)</label><input id="ajaibIsi" class="kecil" placeholder="misal: 50000 atau Habis atau -">
+<label>4. PILIH SCRIPT TABEL</label>
+<select id="ajaibPilih">
+<option value="lihat">👁️ LIHAT ISI - 10 baris pertama</option>
+<option value="hitung">🔢 HITUNG - Berapa jumlah isi</option>
+<option value="kolom">🧱 CEK KOLOM - Apa aja kolomnya</option>
+<option value="backup">⬇️ BACKUP - Langsung download JSON</option>
+<option value="kosongkan">🗑️ KOSONGKAN TABEL - Hapus SEMUA isi (BAHAYA!)</option>
+</select>
+<button class="botBtn" onclick="jalankanAjaib()">🪄 JALANKAN SCRIPT TABEL!</button>
+<label>5. PILIH SCRIPT KOLOM</label>
+<select id="ajaibPilihKolom">
+<option value="lihat_kolom">👁️ LIHAT ISI 1 KOLOM - Semua baris, kolom itu doang</option>
+<option value="hitung_kosong">🔍 HITUNG KOLOM KOSONG - Berapa baris yg kolomnya kosong</option>
+<option value="isi_kolom">✏️ ISI KOLOM YG KOSONG - Isi yg kosong pake ISI BARU di atas</option>
+<option value="ganti_kolom">🔄 GANTI SEMUA ISI KOLOM - Timpa semua baris pake ISI BARU</option>
+<option value="cek_unik">🧐 CEK ISI UNIK KOLOM - List isi yg beda-beda di kolom itu</option>
+</select>
+<button class="botBtn" onclick="jalankanAjaibKolom()">🪄 JALANKAN SCRIPT KOLOM!</button>
+<div id="ajaibHasil" style="font-size:11px;color:#ccc;margin-top:8px;white-space:pre-wrap;word-break:break-all;background:#000;border:1px solid #333;border-radius:10px;padding:10px;max-height:300px;overflow:auto">Belum jalan. Isi tabel + kolom, pilih script, pencet JALANKAN.</div>
 </div>
-<div class="row"><button class="sec" onclick="bukaProjectBaru()">➕ PROJECT BARU</button><button class="sec" onclick="salin5Kolom()">📋 SALIN</button></div>
-<div class="row"><button onclick="simpanProjectKeDb()">💾 SIMPAN PROJECT INI</button></div>
-<div id="topStatus" style="font-size:12px;margin-top:8px;text-align:center;color:#8aff8a"></div>
+<div class="card" style="border-color:#ff6b6b;background:#1a0a0a"><b style="color:#ff9999">😂 OBAT TIDUR POLISI - TOMBOL RAHASIA</b><small><br>Buat ngetes aja ko, jangan beneran dijual! 😂</small>
+<label>NAMA TABEL PRODUK (BIASANYA products)</label><input id="polisiTabel" class="kecil" value="products">
+<label>HARGA OBAT TIDUR POLISI</label><input id="polisiHarga" class="kecil" value="999999">
+<button style="background:linear-gradient(180deg,#ff9999,#ff6b6b);color:#000" onclick="tambahObatTidurPolisi()">😴💊 TAMBAH OBAT TIDUR POLISI KE TABEL!</button>
+<button class="sec" onclick="lihatObatTidurPolisi()">👮 LIHAT OBAT TIDUR POLISI DI TABEL</button>
+<div id="polisiHasil" style="font-size:11px;color:#ccc;margin-top:8px;white-space:pre-wrap;word-break:break-all;background:#000;border:1px solid #333;border-radius:10px;padding:10px">Belum ada.</div>
+<small><br>Fungsinya: nambahin 1 produk dummy "Obat Tidur Polisi - Biar Polisi Tidur, Kita Gas Terus 😂" ke tabel products. Buat ngetes tombol ajaib kolom juga bisa.</small>
 </div>
-<div class="card"><b style="color:#E8C97A">🚀 MAU KEMANA KO?</b>
-<div class="menu3">
-<button onclick="pindahHalaman('github')">📂<br>GITHUB<small>EDIT FILE</small></button>
-<button onclick="pindahHalaman('supabase')">🗄️<br>SUPABASE<small>BACKUP ISI</small></button>
-<button class="botBtn" onclick="pindahHalaman('bot')">🤖<br>BOT<small>FAQ</small></button>
-</div>
-<small><br>Pilih project dulu di atas, terus pencet salah satu.</small></div>
-<div class="card"><b style="color:#E8C97A">⚡ CEPAT - DI DEPAN AJA</b>
-<button class="sec" onclick="pulihkanDariHP()">♻️ PULIHKAN DARI HP</button>
-<div id="status">Belum load...</div>
-<label>NAMA TABEL UNTUK BACKUP CEPAT</label><input id="sbTableDepan" class="kecil" value="products" oninput="document.getElementById('sbTable').value=this.value">
-<div class="row"><button class="sec" onclick="backupDatabase()">⬇️ BACKUP 1 TABEL + ISI</button><button onclick="backupSemuaTabel()">⬇️ BACKUP SEMUA + ISI</button></div>
-<div id="sbStatus"></div>
-<small><br>Backup baru sudah termasuk ISI, bukan cuma tabel + kolom. Cek file-nya ada jumlah + data.</small></div>
-</div>
-<div id="page-github" class="page">
-<button class="btnKembali" onclick="pindahHalaman('home')">⬅️ KEMBALI KE DEPAN</button>
-<div class="judulHalaman">📂 GITHUB</div><div class="infoProject" id="infoProjGithub">Belum pilih project</div>
-<div class="card"><b style="color:#E8C97A">📂 GITHUB</b>
-<label>NAMA PROJECT / PEMBELI</label><input id="projName" class="kecil" placeholder="Ammo Travel - Si A" oninput="document.getElementById('topNama').value=this.value;simpanSementara()">
-<div class="row"><div><label>NAMA REPO</label><input id="project" class="kecil" placeholder="nama-repo"></div><div><label>BRANCH</label><input id="branch" class="kecil" value="main"></div></div>
-<label>NAMA FILE</label><input id="fileName" class="kecil" value="index.html">
-<button class="sec" onclick="listFiles()">📂 LIHAT FILE DI REPO</button>
-<div id="listFile" style="margin-top:8px"></div>
-<button class="sec" onclick="loadFile()">📥 LOAD FILE</button>
-<button class="sec" onclick="isiTemplate()">✨ TEMPLATE</button>
-<div id="debugBox" class="debug" style="display:none"></div>
-<button class="sec" onclick="pulihkanDariHP()">♻️ PULIHKAN DARI HP</button></div>
-<div class="card"><b style="color:#E8C97A">📝 ISI FILE</b>
-<div class="eTabs"><button class="tabBtn active" id="eBtnStyle" onclick="tampilEditor('style')">🎨 STYLE</button><button class="tabBtn" id="eBtnBody" onclick="tampilEditor('body')">📝 BODY</button><button class="tabBtn" id="eBtnScript" onclick="tampilEditor('script')">🧠 SCRIPT</button><button class="tabBtn" id="eBtnHead" onclick="tampilEditor('head')">🏷️ HEAD</button><button class="tabBtn" id="eBtnFull" onclick="tampilEditor('full')">📄 FULL</button></div>
-<div id="editorInfo" style="font-size:12px;color:#E8C97A;text-align:center;padding:8px;background:#0a0a0a;border-radius:10px;border:1px solid #3a2f14">🎨 Lagi edit: STYLE</div>
-<textarea id="content" placeholder="Klik LOAD FILE dulu..."></textarea><div id="info" style="font-size:11px;color:#888;margin-top:6px">Karakter: 0</div>
-<button onclick="saveFile()">💾 SAVE KE GITHUB</button></div>
-<div class="card"><b style="color:#E8C97A">⚡ GANTI CEPAT</b><label>CARI</label><input id="findTxt" class="kecil" placeholder="628..."><label>GANTI JADI</label><input id="replaceTxt" class="kecil" placeholder="628..."><button class="sec" onclick="doReplace()">🔄 GANTI SEMUA</button></div>
-<div class="card"><b style="color:#E8C97A">📱 FILE HP → GITHUB</b><input type="file" id="fileHP" accept=".html,.css,.js,.txt,.json" style="padding:10px"><div id="fileHPInfo" style="font-size:11px;color:#888;margin-top:6px">Belum ada file dipilih</div><button class="sec" onclick="kirimFileHPKeGithub()">📤 KIRIM FILE HP KE GITHUB</button></div>
-<button class="btnKembali" onclick="pindahHalaman('home')">⬅️ KEMBALI KE DEPAN</button>
-</div>
-<div id="page-supabase" class="page">
-<button class="btnKembali" onclick="pindahHalaman('home')">⬅️ KEMBALI KE DEPAN</button>
-<div class="judulHalaman">🗄️ SUPABASE</div><div class="infoProject" id="infoProjSupabase">Belum pilih project</div>
-<div class="card"><b style="color:#E8C97A">🗄️ SUPABASE - BACKUP ISI</b>
-<label>NAMA TABEL</label><input id="sbTable" class="kecil" value="products" oninput="document.getElementById('sbTableDepan').value=this.value">
-<button class="sec" onclick="backupDatabase()">⬇️ BACKUP 1 TABEL + ISI</button>
-<label>TABEL TAMBAHAN (PISAH KOMA)</label><input id="tabelTambahan" class="kecil" placeholder="promo,diskon,voucher">
-<button onclick="backupSemuaTabel()">⬇️ BACKUP SEMUA - 1 FILE JSON + ISI</button></div>
-<div class="card"><b style="color:#E8C97A">🗄️ RESTORE - BISA BACA FORMAT LAMA & BARU</b><input type="file" id="backupHP" accept=".json" style="padding:10px"><div id="backupHPInfo" style="font-size:11px;color:#888;margin-top:6px">Belum ada backup dipilih.</div><button onclick="kirimBackupKeSupabase()">🗄️ KIRIM 1 TABEL</button><button class="sec" onclick="kirimBackupSemuaKeSupabase()">🗄️ KIRIM SEMUA TABEL</button></div>
-<div class="card"><b style="color:#E8C97A">🔧 KELOLA TABEL & KOLOM - LIHAT ISI</b>
-<label>NAMA TABEL</label><input id="kelolaTabel" class="kecil" value="products">
-<button class="sec" onclick="lihatStrukturTabel()">👁️ LIHAT KOLOM + ISI 5 BARIS</button>
-<div id="strukturBox" style="font-size:11px;color:#ccc;margin-top:8px;white-space:pre-wrap;word-break:break-all;background:#000;border:1px solid #333;border-radius:10px;padding:10px;max-height:300px;overflow:auto">Belum dicek. Pencet tombol di atas.</div>
-<label>NAMA KOLOM BARU (INFO SAJA)</label><input id="kolomBaru" class="kecil" placeholder="misal: harga_baru">
-<label>TIPE KOLOM</label><input id="tipeKolom" class="kecil" value="text">
-<small><br>⚠️ Tambah kolom harus dari Supabase Dashboard > Table Editor > Add Column. API Supabase nggak ngizinin bikin kolom lewat MASTER, kalo dipaksain database bisa jebol. Di sini buat LIHAT dulu kolomnya apa aja.</small></div>
-<button class="btnKembali" onclick="pindahHalaman('home')">⬅️ KEMBALI KE DEPAN</button>
-</div>
-<div id="page-bot" class="page">
-<button class="btnKembali" onclick="pindahHalaman('home')">⬅️ KEMBALI KE DEPAN</button>
-<div class="judulHalaman" style="color:#7DF9FF">🤖 BOT</div><div class="infoProject" id="infoProjBot">Belum pilih project</div>
-<div class="card bot"><b style="color:#7DF9FF">🤖 EDIT BOT</b><div id="botInfo" style="font-size:11px;color:#aaa;margin-top:6px">File di HP: belum ada.</div>
-<textarea id="botCode" class="botArea" placeholder="1. LOAD FILE dulu di GITHUB&#10;2. Pencet AMBIL BOT"></textarea>
-<div class="row"><button class="botBtn" onclick="ambilBotDariFile()">🤖 AMBIL BOT</button><button class="botBtn" onclick="simpanBotKeFile()">💾 SIMPAN BOT + GITHUB</button></div><div id="botStatus"></div></div>
-<div class="card bot"><b style="color:#7DF9FF">💬 BOT FAQ - Tabel bot_faq</b><button class="botBtn" onclick="loadBotFaq()">🔄 LIHAT FAQ</button><div id="faqList"><p style="color:#888">Belum load.</p></div><label>❓ PERTANYAAN</label><input id="faqQ" class="kecil" placeholder="harga, ongkir"><label>💬 JAWABAN</label><input id="faqA" class="kecil" placeholder="Harga mulai 50rb..."><button class="botBtn" onclick="tambahFaq()">+ TAMBAH FAQ</button><div id="faqStatus" style="font-size:12px;color:#8aff8a;text-align:center;margin-top:8px"></div></div>
-<div class="card bot"><b style="color:#7DF9FF">📋 ANTRIAN</b><button class="botBtn" onclick="loadAntrian()">🔄 LIHAT ANTRIAN</button><div id="antrianList"><p style="color:#888">Belum load.</p></div></div>
-<div class="card bot"><b style="color:#7DF9FF">⚙️ SETTING BOT</b><label>NAMA BOT</label><input id="botNama" class="kecil" value="Admin D'Lusso"><label>PESAN PEMBUKA</label><input id="botSalam" class="kecil" value="Halo kak! Selamat datang di D'Lusso!"><label>NOMOR WA</label><input id="botWa" class="kecil" placeholder="628..."><button class="botBtn" onclick="simpanSettingBot()">💾 SIMPAN SETTING BOT</button></div>
-<button class="btnKembali" onclick="pindahHalaman('home')">⬅️ KEMBALI KE DEPAN</button>
-</div>
+<button class="btnKembali" onclick="pindahHalaman('home')">⬅️ KEMBALI KE DEPAN</button></div>
+<div id="page-bot" class="page"><button class="btnKembali" onclick="pindahHalaman('home')">⬅️ KEMBALI KE DEPAN</button><div class="judulHalaman" style="color:#7DF9FF">🤖 BOT</div><div class="infoProject" id="infoProjBot">Belum pilih project</div><div class="card bot"><b style="color:#7DF9FF">🤖 EDIT BOT</b><div id="botInfo" style="font-size:11px;color:#aaa;margin-top:6px">File di HP: belum ada.</div><textarea id="botCode" class="botArea" placeholder="1. LOAD FILE dulu di GITHUB&#10;2. Pencet AMBIL BOT"></textarea><div class="row"><button class="botBtn" onclick="ambilBotDariFile()">🤖 AMBIL BOT</button><button class="botBtn" onclick="simpanBotKeFile()">💾 SIMPAN BOT + GITHUB</button></div><div id="botStatus"></div></div><div class="card bot"><b style="color:#7DF9FF">💬 BOT FAQ - Tabel bot_faq</b><button class="botBtn" onclick="loadBotFaq()">🔄 LIHAT FAQ</button><div id="faqList"><p style="color:#888">Belum load.</p></div><label>❓ PERTANYAAN</label><input id="faqQ" class="kecil" placeholder="harga, ongkir"><label>💬 JAWABAN</label><input id="faqA" class="kecil" placeholder="Harga mulai 50rb..."><button class="botBtn" onclick="tambahFaq()">+ TAMBAH FAQ</button><div id="faqStatus" style="font-size:12px;color:#8aff8a;text-align:center;margin-top:8px"></div></div><div class="card bot"><b style="color:#7DF9FF">📋 ANTRIAN</b><button class="botBtn" onclick="loadAntrian()">🔄 LIHAT ANTRIAN</button><div id="antrianList"><p style="color:#888">Belum load.</p></div></div><div class="card bot"><b style="color:#7DF9FF">⚙️ SETTING BOT</b><label>NAMA BOT</label><input id="botNama" class="kecil" value="Admin D'Lusso"><label>PESAN PEMBUKA</label><input id="botSalam" class="kecil" value="Halo kak! Selamat datang di D'Lusso!"><label>NOMOR WA</label><input id="botWa" class="kecil" placeholder="628..."><button class="botBtn" onclick="simpanSettingBot()">💾 SIMPAN SETTING BOT</button></div><button class="btnKembali" onclick="pindahHalaman('home')">⬅️ KEMBALI KE DEPAN</button></div>
 <script>
 var MASTER_DB_URL = "https://lrnnosiewovhaoyyvsmc.supabase.co";
 var MASTER_DB_KEY = "sb_publishable_2tzMRe0rQriqi4q3GLYWkQ_8A2scdc5";
@@ -179,47 +131,9 @@ function pilihDb(i){ var p=daftarDb[i]; if(!p) return; _editId=p.id; document.ge
 async function simpanProjectKeDb(){ var m=getMaster(); var data={ name:v('topNama')||v('projName')||v('project')||"Project Baru", github_repo:v('topUrl'), github_token:kunciAES(v('topTokenGH')), api_url:v('topApi'), token:kunciAES(v('topTokenSB')) }; if(!data.github_repo && !data.api_url){ alert("Isi URL / API dulu Ko!"); return; } try{ var url=m.url+"/rest/v1/projects", headers={apikey:m.key,Authorization:"Bearer "+m.key,"Content-Type":"application/json",Prefer:"return=representation"}; var r; if(_editId) r=await fetch(url+"?id=eq."+_editId,{method:"PATCH",headers:headers,body:JSON.stringify(data)}); else r=await fetch(url,{method:"POST",headers:headers,body:JSON.stringify(data)}); var j=await r.json(); if(!r.ok) throw new Error(JSON.stringify(j)); alert("✅ Tersimpan!"); simpanSementara(); }catch(e){ alert("Gagal: "+e.message); } }
 async function hapusDb(id){ if(!confirm("Hapus project ini?")) return; var m=getMaster(); await fetch(m.url+"/rest/v1/projects?id=eq."+id,{method:"DELETE",headers:{apikey:m.key,Authorization:"Bearer "+m.key}}); loadProjectsDariDb(); }
 function tambahManual(){ var n=v('newProj'); if(!n){ alert("Isi Nama Project!"); return; } document.getElementById('projName').value=n; document.getElementById('topNama').value=n; document.getElementById('project').value=n; document.getElementById('dropdownProject').classList.remove('show'); dropdownBuka=false; updateInfoProject(); simpanSementara(); alert("Siap isi URL / API / TOKEN untuk "+n); }
-async function listFiles(){
-  var a = getGithub();
-  if(!a.owner || !a.repo || !a.token){ alert("Pilih project dulu di DEPAN!"); pindahHalaman('home'); return; }
-  var box = document.getElementById('listFile');
-  box.innerHTML = '⏳ Loading daftar file...';
-  try{
-    var r = await fetch("https://api.github.com/repos/"+a.owner+"/"+a.repo+"/contents/?ref="+a.branch, {headers:{Authorization:"Bearer "+a.token}});
-    var j = await r.json();
-    if(!Array.isArray(j)){ box.innerHTML = '❌ '+ (j.message||'Gagal'); return; }
-    var html = '';
-    for(var i=0;i<j.length;i++){
-      var f = j[i];
-      if(f.type === 'dir'){
-        html += '<button class="sec" onclick="listFilesFolder(\''+f.name+'\')">📁 '+f.name+' /</button>';
-      } else {
-        html += '<button class="sec" onclick="pilihFile(\''+f.name+'\')">📄 '+f.name+'</button>';
-      }
-    }
-    box.innerHTML = html + '<button class="sec" onclick="document.getElementById(\'listFile\').innerHTML=\'\'">❌ TUTUP LIST</button>';
-  }catch(e){ box.innerHTML = '❌ '+e.message; }
-}
-async function listFilesFolder(folder){
-  var a = getGithub();
-  var box = document.getElementById('listFile');
-  box.innerHTML = '⏳ Loading '+folder+'...';
-  try{
-    var r = await fetch("https://api.github.com/repos/"+a.owner+"/"+a.repo+"/contents/"+folder+"?ref="+a.branch, {headers:{Authorization:"Bearer "+a.token}});
-    var j = await r.json();
-    var html = '<button class="sec" onclick="listFiles()">⬅️ KEMBALI</button>';
-    for(var i=0;i<j.length;i++){
-      var f = j[i];
-      html += '<button class="sec" onclick="pilihFile(\''+f.path+'\')">📄 '+f.path+'</button>';
-    }
-    box.innerHTML = html;
-  }catch(e){ box.innerHTML = '❌ '+e.message; }
-}
-function pilihFile(nama){
-  document.getElementById('fileName').value = nama;
-  document.getElementById('listFile').innerHTML = '';
-  document.getElementById('status').textContent = '✅ Dipilih: '+nama+' - tinggal LOAD FILE';
-}
+async function listFiles(){ var a=getGithub(); if(!a.owner||!a.repo||!a.token){ alert("Pilih project dulu di DEPAN!"); pindahHalaman('home'); return; } var box=document.getElementById('listFile'); box.innerHTML='⏳ Loading daftar file...'; try{ var r=await fetch("https://api.github.com/repos/"+a.owner+"/"+a.repo+"/contents/?ref="+a.branch,{headers:{Authorization:"Bearer "+a.token}}); var j=await r.json(); if(!Array.isArray(j)){ box.innerHTML='❌ '+(j.message||'Gagal'); return; } var html=''; for(var i=0;i<j.length;i++){ var f=j[i]; if(f.type==='dir'){ html+='<button class="sec" onclick="listFilesFolder(\''+f.name+'\')">📁 '+f.name+' /</button>'; } else { html+='<button class="sec" onclick="pilihFile(\''+f.name+'\')">📄 '+f.name+'</button>'; } } box.innerHTML=html+'<button class="sec" onclick="document.getElementById(\'listFile\').innerHTML=\'\'">❌ TUTUP LIST</button>'; }catch(e){ box.innerHTML='❌ '+e.message; } }
+async function listFilesFolder(folder){ var a=getGithub(); var box=document.getElementById('listFile'); box.innerHTML='⏳ Loading '+folder+'...'; try{ var r=await fetch("https://api.github.com/repos/"+a.owner+"/"+a.repo+"/contents/"+folder+"?ref="+a.branch,{headers:{Authorization:"Bearer "+a.token}}); var j=await r.json(); var html='<button class="sec" onclick="listFiles()">⬅️ KEMBALI</button>'; for(var i=0;i<j.length;i++){ var f=j[i]; html+='<button class="sec" onclick="pilihFile(\''+f.path+'\')">📄 '+f.path+'</button>'; } box.innerHTML=html; }catch(e){ box.innerHTML='❌ '+e.message; } }
+function pilihFile(nama){ document.getElementById('fileName').value=nama; document.getElementById('listFile').innerHTML=''; document.getElementById('status').textContent='✅ Dipilih: '+nama+' - tinggal LOAD FILE'; }
 async function loadFile(){ var a=getGithub(); if(!a.owner||!a.repo||!a.token){ alert("Pilih project dulu di DEPAN!"); pindahHalaman('home'); return; } document.getElementById('status').textContent="⏳ Loading "+a.file+"..."; document.getElementById('debugBox').style.display='block'; try{ var r=await fetch("https://api.github.com/repos/"+a.owner+"/"+a.repo+"/contents/"+a.file+"?ref="+a.branch,{headers:{Authorization:"Bearer "+a.token}}); var j=await r.json(); if(j.message==="Not Found"){ alert("File tidak ketemu!"); return; } if(j.message){ alert(j.message); return; } sha=j.sha; cacheFull=decodeGithub(j.content); document.getElementById('content').value=cacheFull; tampilEditor('full'); document.getElementById('status').textContent="✅ Berhasil! "+cacheFull.length+" karakter!"; document.getElementById('debugBox').textContent="✅ File ketemu! Total: "+cacheFull.length; }catch(e){ document.getElementById('status').textContent="❌ "+e.message; } }
 async function saveFile(){ var a=getGithub(); simpanBagianKeFull(); if(!cacheFull){ alert("Isi file kosong!"); return; } if(!confirm("SAVE ke "+a.owner+"/"+a.repo+" ?")) return; document.getElementById('status').textContent="⏳ Saving..."; try{ var body={message:"Update via MASTER - "+new Date().toLocaleString('id-ID'),content:btoa(unescape(encodeURIComponent(cacheFull))),branch:a.branch}; if(sha) body.sha=sha; var r=await fetch("https://api.github.com/repos/"+a.owner+"/"+a.repo+"/contents/"+a.file,{method:"PUT",headers:{Authorization:"Bearer "+a.token,"Content-Type":"application/json"},body:JSON.stringify(body)}); var j=await r.json(); if(j.message && !j.content){ alert(j.message); return; } sha=j.content.sha; document.getElementById('status').textContent="✅ BERHASIL!"; alert("BERHASIL! ✅"); }catch(e){ alert(e.message); } }
 function isiTemplate(){ if(!confirm("Isi TEMPLATE?")) return; var t='<!DOCTYPE html><html><head><meta charset="UTF-8"><title>TOKO BARU</title><style>body{background:#0a0a0a;color:#fff;text-align:center;padding:40px}h1{color:#E8C97A}</style></head><body><h1>TOKO BARU</h1><p>WA: 628...</p><script>function balasBot(p){ if(p.includes("harga")) return "Harga 50rb kak!"; return "Halo kak!"; }'+CLOSE_SCRIPT+'</body></html>'; cacheFull=t; simpanCacheKeHP(); document.getElementById('content').value=t; tampilEditor('style'); }
@@ -228,33 +142,72 @@ document.getElementById('content').addEventListener('input',function(e){ documen
 document.getElementById('fileHP').addEventListener('change',function(e){ var f=e.target.files[0]; if(!f) return; var rd=new FileReader(); rd.onload=function(ev){ isiFileHP=ev.target.result; document.getElementById('fileHPInfo').textContent="✅ "+f.name+" siap!"; document.getElementById('fileName').value=f.name; }; rd.readAsText(f); });
 async function kirimFileHPKeGithub(){ var a=getGithub(); if(!isiFileHP){ alert("Pilih file dulu!"); return; } if(!confirm("Kirim ke "+a.owner+"/"+a.repo+" ?")) return; try{ var cek=await fetch("https://api.github.com/repos/"+a.owner+"/"+a.repo+"/contents/"+a.file+"?ref="+a.branch,{headers:{Authorization:"Bearer "+a.token}}); var cekJ=await cek.json(); var body={message:"Upload dari HP via MASTER",content:btoa(unescape(encodeURIComponent(isiFileHP))),branch:a.branch}; if(cekJ.sha) body.sha=cekJ.sha; var r=await fetch("https://api.github.com/repos/"+a.owner+"/"+a.repo+"/contents/"+a.file,{method:"PUT",headers:{Authorization:"Bearer "+a.token,"Content-Type":"application/json"},body:JSON.stringify(body)}); var j=await r.json(); if(j.message && !j.content){ alert(j.message); return; } alert("BERHASIL! ✅"); }catch(e){ alert(e.message); } }
 document.getElementById('backupHP').addEventListener('change',function(e){ var f=e.target.files[0]; if(!f) return; var rd=new FileReader(); rd.onload=function(ev){ try{ isiBackup=JSON.parse(ev.target.result); document.getElementById('backupHPInfo').textContent="✅ "+f.name+" terbaca!"; }catch(err){ alert("File JSON rusak!"); } }; rd.readAsText(f); });
-// ===== BARU: AMBIL SEMUA BARIS PAKE PAGINATION BIAR ISI KESEDOT SEMUA =====
-async function ambilSemuaBaris(s,tabel){
-  var semua=[]; var dari=0; var step=1000;
-  while(true){
-    try{
-      var r=await fetch(s.url+"/rest/v1/"+tabel+"?select=*&limit="+step+"&offset="+dari,{headers:{apikey:s.key,Authorization:"Bearer "+s.key}});
-      var j=await r.json();
-      if(!Array.isArray(j)||!j.length) break;
-      semua=semua.concat(j);
-      if(j.length<step) break;
-      dari+=step;
-      if(dari>20000) break;
-    }catch(e){ break; }
-  }
-  return semua;
-}
-function ambilDataDariBackup(isiBackup,tabel){
-  if(Array.isArray(isiBackup)) return isiBackup;
-  if(isiBackup.data && Array.isArray(isiBackup.data)) return isiBackup.data;
-  if(isiBackup.tabel && isiBackup.tabel[tabel]){ var o=isiBackup.tabel[tabel]; return Array.isArray(o)?o:(o.data||[]); }
-  if(isiBackup[tabel]){ var o2=isiBackup[tabel]; return Array.isArray(o2)?o2:(o2.data||[]); }
-  return [isiBackup];
-}
+async function ambilSemuaBaris(s,tabel){ var semua=[]; var dari=0; var step=1000; while(true){ try{ var r=await fetch(s.url+"/rest/v1/"+tabel+"?select=*&limit="+step+"&offset="+dari,{headers:{apikey:s.key,Authorization:"Bearer "+s.key}}); var j=await r.json(); if(!Array.isArray(j)||!j.length) break; semua=semua.concat(j); if(j.length<step) break; dari+=step; if(dari>20000) break; }catch(e){ break; } } return semua; }
+function ambilDataDariBackup(isiBackup,tabel){ if(Array.isArray(isiBackup)) return isiBackup; if(isiBackup.data && Array.isArray(isiBackup.data)) return isiBackup.data; if(isiBackup.tabel && isiBackup.tabel[tabel]){ var o=isiBackup.tabel[tabel]; return Array.isArray(o)?o:(o.data||[]); } if(isiBackup[tabel]){ var o2=isiBackup[tabel]; return Array.isArray(o2)?o2:(o2.data||[]); } return [isiBackup]; }
 async function kirimBackupKeSupabase(){ var s=getSb(),tabel=getSb().tabel; if(!isiBackup){ alert("Pilih backup.json dulu!"); return; } var dataKirim=ambilDataDariBackup(isiBackup,tabel); if(!confirm("Kirim "+dataKirim.length+" data ke "+tabel+" ?")) return; try{ var sukses=0; for(var i=0;i<dataKirim.length;i+=100){ var potong=dataKirim.slice(i,i+100); var r=await fetch(s.url+"/rest/v1/"+tabel,{method:"POST",headers:{apikey:s.key,Authorization:"Bearer "+s.key,"Content-Type":"application/json",Prefer:"resolution=merge-duplicates"},body:JSON.stringify(potong)}); if(r.ok) sukses+=potong.length; } document.getElementById('sbStatus').textContent="✅ Selesai! Sukses: "+sukses; alert("BERHASIL! ✅"); }catch(e){ alert(e.message); } }
-async function backupDatabase(){ var s=getSb(),tabel=getSb().tabel; document.getElementById('sbStatus').textContent="⏳ Nyedot isi "+tabel+"..."; try{ var j=await ambilSemuaBaris(s,tabel); var paket={tabel:tabel,tanggal:new Date().toISOString(),jumlah:j.length,kolom:j.length?Object.keys(j[0]):[],data:j}; var blob=new Blob([JSON.stringify(paket,null,2)],{type:"application/json"}); var a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download="backup-ISI-"+tabel+"-"+new Date().toISOString().slice(0,10)+".json"; a.click(); document.getElementById('sbStatus').textContent="✅ Berhasil! "+j.length+" baris kesedot!"; alert("Berhasil! "+j.length+" baris! Cek Download!"); }catch(e){ alert(e.message); } }
-async function backupSemuaTabel(){ var s=getSb(); var daftar=["products","members","admins","pegawai","orders","riwayat_saldo","bot_faq","bot_antrian","order_items","member_notifications"]; var tambahan=v('tabelTambahan'); if(tambahan) tambahan.split(",").forEach(function(t){ t=t.trim(); if(t && daftar.indexOf(t)===-1) daftar.push(t); }); var hasil={tanggal:new Date().toISOString(),tabel:{}}; try{ for(var i=0;i<daftar.length;i++){ var data=await ambilSemuaBaris(s,daftar[i]); hasil.tabel[daftar[i]]={jumlah:data.length,kolom:data.length?Object.keys(data[0]):[],data:data}; } var blob=new Blob([JSON.stringify(hasil,null,2)],{type:"application/json"}); var a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download="backup-SEMUA-ISI-"+new Date().toISOString().slice(0,10)+".json"; a.click(); alert("BERHASIL! ✅ Isi semua tabel kesedot!"); }catch(e){ alert(e.message); } }
-async function kirimBackupSemuaKeSupabase(){ var s=getSb(); if(!isiBackup){ alert("Pilih backup-SEMUA.json dulu!"); return; } if(Array.isArray(isiBackup)){ alert("File ini cuma 1 tabel! Pake tombol KIRIM 1 TABEL!"); return; } var isi=isiBackup.tabel||isiBackup; var daftar=Object.keys(isi); if(!confirm("Kirim RESTORE "+daftar.length+" tabel?")) return; try{ for(var t=0;t<daftar.length;t++){ var tabel=daftar[t]; var data=ambilDataDariBackup(isiBackup,tabel); for(var i=0;i<data.length;i+=100){ await fetch(s.url+"/rest/v1/"+tabel,{method:"POST",headers:{apikey:s.key,Authorization:"Bearer "+s.key,"Content-Type":"application/json",Prefer:"resolution=merge-duplicates"},body:JSON.stringify(data.slice(i,i+100))}); } } alert("RESTORE BERHASIL! ✅"); }catch(e){ alert(e.message); } }
-async function lihatStrukturTabel(){ var s=getSb(); var tabel=document.getElementById('kelolaTabel').value||"products"; document.getElementById('strukturBox').textContent="⏳ Loading "+tabel+"..."; try{ var data=await ambilSemuaBaris(s,tabel); var kolom=data.length?Object.keys(data[0]):[]; var txt="TABEL: "+tabel+"\nJUMLAH ISI: "+data.length+" baris\nKOLOM: "+(kolom.length?kolom.join(", "):"(kosong / tabel belum ada kolom / RLS lock)")+"\n\nCONTOH 5 BARIS PERTAMA:\n"+JSON.stringify(data.slice(0,5),null,2); document.getElementById('strukturBox').textContent=txt; }catch(e){ document.getElementById('strukturBox').textContent="❌ "+e.message; } }
+async function backupDatabase(){ var s=getSb(),tabel=getSb().tabel; document.getElementById('sbStatus').textContent="⏳ Nyedot isi "+tabel+"..."; try{ var j=await ambilSemuaBaris(s,tabel); var paket={tabel:tabel,tanggal:new Date().toISOString(),jumlah:j.length,kolom:j.length?Object.keys(j[0]):[],data:j}; var blob=new Blob([JSON.stringify(paket,null,2)],{type:"application/json"}); var a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download="backup-ISI-"+tabel+"-"+new Date().toISOString().slice(0,10)+".json"; a.click(); document.getElementById('sbStatus').textContent="✅ Berhasil! "+j.length+" baris kesedot!"; alert("Berhasil! "+j.length+" baris!"); }catch(e){ alert(e.message); } }
+async function backupSemuaTabel(){ var s=getSb(); var daftar=["products","members","admins","pegawai","orders","riwayat_saldo","bot_faq","bot_antrian","order_items","member_notifications"]; var tambahan=v('tabelTambahan'); if(tambahan) tambahan.split(",").forEach(function(t){ t=t.trim(); if(t && daftar.indexOf(t)===-1) daftar.push(t); }); var hasil={tanggal:new Date().toISOString(),tabel:{}}; try{ for(var i=0;i<daftar.length;i++){ var data=await ambilSemuaBaris(s,daftar[i]); hasil.tabel[daftar[i]]={jumlah:data.length,kolom:data.length?Object.keys(data[0]):[],data:data}; } var blob=new Blob([JSON.stringify(hasil,null,2)],{type:"application/json"}); var a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download="backup-SEMUA-ISI-"+new Date().toISOString().slice(0,10)+".json"; a.click(); alert("BERHASIL! ✅"); }catch(e){ alert(e.message); } }
+async function kirimBackupSemuaKeSupabase(){ var s=getSb(); if(!isiBackup){ alert("Pilih backup-SEMUA.json dulu!"); return; } if(Array.isArray(isiBackup)){ alert("File ini cuma 1 tabel!"); return; } var isi=isiBackup.tabel||isiBackup; var daftar=Object.keys(isi); if(!confirm("Kirim RESTORE "+daftar.length+" tabel?")) return; try{ for(var t=0;t<daftar.length;t++){ var tabel=daftar[t]; var data=ambilDataDariBackup(isiBackup,tabel); for(var i=0;i<data.length;i+=100){ await fetch(s.url+"/rest/v1/"+tabel,{method:"POST",headers:{apikey:s.key,Authorization:"Bearer "+s.key,"Content-Type":"application/json",Prefer:"resolution=merge-duplicates"},body:JSON.stringify(data.slice(i,i+100))}); } } alert("RESTORE BERHASIL! ✅"); }catch(e){ alert(e.message); } }
+async function lihatStrukturTabel(){ var s=getSb(); var tabel=document.getElementById('kelolaTabel').value||"products"; document.getElementById('strukturBox').textContent="⏳ Loading "+tabel+"..."; try{ var data=await ambilSemuaBaris(s,tabel); var kolom=data.length?Object.keys(data[0]):[]; document.getElementById('strukturBox').textContent="TABEL: "+tabel+"\nJUMLAH ISI: "+data.length+" baris\nKOLOM: "+(kolom.length?kolom.join(", "):"(kosong)")+"\n\nCONTOH 5 BARIS:\n"+JSON.stringify(data.slice(0,5),null,2); }catch(e){ document.getElementById('strukturBox').textContent="❌ "+e.message; } }
+// ===== AJAIB TABEL =====
+async function jalankanAjaib(){
+  var s=getSb(); var tabel=(document.getElementById('ajaibTabel').value||"products").trim(); var pilih=document.getElementById('ajaibPilih').value; var box=document.getElementById('ajaibHasil'); box.textContent="⏳ Jalanin "+pilih+" buat "+tabel+"...";
+  try{
+    var data=await ambilSemuaBaris(s,tabel);
+    if(pilih==="lihat") box.textContent="✅ "+tabel+" | "+data.length+" baris\n\n"+JSON.stringify(data.slice(0,10),null,2);
+    if(pilih==="hitung") box.textContent="✅ "+tabel+"\nJUMLAH: "+data.length+" baris";
+    if(pilih==="kolom"){ var k=data.length?Object.keys(data[0]):[]; box.textContent="✅ "+tabel+"\nKOLOM ("+k.length+"):\n- "+k.join("\n- "); }
+    if(pilih==="backup"){ var paket={tabel:tabel,tanggal:new Date().toISOString(),jumlah:data.length,kolom:data.length?Object.keys(data[0]):[],data:data}; var blob=new Blob([JSON.stringify(paket,null,2)],{type:"application/json"}); var a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download="backup-AJAIB-"+tabel+".json"; a.click(); box.textContent="✅ BACKUP BERHASIL! "+data.length+" baris ke-download!"; }
+    if(pilih==="kosongkan"){ if(!confirm("HAPUS SEMUA ISI "+tabel+" ("+data.length+" baris)?")){ box.textContent="❌ Dibatalin."; return; } var ok=0; for(var i=0;i<data.length;i++){ if(data[i].id==null) continue; var r=await fetch(s.url+"/rest/v1/"+tabel+"?id=eq."+data[i].id,{method:"DELETE",headers:{apikey:s.key,Authorization:"Bearer "+s.key}}); if(r.ok) ok++; } box.textContent="🗑️ Terhapus: "+ok+" baris dari "+tabel; }
+  }catch(e){ box.textContent="❌ "+e.message; }
+}
+// ===== AJAIB KOLOM =====
+async function jalankanAjaibKolom(){
+  var s=getSb(); var tabel=(document.getElementById('ajaibTabel').value||"products").trim(); var kolom=(document.getElementById('ajaibKolom').value||"").trim(); var isiBaru=document.getElementById('ajaibIsi').value; var pilih=document.getElementById('ajaibPilihKolom').value; var box=document.getElementById('ajaibHasil');
+  if(!kolom){ alert("Isi NAMA KOLOM dulu ko! Misal: harga"); return; }
+  box.textContent="⏳ Jalanin script kolom "+kolom+" di "+tabel+"...";
+  try{
+    var data=await ambilSemuaBaris(s,tabel);
+    if(!data.length){ box.textContent="Tabel "+tabel+" kosong, nggak bisa cek kolom."; return; }
+    if(!(kolom in data[0])){ box.textContent="❌ Kolom '"+kolom+"' nggak ada di "+tabel+". Kolom yg ada: "+Object.keys(data[0]).join(", "); return; }
+    if(pilih==="lihat_kolom"){ var list=data.map(function(r,i){ return (i+1)+". "+JSON.stringify(r[kolom]); }); box.textContent="✅ KOLOM: "+kolom+" di "+tabel+" ("+data.length+" baris)\n\n"+list.join("\n"); }
+    if(pilih==="hitung_kosong"){ var kosong=data.filter(function(r){ return r[kolom]===null||r[kolom]===""||r[kolom]===undefined; }).length; box.textContent="✅ KOLOM: "+kolom+"\nTotal baris: "+data.length+"\nYang kosong: "+kosong+" baris\nYang terisi: "+(data.length-kosong)+" baris"; }
+    if(pilih==="isi_kolom"){ if(!isiBaru){ alert("Isi ISI BARU dulu!"); return; } if(!confirm("Isi kolom '"+kolom+"' yg kosong pake '"+isiBaru+"' ?")) return; var target=data.filter(function(r){ return r[kolom]===null||r[kolom]===""||r[kolom]===undefined; }); var ok=0; for(var i=0;i<target.length;i++){ var bod={}; bod[kolom]=isiBaru; var r2=await fetch(s.url+"/rest/v1/"+tabel+"?id=eq."+target[i].id,{method:"PATCH",headers:{apikey:s.key,Authorization:"Bearer "+s.key,"Content-Type":"application/json"},body:JSON.stringify(bod)}); if(r2.ok) ok++; } box.textContent="✅ Berhasil isi "+ok+" baris yg kosong di kolom "+kolom+" pake '"+isiBaru+"'"; }
+    if(pilih==="ganti_kolom"){ if(!isiBaru){ alert("Isi ISI BARU dulu!"); return; } if(!confirm("GANTI SEMUA isi kolom '"+kolom+"' jadi '"+isiBaru+"' ? ("+data.length+" baris)")) return; var ok2=0; for(var j=0;j<data.length;j++){ var b2={}; b2[kolom]=isiBaru; var r3=await fetch(s.url+"/rest/v1/"+tabel+"?id=eq."+data[j].id,{method:"PATCH",headers:{apikey:s.key,Authorization:"Bearer "+s.key,"Content-Type":"application/json"},body:JSON.stringify(b2)}); if(r3.ok) ok2++; } box.textContent="✅ Berhasil ganti "+ok2+" baris di kolom "+kolom+" jadi '"+isiBaru+"'"; }
+    if(pilih==="cek_unik"){ var unik={}; data.forEach(function(r){ unik[JSON.stringify(r[kolom])]=true; }); box.textContent="✅ ISI UNIK di kolom "+kolom+":\n- "+Object.keys(unik).join("\n- ")+"\n\nTotal unik: "+Object.keys(unik).length+" dari "+data.length+" baris"; }
+  }catch(e){ box.textContent="❌ "+e.message; }
+}
+// ===== OBAT TIDUR POLISI 😂 =====
+async function tambahObatTidurPolisi(){
+  var s=getSb(); var tabel=(document.getElementById('polisiTabel').value||"products").trim(); var harga=document.getElementById('polisiHarga').value||"999999"; var box=document.getElementById('polisiHasil'); box.textContent="⏳ Lagi nyuntik polisi... 😂";
+  try{
+    var cek=await ambilSemuaBaris(s,tabel);
+    var kolom=cek.length?Object.keys(cek[0]):["nama","harga","deskripsi","stok"];
+    var produk={}; 
+    // isi dinamis sesuai kolom yg ada, biar nggak error kalo nama kolom beda
+    function cari(namaList){ for(var i=0;i<namaList.length;i++){ if(kolom.indexOf(namaList[i])!==-1) return namaList[i]; } return null; }
+    var cNama=cari(["nama","name","nama_produk","title"])||"nama";
+    var cHarga=cari(["harga","price"])||"harga";
+    var cDesk=cari(["deskripsi","description","desc","keterangan"]);
+    var cStok=cari(["stok","stock","jumlah"]);
+    produk[cNama]="Obat Tidur Polisi 😴👮";
+    produk[cHarga]=isNaN(Number(harga))?harga:Number(harga);
+    if(cDesk) produk[cDesk]="Biar polisi tidur, kita gas terus 😂 - PRODUK DUMMY BUAT NGETES DOANG, JANGAN DIJUAL BENERAN!";
+    if(cStok) produk[cStok]=100;
+    var r=await fetch(s.url+"/rest/v1/"+tabel,{method:"POST",headers:{apikey:s.key,Authorization:"Bearer "+s.key,"Content-Type":"application/json",Prefer:"return=representation"},body:JSON.stringify(produk)});
+    var j=await r.json();
+    if(!r.ok) throw new Error(JSON.stringify(j));
+    box.textContent="✅ BERHASIL! 😂👮\nObat Tidur Polisi udah masuk ke "+tabel+"!\nHarga: "+harga+"\n\nData: "+JSON.stringify(j,null,2);
+  }catch(e){ box.textContent="❌ Gagal: "+e.message+"\n\nTips: cek dulu kolom di tabel "+tabel+" pake TOMBOL AJAIB > CEK KOLOM. Mungkin nama kolomnya beda."; }
+}
+async function lihatObatTidurPolisi(){
+  var s=getSb(); var tabel=(document.getElementById('polisiTabel').value||"products").trim(); var box=document.getElementById('polisiHasil'); box.textContent="⏳ Nyari polisi yg tidur...";
+  try{
+    var data=await ambilSemuaBaris(s,tabel);
+    var ketemu=data.filter(function(r){ return JSON.stringify(r).toLowerCase().indexOf("tidur polisi")!==-1 || JSON.stringify(r).toLowerCase().indexOf("obat tidur")!==-1; });
+    if(!ketemu.length) box.textContent="Belum ada Obat Tidur Polisi di "+tabel+". Pencet tombol TAMBAH dulu ko! 😂";
+    else box.textContent="✅ Ketemu "+ketemu.length+" Obat Tidur Polisi! 😂\n\n"+JSON.stringify(ketemu,null,2);
+  }catch(e){ box.textContent="❌ "+e.message; }
+}
 loadSettingBot(); loadSementara(); pindahHalaman('home');
 </script></body></html>

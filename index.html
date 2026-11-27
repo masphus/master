@@ -41,15 +41,19 @@ small{color:#888;font-size:11px;line-height:1.4}
 .menu3 button{flex:1;padding:14px 4px;font-size:12px;margin-top:10px}
 .menu3 button small{display:block;font-size:10px;font-weight:400;margin-top:3px;opacity:.8}
 select{width:100%;background:#0a0a0a;border:1px solid #3a2f14;color:#fff;padding:11px;border-radius:10px;font-size:13px}
-.dropdown{display:none;background:#0a0a0a;border:1px solid #C9A86A;border-radius:12px;margin-top:10px;max-height:320px;overflow:auto;padding:6px}
+.dropdown{display:none;background:#0a0a0a;border:1px solid #C9A86A;border-radius:12px;margin-top:10px;max-height:400px;overflow:auto;padding:6px}
 .dropdown.show{display:block}
 #bannerTerpilih{display:none;background:#0a2a0a;border:1px solid #8aff8a;color:#8aff8a;border-radius:12px;padding:10px;margin-top:10px;text-align:center;font-size:12px;font-weight:900}
 #bannerTerpilih.show{display:block}
 </style></head><body>
-<h1>👑 MASTER</h1><div class="sub">D' LUSSO - BOT ANTI SILUMAN 👻</div>
-<div class="tabs"><button class="tabBtn active" id="btnHome" onclick="pindahHalaman('home')">🏠 HOME</button><button class="tabBtn" id="btnDaftar" onclick="toggleDaftarProject()">📂 DAFTAR PROJECT</button></div>
+<h1>👑 MASTER</h1><div class="sub">D' LUSSO - DAFTAR PROJECT BISA DIKLIK LAGI!</div>
+<div class="tabs"><button class="tabBtn active" id="btnHome" onclick="pindahHalaman('home')">🏠 HOME</button><button class="tabBtn" id="btnDaftar" onclick="toggleDaftarProject(event)">📂 DAFTAR PROJECT</button></div>
 <div id="bannerTerpilih">✅ LAGI NGERJAIN: -</div>
-<div id="dropdownProject" class="dropdown"><div id="list"><p style="color:#888;font-size:12px;padding:8px">⏳ Loading...</p></div><div class="row" style="padding:0 4px 4px"><input id="newProj" class="kecil" placeholder="Nama project baru"><button class="sec" style="width:90px" onclick="tambahManual()">+ TAMBAH</button></div></div>
+<div id="dropdownProject" class="dropdown">
+<button class="sec" style="background:#333;color:#fff" onclick="tutupDaftarProject()">❌ TUTUP DAFTAR - KLIK DI SINI KLO MAU NUTUP</button>
+<div id="list"><p style="color:#888;font-size:12px;padding:8px">⏳ Loading...</p></div>
+<div class="row" style="padding:0 4px 4px"><input id="newProj" class="kecil" placeholder="Nama project baru"><button class="sec" style="width:90px" onclick="tambahManual()">+ TAMBAH</button></div>
+</div>
 <div id="page-home" class="page active">
 <div class="card top3"><label>📁 NAMA</label><input id="topNama" placeholder="Fashion-gw" autocomplete="off" oninput="simpanSementara()"><div class="row"><div><label class="mini">🌐 URL GH</label><input id="topUrl" class="mini" placeholder="github.com/..." autocomplete="off" oninput="simpanSementara()"></div><div><label class="mini">🗄️ API SB</label><input id="topApi" class="mini" placeholder="https://xxx..." autocomplete="off" oninput="simpanSementara()"></div></div><div class="row"><div><label class="mini">🔑 TOKEN GH</label><input id="topTokenGH" class="mini" placeholder="ghp_..." autocomplete="off" oninput="simpanSementara()"></div><div><label class="mini">🔑 TOKEN SB</label><input id="topTokenSB" class="mini" placeholder="sb_... / eyJ..." autocomplete="off" oninput="simpanSementara()"></div></div><div class="row"><button class="sec" onclick="bukaProjectBaru()">➕ PROJECT BARU</button><button class="sec" onclick="salin5Kolom()">📋 SALIN</button></div><div class="row"><button onclick="simpanProjectKeDb()">💾 SIMPAN PROJECT INI</button></div><div id="topStatus" style="font-size:12px;margin-top:8px;text-align:center;color:#8aff8a"></div></div>
 <div class="card"><b style="color:#E8C97A">🚀 MAU KEMANA KO?</b><div class="menu3"><button onclick="pindahHalaman('github')">📂<br>GITHUB<small>EDIT FILE</small></button><button onclick="pindahHalaman('supabase')">🗄️<br>SUPABASE<small>BACKUP ISI</small></button><button class="botBtn" onclick="pindahHalaman('bot')">🤖<br>BOT<small>FAQ</small></button></div><small><br>Pilih project dulu di atas, terus pencet salah satu.</small></div>
@@ -65,14 +69,8 @@ select{width:100%;background:#0a0a0a;border:1px solid #3a2f14;color:#fff;padding
 <div class="card" style="border-color:#ff6b6b;background:#1a0a0a"><b style="color:#ff9999">😂 OBAT TIDUR POLISI</b><label>NAMA TABEL PRODUK</label><input id="polisiTabel" class="kecil" value="products"><label>HARGA</label><input id="polisiHarga" class="kecil" value="999999"><button style="background:linear-gradient(180deg,#ff9999,#ff6b6b);color:#000" onclick="tambahObatTidurPolisi()">😴💊 TAMBAH OBAT TIDUR POLISI!</button><button class="sec" onclick="lihatObatTidurPolisi()">👮 LIHAT OBAT TIDUR POLISI</button><div id="polisiHasil" style="font-size:11px;color:#ccc;margin-top:8px;white-space:pre-wrap;word-break:break-all;background:#000;border:1px solid #333;border-radius:10px;padding:10px">Belum ada.</div></div>
 <button class="btnKembali" onclick="pindahHalaman('home')">⬅️ KEMBALI KE DEPAN</button></div>
 <div id="page-bot" class="page"><button class="btnKembali" onclick="pindahHalaman('home')">⬅️ KEMBALI KE DEPAN</button><div class="judulHalaman" style="color:#7DF9FF">🤖 BOT - ANTI SILUMAN</div><div class="infoProject" id="infoProjBot">Belum pilih project</div>
-<div class="card bot"><b style="color:#7DF9FF">🤖 EDIT BOT - SEKARANG ADA KOTAKNYA, NGGAK HILANG LAGI!</b><div id="botInfo" style="font-size:11px;color:#aaa;margin-top:6px">File di HP: belum ada.</div>
-<small><br>Caranya: 1. LOAD FILE di GITHUB dulu - 2. Masuk sini, BOT otomatis muncul - 3. Edit - 4. SIMPAN BOT. BOT disimpan di antara /* BOT-START */ dan /* BOT-END */, jadi nggak kehapus pas edit STYLE / BODY.</small>
-<textarea id="botCode" class="botArea" placeholder="BOT akan muncul otomatis di sini setelah LOAD FILE..."></textarea>
-<div class="row"><button class="botBtn" onclick="ambilBotDariFile()">🤖 AMBIL BOT LAGI</button><button class="botBtn" onclick="simpanBotKeFile()">💾 SIMPAN BOT + GITHUB</button></div><div id="botStatus"></div>
-<button class="botBtn" onclick="cekBotDiFile()">🔍 CEK BOT DI FILE - ADA APA NGGAK?</button>
-<div id="botCekHasil" style="font-size:11px;color:#ccc;margin-top:8px;white-space:pre-wrap;word-break:break-all;background:#000;border:1px solid #333;border-radius:10px;padding:10px;max-height:200px;overflow:auto">Belum dicek.</div>
-</div>
-<div class="card bot"><b style="color:#7DF9FF">💬 BOT FAQ - Tabel bot_faq</b><button class="botBtn" onclick="loadBotFaq()">🔄 LIHAT FAQ</button><div id="faqList"><p style="color:#888">Belum load.</p></div><label>❓ PERTANYAAN</label><input id="faqQ" class="kecil" placeholder="harga, ongkir"><label>💬 JAWABAN</label><input id="faqA" class="kecil" placeholder="Harga mulai 50rb..."><button class="botBtn" onclick="tambahFaq()">+ TAMBAH FAQ</button><div id="faqStatus" style="font-size:12px;color:#8aff8a;text-align:center;margin-top:8px"></div></div>
+<div class="card bot"><b style="color:#7DF9FF">🤖 EDIT BOT</b><div id="botInfo" style="font-size:11px;color:#aaa;margin-top:6px">File di HP: belum ada.</div><textarea id="botCode" class="botArea" placeholder="BOT akan muncul otomatis setelah LOAD FILE..."></textarea><div class="row"><button class="botBtn" onclick="ambilBotDariFile()">🤖 AMBIL BOT LAGI</button><button class="botBtn" onclick="simpanBotKeFile()">💾 SIMPAN BOT + GITHUB</button></div><div id="botStatus"></div><button class="botBtn" onclick="cekBotDiFile()">🔍 CEK BOT DI FILE</button><div id="botCekHasil" style="font-size:11px;color:#ccc;margin-top:8px;white-space:pre-wrap;word-break:break-all;background:#000;border:1px solid #333;border-radius:10px;padding:10px;max-height:200px;overflow:auto">Belum dicek.</div></div>
+<div class="card bot"><b style="color:#7DF9FF">💬 BOT FAQ</b><button class="botBtn" onclick="loadBotFaq()">🔄 LIHAT FAQ</button><div id="faqList"><p style="color:#888">Belum load.</p></div><label>❓ PERTANYAAN</label><input id="faqQ" class="kecil" placeholder="harga, ongkir"><label>💬 JAWABAN</label><input id="faqA" class="kecil" placeholder="Harga mulai 50rb..."><button class="botBtn" onclick="tambahFaq()">+ TAMBAH FAQ</button><div id="faqStatus" style="font-size:12px;color:#8aff8a;text-align:center;margin-top:8px"></div></div>
 <div class="card bot"><b style="color:#7DF9FF">📋 ANTRIAN</b><button class="botBtn" onclick="loadAntrian()">🔄 LIHAT ANTRIAN</button><div id="antrianList"><p style="color:#888">Belum load.</p></div></div>
 <div class="card bot"><b style="color:#7DF9FF">⚙️ SETTING BOT</b><label>NAMA BOT</label><input id="botNama" class="kecil" value="Admin D'Lusso"><label>PESAN PEMBUKA</label><input id="botSalam" class="kecil" value="Halo kak! Selamat datang di D'Lusso!"><label>NOMOR WA</label><input id="botWa" class="kecil" placeholder="628..."><button class="botBtn" onclick="simpanSettingBot()">💾 SIMPAN SETTING BOT</button></div>
 <button class="btnKembali" onclick="pindahHalaman('home')">⬅️ KEMBALI KE DEPAN</button></div>
@@ -83,13 +81,12 @@ var KUNCI_AES = "Dlusso-Kunci-Rahasia-123";
 function kunciAES(teks){ if(!teks) return ""; try{ return CryptoJS.AES.encrypt(String(teks), KUNCI_AES).toString(); }catch(e){ return teks; } }
 function bukaAES(teksAcak){ if(!teksAcak) return ""; if(String(teksAcak).indexOf("U2FsdGVkX1") !== 0) return String(teksAcak); try{ var hasil = CryptoJS.AES.decrypt(String(teksAcak), KUNCI_AES).toString(CryptoJS.enc.Utf8); return hasil || String(teksAcak); }catch(e){ return String(teksAcak); } }
 function updateInfoProject(){ var n=document.getElementById('topNama').value||document.getElementById('projName').value||document.getElementById('project').value||"Belum pilih project"; var t="✅ Lagi ngerjain: "+n; ['infoProjGithub','infoProjSupabase','infoProjBot'].forEach(function(id){ var el=document.getElementById(id); if(el) el.textContent=t; }); var b=document.getElementById('bannerTerpilih'); if(b){ if(n && n!=="Belum pilih project"){ b.textContent="✅ LAGI NGERJAIN: "+n+" - pencet DAFTAR PROJECT kalo mau ganti"; b.classList.add('show'); } else { b.classList.remove('show'); } } }
-function pindahHalaman(ke){ ['home','github','supabase','bot'].forEach(function(x){ var el=document.getElementById('page-'+x); if(el) el.style.display=(ke===x?'block':'none'); }); var bh=document.getElementById('btnHome'); if(bh) bh.className='tabBtn'+(ke==='home'?' active':''); var bd=document.getElementById('btnDaftar'); if(bd) bd.className='tabBtn'; try{ localStorage.setItem('master_halaman',ke); }catch(e){} updateInfoProject(); if(ke==='bot'){ updateBotInfo(); autoAmbilBot(); } window.scrollTo(0,0); }
+function pindahHalaman(ke){ ['home','github','supabase','bot'].forEach(function(x){ var el=document.getElementById('page-'+x); if(el) el.style.display=(ke===x?'block':'none'); }); var bh=document.getElementById('btnHome'); if(bh) bh.className='tabBtn'+(ke==='home'?' active':''); try{ localStorage.setItem('master_halaman',ke); }catch(e){} updateInfoProject(); if(ke==='bot'){ updateBotInfo(); autoAmbilBot(); } window.scrollTo(0,0); }
 var sha="",isiFileHP="",isiBackup=null,editorMode='full',cacheFull="",daftarDb=[],_editId=null,dropdownBuka=false;
 var CLOSE_SCRIPT="<"+"/"+"script>";
 var labelEditor={style:"🎨 Lagi edit: STYLE",body:"📝 Lagi edit: BODY",script:"🧠 Lagi edit: SCRIPT",head:"🏷️ Lagi edit: HEAD",full:"📄 Lagi edit: FULL"};
 function tutupDaftarProject(){ var d=document.getElementById('dropdownProject'); if(d) d.classList.remove('show'); dropdownBuka=false; var bd=document.getElementById('btnDaftar'); if(bd) bd.className='tabBtn'; }
-function toggleDaftarProject(){ var d=document.getElementById('dropdownProject'); dropdownBuka=!dropdownBuka; if(dropdownBuka){ d.classList.add('show'); var bd=document.getElementById('btnDaftar'); if(bd) bd.className='tabBtn active'; loadProjectsDariDb(); } else { tutupDaftarProject(); } }
-document.addEventListener('click',function(e){ if(!dropdownBuka) return; var d=document.getElementById('dropdownProject'); var btn=document.getElementById('btnDaftar'); if(d && !d.contains(e.target) && btn && !btn.contains(e.target)){ tutupDaftarProject(); } });
+function toggleDaftarProject(ev){ if(ev){ ev.preventDefault(); ev.stopPropagation(); } var d=document.getElementById('dropdownProject'); dropdownBuka=!dropdownBuka; if(dropdownBuka){ d.classList.add('show'); var bd=document.getElementById('btnDaftar'); if(bd) bd.className='tabBtn active'; loadProjectsDariDb(); } else { tutupDaftarProject(); } }
 function bukaProjectBaru(){ _editId=null; ['topNama','topUrl','topApi','topTokenGH','topTokenSB','projName','project'].forEach(function(id){ var el=document.getElementById(id); if(el) el.value=''; }); document.getElementById('topStatus').textContent="Siap isi project baru... ketik NAMA baru dulu ko!"; tutupDaftarProject(); updateInfoProject(); simpanSementara(); document.getElementById('topNama').focus(); }
 function salin5Kolom(){ var t="NAMA: "+v('topNama')+"\nURL GH: "+v('topUrl')+"\nAPI SB: "+v('topApi')+"\nTOKEN GH: "+v('topTokenGH')+"\nTOKEN SB: "+v('topTokenSB'); try{ navigator.clipboard.writeText(t); document.getElementById('topStatus').textContent="✅ Tersalin!"; }catch(e){ alert(t); } }
 function v(id){ return (document.getElementById(id).value||'').trim(); }
@@ -104,92 +101,12 @@ function decodeGithub(b64){ try{ var bin=atob(b64.replace(/\n/g,'')); var bytes=
 function simpanBagianKeFull(){ var isi=document.getElementById('content').value; if(!cacheFull && !isi) return; if(isi==="" && cacheFull!=="") return; if(editorMode==='full'){ cacheFull=isi; simpanCacheKeHP(); return; } if(editorMode==='style'){ cacheFull=cacheFull.replace(/<style[^>]*>[\s\S]*?<\/style>/i,"<style>"+isi+"</style>"); simpanCacheKeHP(); return; } if(editorMode==='head'){ cacheFull=cacheFull.replace(/<head[^>]*>[\s\S]*?<\/head>/i,"<head>"+isi+"</head>"); simpanCacheKeHP(); return; } if(editorMode==='body'){ var mm=cacheFull.match(/<body[^>]*>/i); if(mm){ var s=cacheFull.indexOf(mm[0])+mm[0].length; var e=cacheFull.lastIndexOf("</body>"); cacheFull=cacheFull.slice(0,s)+isi+cacheFull.slice(e); } simpanCacheKeHP(); return; } if(editorMode==='script'){ var idx=cacheFull.lastIndexOf("<script"); if(idx>=0){ var eT=cacheFull.indexOf(">",idx); var eC=cacheFull.indexOf(CLOSE_SCRIPT,eT); if(eT>=0 && eC>=0) cacheFull=cacheFull.slice(0,eT+1)+isi+cacheFull.slice(eC); } simpanCacheKeHP(); return; } }
 function ambilBagian(tag){ var m=cacheFull.match(new RegExp("<"+tag+"[^>]*>([\\s\\S]*?)<\\/"+tag+">","i")); return m?m[1]:""; }
 function tampilEditor(mode){ if(mode!==editorMode) simpanBagianKeFull(); editorMode=mode; ['style','body','script','head','full'].forEach(function(k){ var b=document.getElementById('eBtn'+k.charAt(0).toUpperCase()+k.slice(1)); if(b) b.className='tabBtn'+(k===mode?' active':''); }); document.getElementById('editorInfo').textContent=labelEditor[mode]; if(mode==='full') document.getElementById('content').value=cacheFull; else if(mode==='style') document.getElementById('content').value=ambilBagian('style')||"/* TIDAK ADA <style> */"; else if(mode==='head') document.getElementById('content').value=ambilBagian('head')||"<!-- TIDAK ADA <head> -->"; else if(mode==='body') document.getElementById('content').value=ambilBagian('body')||"<!-- TIDAK ADA <body> -->"; else if(mode==='script'){ var hasil=""; var re=new RegExp("<script[^>]*>([\\s\\S]*?)<\\/script>","gi"); var mm; while((mm=re.exec(cacheFull))!==null) hasil=mm[1]; document.getElementById('content').value=hasil||"// TIDAK ADA <script>"; } document.getElementById('info').textContent="Karakter: "+document.getElementById('content').value.length+" | Total: "+cacheFull.length; }
-// ===== BOT ANTI SILUMAN - PAKE KOTAK BOT-START / BOT-END =====
-var cacheBot="";
-var BOT_START="/* BOT-START */";
-var BOT_END="/* BOT-END */";
-function ekstrakBotDariCache(){
-  if(!cacheFull) cacheFull=localStorage.getItem('master_cache')||"";
-  if(!cacheFull) return "";
-  var s=cacheFull.indexOf(BOT_START);
-  var e=cacheFull.indexOf(BOT_END);
-  if(s!==-1 && e!==-1 && e>s){
-    return cacheFull.slice(s+BOT_START.length, e).trim();
-  }
-  // FALLBACK: file lama yg belum ada kotaknya - ambil baris yg ada balasBot / bot
-  var lines=cacheFull.split("\n"), out=[];
-  for(var i=0;i<lines.length;i++){
-    if(/function balasBot|function balas|bot_faq|bot_antrian/i.test(lines[i])) out.push(lines[i]);
-  }
-  // kalo fallback ketemu, kembalikan juga 5 baris sesudah function balasBot biar nggak kepotong
-  if(out.length){
-    var idx=cacheFull.indexOf("function balasBot");
-    if(idx!==-1){
-      var potong=cacheFull.slice(idx, idx+3000);
-      // ambil sampe penutup function pertama yg agak panjang
-      return potong.split("\n").slice(0,30).join("\n");
-    }
-    return out.join("\n");
-  }
-  return "";
-}
-function autoAmbilBot(){
-  var isi=ekstrakBotDariCache();
-  if(isi){
-    cacheBot=isi;
-    var el=document.getElementById('botCode');
-    if(el && !el.value) el.value=isi;
-    else if(el) el.value=isi;
-    document.getElementById('botStatus').textContent="✅ BOT ketemu otomatis! "+isi.split("\n").length+" baris. Tinggal edit, terus SIMPAN.";
-  }
-}
-function ambilBotDariFile(){
-  if(!cacheFull) cacheFull=localStorage.getItem('master_cache')||"";
-  if(!cacheFull){ alert("LOAD FILE dulu di GITHUB!"); pindahHalaman('github'); return; }
-  var isi=ekstrakBotDariCache();
-  if(!isi){
-    document.getElementById('botCode').value="// BELUM ADA BOT DI FILE INI\n// Tulis BOT baru di sini, terus SIMPAN.\nfunction balasBot(p){\n  p=(p||'').toLowerCase();\n  if(p.includes('harga')) return 'Harga 50rb kak!';\n  if(p.includes('ongkir')) return 'Ongkir tergantung lokasi kak!';\n  return 'Halo kak! Selamat datang di D\\'Lusso!';\n}";
-    document.getElementById('botStatus').textContent="⚠️ Di file ini belum ada BOT. Gw bikinin template BOT baru, tinggal SIMPAN!";
-    return;
-  }
-  cacheBot=isi;
-  document.getElementById('botCode').value=isi;
-  document.getElementById('botStatus').textContent="✅ Ketemu BOT! "+isi.split("\n").length+" baris! Nggak hilang lagi!";
-}
-function cekBotDiFile(){
-  if(!cacheFull) cacheFull=localStorage.getItem('master_cache')||"";
-  var box=document.getElementById('botCekHasil');
-  if(!cacheFull){ box.textContent="❌ File belum di-LOAD. LOAD dulu di GITHUB."; return; }
-  var adaKotak=cacheFull.indexOf(BOT_START)!==-1;
-  var isi=ekstrakBotDariCache();
-  var adaBalas=cacheFull.indexOf("balasBot")!==-1;
-  box.textContent="CEK BOT DI FILE:\nFile: "+cacheFull.length+" karakter\nAda kotak BOT-START? "+(adaKotak?"✅ ADA":"❌ BELUM ADA (file lama)")+"\nAda function balasBot? "+(adaBalas?"✅ ADA":"❌ NGGAK ADA")+"\nIsi BOT yg kedetek: "+(isi?isi.split("\n").length+" baris":"0 baris - KOSONG!")+"\n\n"+(isi?isi.slice(0,500):"Kalo kosong, pencet AMBIL BOT LAGI, nanti gw bikinin template baru.");
-}
-function simpanBotKeFile(){
-  var baru=document.getElementById('botCode').value;
-  if(!baru || !baru.trim()){ alert("Isi BOT dulu!"); return; }
-  if(!cacheFull) cacheFull=localStorage.getItem('master_cache')||"";
-  if(!cacheFull){ alert("LOAD FILE dulu di GITHUB!"); pindahHalaman('github'); return; }
-  if(!confirm("Simpan BOT + SAVE ke GitHub? BOT lama akan diganti, file lain NGGAK akan kehapus.")) return;
-  var botBaru="\n"+BOT_START+"\n"+baru.trim()+"\n"+BOT_END+"\n";
-  var s=cacheFull.indexOf(BOT_START);
-  var e=cacheFull.indexOf(BOT_END);
-  if(s!==-1 && e!==-1 && e>s){
-    // ADA KOTAK LAMA - ganti isi kotaknya aja, yg lain jangan diutak-atik
-    cacheFull=cacheFull.slice(0,s)+botBaru+cacheFull.slice(e+BOT_END.length);
-  } else {
-    // BELUM ADA KOTAK - tempel kotak baru sebelum </script> terakhir, tanpa hapus apapun
-    var idx=cacheFull.lastIndexOf(CLOSE_SCRIPT);
-    if(idx>=0) cacheFull=cacheFull.slice(0,idx)+botBaru+cacheFull.slice(idx);
-    else cacheFull+= "\n<script>\n"+botBaru+CLOSE_SCRIPT;
-  }
-  cacheBot=baru.trim();
-  simpanCacheKeHP();
-  document.getElementById('content').value=cacheFull;
-  editorMode='full';
-  document.getElementById('botStatus').textContent="✅ BOT ditempel di kotaknya, lagi SAVE ke GitHub... Nggak ada yg kehapus!";
-  saveFile();
-}
+var cacheBot=""; var BOT_START="/* BOT-START */"; var BOT_END="/* BOT-END */";
+function ekstrakBotDariCache(){ if(!cacheFull) cacheFull=localStorage.getItem('master_cache')||""; if(!cacheFull) return ""; var s=cacheFull.indexOf(BOT_START); var e=cacheFull.indexOf(BOT_END); if(s!==-1 && e!==-1 && e>s){ return cacheFull.slice(s+BOT_START.length, e).trim(); } var lines=cacheFull.split("\n"), out=[]; for(var i=0;i<lines.length;i++){ if(/function balasBot|function balas|bot_faq|bot_antrian/i.test(lines[i])) out.push(lines[i]); } if(out.length){ var idx=cacheFull.indexOf("function balasBot"); if(idx!==-1){ return cacheFull.slice(idx, idx+3000).split("\n").slice(0,30).join("\n"); } return out.join("\n"); } return ""; }
+function autoAmbilBot(){ var isi=ekstrakBotDariCache(); if(isi){ cacheBot=isi; var el=document.getElementById('botCode'); if(el) el.value=isi; document.getElementById('botStatus').textContent="✅ BOT ketemu otomatis! "+isi.split("\n").length+" baris."; } }
+function ambilBotDariFile(){ if(!cacheFull) cacheFull=localStorage.getItem('master_cache')||""; if(!cacheFull){ alert("LOAD FILE dulu di GITHUB!"); pindahHalaman('github'); return; } var isi=ekstrakBotDariCache(); if(!isi){ document.getElementById('botCode').value="// BELUM ADA BOT\nfunction balasBot(p){\n  p=(p||'').toLowerCase();\n  if(p.includes('harga')) return 'Harga 50rb kak!';\n  return 'Halo kak!';\n}"; document.getElementById('botStatus').textContent="⚠️ Belum ada BOT, gw bikinin template baru!"; return; } cacheBot=isi; document.getElementById('botCode').value=isi; document.getElementById('botStatus').textContent="✅ Ketemu BOT! "+isi.split("\n").length+" baris!"; }
+function cekBotDiFile(){ if(!cacheFull) cacheFull=localStorage.getItem('master_cache')||""; var box=document.getElementById('botCekHasil'); if(!cacheFull){ box.textContent="❌ File belum di-LOAD."; return; } var isi=ekstrakBotDariCache(); box.textContent="File: "+cacheFull.length+" karakter\nAda kotak? "+(cacheFull.indexOf(BOT_START)!==-1?"✅ ADA":"❌ BELUM")+"\nAda balasBot? "+(cacheFull.indexOf("balasBot")!==-1?"✅ ADA":"❌ NGGAK ADA")+"\nIsi BOT: "+(isi?isi.split("\n").length+" baris":"0"); }
+function simpanBotKeFile(){ var baru=document.getElementById('botCode').value; if(!baru || !baru.trim()){ alert("Isi BOT dulu!"); return; } if(!cacheFull) cacheFull=localStorage.getItem('master_cache')||""; if(!cacheFull){ alert("LOAD FILE dulu di GITHUB!"); pindahHalaman('github'); return; } if(!confirm("Simpan BOT + SAVE ke GitHub?")) return; var botBaru="\n"+BOT_START+"\n"+baru.trim()+"\n"+BOT_END+"\n"; var s=cacheFull.indexOf(BOT_START); var e=cacheFull.indexOf(BOT_END); if(s!==-1 && e!==-1 && e>s){ cacheFull=cacheFull.slice(0,s)+botBaru+cacheFull.slice(e+BOT_END.length); } else { var idx=cacheFull.lastIndexOf(CLOSE_SCRIPT); if(idx>=0) cacheFull=cacheFull.slice(0,idx)+botBaru+cacheFull.slice(idx); else cacheFull+="\n<script>\n"+botBaru+CLOSE_SCRIPT; } cacheBot=baru.trim(); simpanCacheKeHP(); document.getElementById('content').value=cacheFull; editorMode='full'; document.getElementById('botStatus').textContent="✅ BOT ditempel, lagi SAVE..."; saveFile(); }
 function simpanSettingBot(){ localStorage.setItem('master_bot',JSON.stringify({nama:document.getElementById('botNama').value,salam:document.getElementById('botSalam').value,wa:document.getElementById('botWa').value})); alert("Setting BOT tersimpan! ✅"); }
 function loadSettingBot(){ try{ var d=JSON.parse(localStorage.getItem('master_bot')||'{}'); if(d.nama) document.getElementById('botNama').value=d.nama; if(d.salam) document.getElementById('botSalam').value=d.salam; if(d.wa) document.getElementById('botWa').value=d.wa; }catch(e){} }
 async function loadBotFaq(){ var s=getSb(); if(!s.url||!s.key){ alert("Klik project dulu di DEPAN!"); pindahHalaman('home'); return; } document.getElementById('faqList').innerHTML='<p>⏳ Loading...</p>'; try{ var r=await fetch(s.url+"/rest/v1/bot_faq?select=*&order=id",{headers:{apikey:s.key,Authorization:"Bearer "+s.key}}); var j=await r.json(); if(!Array.isArray(j)||!j.length){ document.getElementById('faqList').innerHTML='<p style="color:#888">Belum ada FAQ.</p>'; return; } var html=""; for(var i=0;i<j.length;i++){ var f=j[i]; html+='<div class="faqItem"><b>❓ '+(f.pertanyaan||f.question||'-')+'</b><p>💬 '+(f.jawaban||f.answer||'-')+'</p><button class="del" onclick="hapusFaq('+f.id+')">Hapus</button></div>'; } document.getElementById('faqList').innerHTML=html; }catch(e){ document.getElementById('faqList').innerHTML='❌ '+e.message; } }
@@ -198,8 +115,8 @@ async function hapusFaq(id){ if(!confirm("Hapus FAQ ini?")) return; var s=getSb(
 async function loadAntrian(){ var s=getSb(); if(!s.url||!s.key){ alert("Klik project dulu di DEPAN!"); pindahHalaman('home'); return; } document.getElementById('antrianList').innerHTML='<p>⏳ Loading...</p>'; try{ var r=await fetch(s.url+"/rest/v1/bot_antrian?select=*&order=id.desc&limit=20",{headers:{apikey:s.key,Authorization:"Bearer "+s.key}}); var j=await r.json(); if(!Array.isArray(j)||!j.length){ document.getElementById('antrianList').innerHTML='<p style="color:#888">Antrian kosong!</p>'; return; } var html=""; for(var i=0;i<j.length;i++){ var x=j[i]; html+='<div class="faqItem"><b>📋 '+(x.nama||x.name||'-')+'</b><p>'+(x.pesan||x.message||JSON.stringify(x))+'</p></div>'; } document.getElementById('antrianList').innerHTML=html; }catch(e){ document.getElementById('antrianList').innerHTML='❌ '+e.message; } }
 function getMaster(){ return {url:MASTER_DB_URL, key:MASTER_DB_KEY}; }
 async function loadProjectsDariDb(){ var m=getMaster(); document.getElementById('list').innerHTML='<p>⏳ Loading...</p>'; try{ var r=await fetch(m.url+"/rest/v1/projects?select=*&order=created_at.desc",{headers:{apikey:m.key,Authorization:"Bearer "+m.key}}); var j=await r.json(); if(!Array.isArray(j)) throw new Error(JSON.stringify(j)); daftarDb=j; renderDb(); }catch(e){ document.getElementById('list').innerHTML='❌ '+e.message; } }
-function renderDb(){ var box=document.getElementById('list'); if(!daftarDb.length){ box.innerHTML='<p style="color:#888">Belum ada project.</p>'; return; } var html=""; for(var i=0;i<daftarDb.length;i++){ var p=daftarDb[i]; html+='<div class="proj" onclick="pilihDb('+i+')"><div><b>📁 '+(p.name||'-')+'</b><small>'+(p.github_repo||'')+'<br>API: '+(p.api_url||'')+'</small></div><button class="del" onclick="event.stopPropagation();hapusDb('+p.id+')">✕</button></div>'; } box.innerHTML=html; }
-function pilihDb(i){ var p=daftarDb[i]; if(!p) return; _editId=p.id; document.getElementById('projName').value=p.name||''; document.getElementById('topNama').value=p.name||''; document.getElementById('topUrl').value=p.github_repo||''; document.getElementById('topApi').value=p.api_url||''; document.getElementById('topTokenGH').value=bukaAES(p.github_token||''); document.getElementById('topTokenSB').value=bukaAES(p.token||''); var m=(p.github_repo||'').match(/github\.com\/([^\/]+)\/([^\/\s]+)/); if(m) document.getElementById('project').value=m[2].replace('.git',''); document.getElementById('topStatus').textContent="✅ "+(p.name||'')+" dipilih!"; document.getElementById('status').textContent="✅ "+(p.name||'')+" dipilih!"; tutupDaftarProject(); updateInfoProject(); simpanSementara(); }
+function renderDb(){ var box=document.getElementById('list'); if(!daftarDb.length){ box.innerHTML='<p style="color:#888">Belum ada project.</p>'; return; } var html=""; for(var i=0;i<daftarDb.length;i++){ var p=daftarDb[i]; html+='<div class="proj" onclick="pilihDb('+i+',event)"><div><b>📁 '+(p.name||'-')+'</b><small>'+(p.github_repo||'')+'<br>API: '+(p.api_url||'')+'</small></div><button class="del" onclick="event.stopPropagation();hapusDb('+p.id+')">✕</button></div>'; } box.innerHTML=html; }
+function pilihDb(i,ev){ if(ev){ ev.preventDefault(); ev.stopPropagation(); } var p=daftarDb[i]; if(!p) return; _editId=p.id; document.getElementById('projName').value=p.name||''; document.getElementById('topNama').value=p.name||''; document.getElementById('topUrl').value=p.github_repo||''; document.getElementById('topApi').value=p.api_url||''; document.getElementById('topTokenGH').value=bukaAES(p.github_token||''); document.getElementById('topTokenSB').value=bukaAES(p.token||''); var m=(p.github_repo||'').match(/github\.com\/([^\/]+)\/([^\/\s]+)/); if(m) document.getElementById('project').value=m[2].replace('.git',''); document.getElementById('topStatus').textContent="✅ "+(p.name||'')+" dipilih!"; document.getElementById('status').textContent="✅ "+(p.name||'')+" dipilih!"; tutupDaftarProject(); updateInfoProject(); simpanSementara(); }
 async function simpanProjectKeDb(){ var m=getMaster(); var data={ name:v('topNama')||v('projName')||v('project')||"Project Baru", github_repo:v('topUrl'), github_token:kunciAES(v('topTokenGH')), api_url:v('topApi'), token:kunciAES(v('topTokenSB')) }; if(!data.github_repo && !data.api_url){ alert("Isi URL / API dulu Ko!"); return; } try{ var url=m.url+"/rest/v1/projects", headers={apikey:m.key,Authorization:"Bearer "+m.key,"Content-Type":"application/json",Prefer:"return=representation"}; var r; if(_editId) r=await fetch(url+"?id=eq."+_editId,{method:"PATCH",headers:headers,body:JSON.stringify(data)}); else r=await fetch(url,{method:"POST",headers:headers,body:JSON.stringify(data)}); var j=await r.json(); if(!r.ok) throw new Error(JSON.stringify(j)); alert("✅ Tersimpan!"); simpanSementara(); }catch(e){ alert("Gagal: "+e.message); } }
 async function hapusDb(id){ if(!confirm("Hapus project ini?")) return; var m=getMaster(); await fetch(m.url+"/rest/v1/projects?id=eq."+id,{method:"DELETE",headers:{apikey:m.key,Authorization:"Bearer "+m.key}}); loadProjectsDariDb(); }
 function tambahManual(){ var n=v('newProj'); if(!n){ alert("Isi Nama Project!"); return; } document.getElementById('projName').value=n; document.getElementById('topNama').value=n; document.getElementById('project').value=n; tutupDaftarProject(); updateInfoProject(); simpanSementara(); alert("Siap isi URL / API / TOKEN untuk "+n); }

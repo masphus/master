@@ -94,7 +94,9 @@ async function getOtak(){
 function norm(s){ return (s||'').toLowerCase().replace(/[^a-z0-9 ]/g,' ').replace(/\s+/g,' ').trim(); }
 
 function cariJawaban(q){
+  // === LANGKAH 1: HITUNG DULU PERTANYAANNYA ===
   let nq = ' ' + norm(q) + ' ';
+  // Ganti sinonim dulu biar kata jadi baku
   for(let s of DB.sinonim){
     let utama = norm(s.kata_utama);
     let list = String(s.daftar_sinonim||'').toLowerCase().split(/[,|]/).map(x=>norm(x));
@@ -102,8 +104,31 @@ function cariJawaban(q){
       if(sin && nq.includes(' '+sin+' ')) nq = nq.replace(' '+sin+' ', ' '+utama+' ');
     }
   }
+  // Hitung jumlah kata pertanyaan yang udah bersih
+  let kataPertanyaan = nq.trim().split(' ').filter(x=>x);
+  let jumlahKata = kataPertanyaan.length;
+
+  // === LANGKAH 2: CARI JAWABAN BERDASARKAN FRASA DULU ===
+  // Frasa itu yang paling mirip sama pertanyaan utuh, jadi dicek pertama!
+  // Kalo ada 2 frasa yang cocok, yang paling panjang (paling detail) yang menang!
+  let bestFrasa = null, bestPanjang = 0;
+  for(let f of DB.frasa){
+    let teksFrasa = norm(f.teks);
+    if(teksFrasa && nq.includes(' '+teksFrasa+' ')){
+      if(teksFrasa.length > bestPanjang){
+        bestPanjang = teksFrasa.length;
+        bestFrasa = f;
+      }
+    }
+  }
+  if(bestFrasa){
+    let rule = DB.rules.find(r => norm(r.kategori) === norm(bestFrasa.kategori));
+    if(rule) return rule.jawaban;
+  }
+
+  // === LANGKAH 3: KALO FRASA NGGAK KETEMU, BARU HITUNG SKOR ===
+  // Penentu = 2, sisanya = 1 (sesuai permintaan lu Ko!)
   let skorKategori = {};
-  // === SKOR BARU: PENENTU = 2, SELAIN ITU = 1 ===
   for(let p of DB.penentu){
     if(p.kata && nq.includes(' '+norm(p.kata)+' ')) skorKategori[p.kategori] = (skorKategori[p.kategori]||0) + 2;
   }
@@ -111,9 +136,6 @@ function cariJawaban(q){
     let k1 = norm(k.kata1), k2 = norm(k.kata2);
     if(k1 && nq.includes(' '+k1+' ')) skorKategori[k.kategori] = (skorKategori[k.kategori]||0) + 1;
     if(k2 && nq.includes(' '+k2+' ')) skorKategori[k.kategori] = (skorKategori[k.kategori]||0) + 1;
-  }
-  for(let f of DB.frasa){
-    if(f.teks && nq.includes(' '+norm(f.teks)+' ')) skorKategori[f.kategori] = (skorKategori[f.kategori]||0) + 1;
   }
   let bestKat = null, bestSkor = 0;
   for(let kat in skorKategori){ if(skorKategori[kat] > bestSkor){ bestSkor = skorKategori[kat]; bestKat = kat; } }

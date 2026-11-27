@@ -38,8 +38,9 @@
   <button onclick="kirim()">Kirim</button>
 </div>
 <script>
-const SUPABASE_URL = 'https://kkydbnjxbcxpcpor.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_Z-EI-4pmMWd8qhArrEvJdw_ZN8R6WAx';
+// === DIGANTI KE PROJECT BARU ===
+const SUPABASE_URL = 'https://msfzsebownnsrpyjusoc.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_7VQcQXBLz4OYn_OJUzusSg_Zz1or9gq';
 const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 const chat = document.getElementById('chat');
 const input = document.getElementById('pesan');
@@ -63,7 +64,6 @@ async function getOtak(){
   if(otakReady) return DB;
   statusEl.textContent = 'Menghubungi Supabase...';
   try{
-    // EDIT: Sesuai tabel yang ada - gak ada lagi bot_faq / persamaan / skor
     let [rPenentu, rKunci, rFrasa, rRules, rSinonim] = await Promise.all([
       Promise.race([supabaseClient.from('kata_penentu').select('kategori,kata'), timeout(3000)]),
       Promise.race([supabaseClient.from('kata_kunci').select('kategori,kata1,kata2'), timeout(3000)]),
@@ -97,7 +97,6 @@ function norm(s){ return (s||'').toLowerCase().replace(/[^a-z0-9 ]/g,' ').replac
 
 function cariJawaban(q){
   let nq = ' ' + norm(q) + ' ';
-  // EDIT: Terapkan sinonim dulu - kata_utama / daftar_sinonim
   for(let s of DB.sinonim){
     let utama = norm(s.kata_utama);
     let list = String(s.daftar_sinonim||'').toLowerCase().split(/[,|]/).map(x=>norm(x));
@@ -106,28 +105,23 @@ function cariJawaban(q){
     }
   }
   let skorKategori = {};
-  // OTAK 1: kata_penentu = +10 (paling kuat)
   for(let p of DB.penentu){
     if(p.kata && nq.includes(' '+norm(p.kata)+' ')) skorKategori[p.kategori] = (skorKategori[p.kategori]||0) + 10;
   }
-  // OTAK 2: kata_kunci kata1 +2, kata2 +3
   for(let k of DB.kunci){
     let k1 = norm(k.kata1), k2 = norm(k.kata2);
     if(k1 && nq.includes(' '+k1+' ')) skorKategori[k.kategori] = (skorKategori[k.kategori]||0) + 2;
     if(k2 && nq.includes(' '+k2+' ')) skorKategori[k.kategori] = (skorKategori[k.kategori]||0) + 3;
   }
-  // OTAK 3: frasa teks = +1
   for(let f of DB.frasa){
     if(f.teks && nq.includes(' '+norm(f.teks)+' ')) skorKategori[f.kategori] = (skorKategori[f.kategori]||0) + 1;
   }
-  // Cari kategori pemenang
   let bestKat = null, bestSkor = 0;
   for(let kat in skorKategori){ if(skorKategori[kat] > bestSkor){ bestSkor = skorKategori[kat]; bestKat = kat; } }
   if(bestKat){
     let rule = DB.rules.find(r => norm(r.kategori) === norm(bestKat));
     if(rule) return rule.jawaban;
   }
-  // Fallback cadangan
   for(let c of OTAK_CADANGAN){ if(nq.includes(c.kategori)) return c.jawaban; }
   return null;
 }
@@ -157,7 +151,6 @@ async function kirim(){
   let jawaban = cariJawaban(teks);
   if(!jawaban){
     jawaban = 'Halo kak, aku Mona 🙏<br><br>Untuk "'+teks+'" aku belum nemu jawabannya. Boleh ceritain lebih detail nggak kak?';
-    // EDIT: bot_antrian cuma punya pertanyaan, status - tanpa member_name
     try{ await supabaseClient.from('bot_antrian').insert([{pertanyaan: teks, status: 'MENUNGGU'}]); }catch(e){ console.log(e); }
   }
   botMsg.innerHTML = jawaban;

@@ -20,67 +20,92 @@
   .msg{padding:10px 13px;border-radius:14px;font-size:14px;line-height:1.45;word-break:break-word}
   .msg.bot{background:#fff;color:#111}
   .msg.me{background:#dcf8c6;color:#111}
-  #box{
-    position:fixed;left:0;right:0;bottom:0;
-    display:flex;gap:8px;padding:10px;padding-bottom:calc(10px + env(safe-area-inset-bottom));
-    background:#fff;border-top:1px solid #ddd;z-index:99;
-  }
+  #box{position:fixed;left:0;right:0;bottom:0;display:flex;gap:8px;padding:10px;padding-bottom:calc(10px + env(safe-area-inset-bottom));background:#fff;border-top:1px solid #ddd;z-index:99}
   #pesan{flex:1;padding:14px;border-radius:20px;border:1px solid #ddd;outline:none;font-size:15px;min-width:0}
   button{padding:12px 18px;border:none;border-radius:20px;background:#111;color:#fff;font-weight:bold;cursor:pointer;flex-shrink:0}
 </style>
 </head>
 <body>
-
 <div id="head">
   <img src="mona.png" onerror="this.src='https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100'">
   <div><b>MONA</b><br><span>● Online</span></div>
 </div>
-
 <div id="chat"></div>
-
 <div id="box">
   <input id="pesan" placeholder="Ketik pesan..." autocomplete="off">
   <button onclick="kirim()">Kirim</button>
 </div>
-
 <script>
 const SUPABASE_URL = 'https://kkydbnjxbcxpcpor.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_Z-EI-4pmMWd8qhArrEvJdw_ZN8R6WAx';
 const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
 const chat = document.getElementById('chat');
 const input = document.getElementById('pesan');
 let OTAK = null;
 
-// === OTAK GABUNGAN: SOFIA + BOT KITA = MONA ===
 async function getOtak(){
   if(OTAK) return OTAK;
   try{
-    // 1. BOT KITA - bot_rules (UTAMA)
     let r1 = await supabaseClient.from('bot_rules').select('persamaan,jawaban,skor');
+    console.log('bot_rules:', r1.data);
     let rules = (r1.data||[]).map(x => ({keyword: x.persamaan, answer: x.jawaban, skor: x.skor||90}));
-    // 2. SOFIA - bot_faq (CADANGAN)
     let r2 = await supabaseClient.from('bot_faq').select('keyword,answer,skor');
+    console.log('bot_faq:', r2.data);
     let faq = r2.data||[];
     OTAK = [...rules, ...faq];
-  }catch(e){ OTAK=[]; }
+  }catch(e){ console.log('GAGAL AMBIL OTAK', e); OTAK=[]; }
   return OTAK;
 }
 
 function norm(s){ return (s||'').toLowerCase().replace(/[^a-z0-9 ]/g,' ').replace(/\s+/g,' ').trim(); }
 
+// === CARA CARI BARU: CARI DI persamaan + jawaban ===
 function cariJawaban(q, otak){
   let nq = norm(q);
+  let stop = ['boleh','tau','tahu','dong','kak','ya','kah','sih','nya','apa','dimana','di','mana','berapa','gimana','mau','tanya','tolong','kasih','kasi','info'];
+  let kataUser = nq.split(' ').filter(w => w.length > 2 && !stop.includes(w));
+  if(!kataUser.length) kataUser = nq.split(' ').filter(w=>w.length>2);
+  console.log('Kata user:', kataUser);
+
   let best = null, bestScore = 0;
+
   for(let r of otak){
+    let kunciGabung = norm((r.keyword||'') + ' ' + (r.answer||''));
+    // 1. Cek di persamaan dulu
     let frasas = String(r.keyword||'').toLowerCase().split('|').map(x=>norm(x)).filter(Boolean);
     for(let f of frasas){
-      if(!f) continue;
-      if(nq===f && 100>bestScore){ best=r; bestScore=100; }
-      else if(nq.includes(f) && f.length>=3 && 70+f.length>bestScore){ best=r; bestScore=70+f.length; }
+      let kataKunci = f.split(' ').filter(w => w.length > 2);
+      let cocok = 0;
+      for(let k of kataKunci){
+        if(kataUser.some(u => u.includes(k) || k.includes(u))) cocok++;
+      }
+      let skor = kataKunci.length ? (cocok / kataKunci.length) * 100 : 0;
+      if(nq.includes(f)) skor += 20;
+      if(skor > bestScore){ bestScore = skor; best = r; }
+    }
+    // 2. KALO DI persamaan GAK KETEMU, CEK DI jawaban!
+    // Ini obatnya: kalo user bilang "alamat", dan jawaban ada kata "Jl. Braga" / "alamat" -> ketemu!
+    let kataJawaban = norm(r.answer||'').split(' ').filter(w=>w.length>2);
+    for(let u of kataUser){
+      if(kataJawaban.some(j => j.includes(u) || u.includes(j))){
+        // Skor dari jawaban lebih kecil, biar persamaan tetep menang
+        let skorJ = 55;
+        if(skorJ > bestScore){ bestScore = skorJ; best = r; }
+        break;
+      }
+    }
+    // 3. Sinonim: alamat = rumah = lokasi = dimana = tinggal
+    let sinonimAlamat = ['alamat','rumah','lokasi','tinggal','dimana','braga','bandung','toko','boutique'];
+    let userMauAlamat = kataUser.some(w => sinonimAlamat.includes(w));
+    let jawabanAdaAlamat = norm(r.answer||'').includes('braga') || norm(r.answer||'').includes('bandung') || norm(r.answer||'').includes('jl.') || norm(r.answer||'').includes('jalan');
+    if(userMauAlamat && jawabanAdaAlamat){
+      if(60 > bestScore){ bestScore = 60; best = r; }
     }
   }
-  return best ? best.answer : null;
+
+  console.log('Best skor:', bestScore, 'Best:', best);
+  if(bestScore >= 50) return best.answer;
+  return null;
 }
 
 function tambah(teks, siapa){
@@ -104,24 +129,17 @@ async function kirim(){
   tambah(teks, 'me');
   input.value = '';
   input.focus();
-
   let rowBot = tambah('...', 'bot');
   let botMsg = rowBot.querySelector('.msg');
-
   let otak = await getOtak();
   let jawaban = cariJawaban(teks, otak);
-
   if(!jawaban){
     jawaban = 'Halo kak, aku Mona 🙏<br><br>Untuk "'+teks+'" aku belum nemu jawabannya di otakku. Boleh ceritain lebih detail nggak kak? Biar aku bantu cariin.';
     try{ await supabaseClient.from('bot_antrian').insert([{pertanyaan: teks, member_name: 'Tamu', status: 'MENUNGGU'}]); }catch(e){}
   }
-
   setTimeout(()=>{ botMsg.innerHTML = jawaban; chat.scrollTop = chat.scrollHeight; }, 400);
 }
-
 input.addEventListener('keydown', e=>{ if(e.key==='Enter') kirim(); });
-
-// Sapaan awal MONA
 tambah('Halo kak, aku Mona 🙏<br>Ada yang bisa aku bantu?', 'bot');
 </script>
 </body>

@@ -45,14 +45,6 @@ const chat = document.getElementById('chat');
 const input = document.getElementById('pesan');
 const statusEl = document.getElementById('status');
 
-let OTAK_CADANGAN = [
-  {kategori:'salam', jawaban:'Halo kak, aku Mona 🙏<br>Ada yang bisa aku bantu?'},
-  {kategori:'alamat', jawaban:'Alamat kita di Jl. Braga No.88, Bandung kak 🙏<br>Buka setiap hari 09.00 - 21.00'},
-  {kategori:'siapa', jawaban:'Aku Mona kak, asisten dari Panorama Indonesia 🙏'},
-  {kategori:'harga', jawaban:'Untuk harga boleh tau produk yang mana kak? Biar aku cekin.'},
-  {kategori:'jam', jawaban:'Kita buka setiap hari 09.00 - 21.00 kak 🙏'},
-  {kategori:'makasih', jawaban:'Sama-sama kak 🙏 Senang bisa bantu!'},
-];
 let DB = { penentu:[], kunci:[], frasa:[], rules:[], sinonim:[] };
 let otakReady = false;
 
@@ -74,7 +66,6 @@ async function getOtak(){
     if(rFrasa && rFrasa.data) DB.frasa = rFrasa.data;
     if(rRules && rRules.data) DB.rules = rRules.data;
     if(rSinonim && rSinonim.data) DB.sinonim = rSinonim.data;
-
     if(DB.rules.length || DB.penentu.length){
       otakReady = true;
       statusEl.textContent = 'Otak siap: Penentu ' + DB.penentu.length + ' • Kunci ' + DB.kunci.length + ' • Frasa ' + DB.frasa.length + ' • Rules ' + DB.rules.length + ' • Supabase ✅';
@@ -84,7 +75,7 @@ async function getOtak(){
     throw new Error('Supabase kosong / timeout');
   }catch(e){
     console.log('Supabase gagal:', e);
-    statusEl.textContent = 'Supabase lambat / RLS terkunci, pake otak cadangan ⚠️';
+    statusEl.textContent = 'Supabase lambat / RLS terkunci ⚠️';
     statusEl.style.background = '#f8d7da';
     otakReady = true;
     return DB;
@@ -93,10 +84,31 @@ async function getOtak(){
 
 function norm(s){ return (s||'').toLowerCase().replace(/[^a-z0-9 ]/g,' ').replace(/\s+/g,' ').trim(); }
 
+// === RANGKAI KATA JADI KALIMAT ===
+// Database cuma gudang kata, jadi kalimat dibikin di sini, bukan diambil dari bot_rules!
+function rangkaiKalimat(kataKetemu, kategori, pertanyaanAsli){
+  // kataKetemu = array kata dari gudang, misal ['tau','bandung']
+  let kataStr = kataKetemu.join(' ');
+  // Bersihin nama kategori biar enak dibaca: tanya_tau_bandung -> tau bandung
+  let topik = kategori ? kategori.replace(/^tanya_|^sapaan_/,'').replace(/_/g,' ') : kataStr;
+  if(!topik) topik = kataStr;
+
+  // Template rangkai - pilih berdasarkan kata yang ketemu
+  // Ini bukan jawaban dari DB, ini kalimat yang dirangkai dari kata gudang!
+  let pembuka = ['Iya Kak,', 'Oh iya Kak,', 'Halo Kak,', 'Betul Kak,'][Math.floor(Math.random()*4)];
+  let kalimat = pembuka + ' soal <b>' + topik + '</b> ya? ';
+  if(kataKetemu.length >= 2){
+    kalimat += 'Kakak nanya soal <b>' + kataStr + '</b>. ';
+  } else if(kataKetemu.length === 1){
+    kalimat += 'Kakak nyebut kata <b>' + kataStr + '</b>. ';
+  }
+  kalimat += 'Coba ceritain lebih detail dong Kak, biar Mona bisa bantu jawab soal ' + topik + ' dengan pas. Kakak maksudnya gimana soal ' + topik + ' itu?';
+  return kalimat;
+}
+
 function cariJawaban(q){
   // === LANGKAH 1: HITUNG DULU PERTANYAANNYA ===
   let nq = ' ' + norm(q) + ' ';
-  // Ganti sinonim dulu biar kata jadi baku
   for(let s of DB.sinonim){
     let utama = norm(s.kata_utama);
     let list = String(s.daftar_sinonim||'').toLowerCase().split(/[,|]/).map(x=>norm(x));
@@ -104,46 +116,59 @@ function cariJawaban(q){
       if(sin && nq.includes(' '+sin+' ')) nq = nq.replace(' '+sin+' ', ' '+utama+' ');
     }
   }
-  // Hitung jumlah kata pertanyaan yang udah bersih
   let kataPertanyaan = nq.trim().split(' ').filter(x=>x);
   let jumlahKata = kataPertanyaan.length;
 
-  // === LANGKAH 2: CARI JAWABAN BERDASARKAN FRASA DULU ===
-  // Frasa itu yang paling mirip sama pertanyaan utuh, jadi dicek pertama!
-  // Kalo ada 2 frasa yang cocok, yang paling panjang (paling detail) yang menang!
+  // === LANGKAH 2: CARI KATA DI GUDANG BERDASARKAN FRASA DULU ===
+  let kataKetemu = [];
+  let kategoriTerpilih = null;
+
+  // 2a. Frasa dulu - paling lengkap
   let bestFrasa = null, bestPanjang = 0;
   for(let f of DB.frasa){
     let teksFrasa = norm(f.teks);
     if(teksFrasa && nq.includes(' '+teksFrasa+' ')){
-      if(teksFrasa.length > bestPanjang){
-        bestPanjang = teksFrasa.length;
-        bestFrasa = f;
-      }
+      if(teksFrasa.length > bestPanjang){ bestPanjang = teksFrasa.length; bestFrasa = f; }
     }
   }
   if(bestFrasa){
-    let rule = DB.rules.find(r => norm(r.kategori) === norm(bestFrasa.kategori));
-    if(rule) return rule.jawaban;
+    kategoriTerpilih = bestFrasa.kategori;
+    kataKetemu = norm(bestFrasa.teks).split(' ');
+    // RANGKAI, bukan ambil jawaban DB!
+    return rangkaiKalimat(kataKetemu, kategoriTerpilih, q);
   }
 
-  // === LANGKAH 3: KALO FRASA NGGAK KETEMU, BARU HITUNG SKOR ===
-  // Penentu = 2, sisanya = 1 (sesuai permintaan lu Ko!)
+  // 2b. Kalo frasa nggak ada, cari kata_penentu (2 poin) + kata_kunci (1 poin)
   let skorKategori = {};
+  let kataPerKategori = {};
   for(let p of DB.penentu){
-    if(p.kata && nq.includes(' '+norm(p.kata)+' ')) skorKategori[p.kategori] = (skorKategori[p.kategori]||0) + 2;
+    if(p.kata && nq.includes(' '+norm(p.kata)+' ')){
+      skorKategori[p.kategori] = (skorKategori[p.kategori]||0) + 2;
+      if(!kataPerKategori[p.kategori]) kataPerKategori[p.kategori] = [];
+      kataPerKategori[p.kategori].push(norm(p.kata));
+    }
   }
   for(let k of DB.kunci){
     let k1 = norm(k.kata1), k2 = norm(k.kata2);
-    if(k1 && nq.includes(' '+k1+' ')) skorKategori[k.kategori] = (skorKategori[k.kategori]||0) + 1;
-    if(k2 && nq.includes(' '+k2+' ')) skorKategori[k.kategori] = (skorKategori[k.kategori]||0) + 1;
+    if(k1 && nq.includes(' '+k1+' ')){
+      skorKategori[k.kategori] = (skorKategori[k.kategori]||0) + 1;
+      if(!kataPerKategori[k.kategori]) kataPerKategori[k.kategori] = [];
+      kataPerKategori[k.kategori].push(k1);
+    }
+    if(k2 && nq.includes(' '+k2+' ')){
+      skorKategori[k.kategori] = (skorKategori[k.kategori]||0) + 1;
+      if(!kataPerKategori[k.kategori]) kataPerKategori[k.kategori] = [];
+      kataPerKategori[k.kategori].push(k2);
+    }
   }
   let bestKat = null, bestSkor = 0;
   for(let kat in skorKategori){ if(skorKategori[kat] > bestSkor){ bestSkor = skorKategori[kat]; bestKat = kat; } }
   if(bestKat){
-    let rule = DB.rules.find(r => norm(r.kategori) === norm(bestKat));
-    if(rule) return rule.jawaban;
+    kataKetemu = [...new Set(kataPerKategori[bestKat] || [])];
+    // RANGKAI, bukan ambil jawaban DB!
+    return rangkaiKalimat(kataKetemu, bestKat, q);
   }
-  for(let c of OTAK_CADANGAN){ if(nq.includes(c.kategori)) return c.jawaban; }
+
   return null;
 }
 
@@ -171,7 +196,7 @@ async function kirim(){
   if(!otakReady){ await getOtak(); }
   let jawaban = cariJawaban(teks);
   if(!jawaban){
-    jawaban = 'Halo kak, aku Mona 🙏<br><br>Untuk "'+teks+'" aku belum nemu jawabannya. Boleh ceritain lebih detail nggak kak?';
+    jawaban = 'Halo kak, aku Mona 🙏<br><br>Untuk "'+teks+'" aku belum nemu katanya di gudang. Boleh ceritain lebih detail nggak kak?';
     try{ await supabaseClient.from('bot_antrian').insert([{pertanyaan: teks, status: 'MENUNGGU'}]); }catch(e){ console.log(e); }
   }
   botMsg.innerHTML = jawaban;

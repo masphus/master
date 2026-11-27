@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="id"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>👑 MASTER D' LUSSO - AUTO ISI PROJECT</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial}
+body{background:#0a0a0a;color:#fff;padding:14px 14px 40px;background:radial-gradient(circle at 50% 0%,#2a2100 0%,#0a0a0a 55%)}
+h1{text-align:center;font-family:Georgia;font-size:28px;letter-spacing:4px;color:#E8C97A;margin-top:14px}
+.sub{text-align:center;color:#aaa;font-size:11px;letter-spacing:1.5px;margin:6px 0 14px}
+.line{height:1px;background:linear-gradient(90deg,transparent,#C9A86A,transparent);margin:10px 0}
+.card{background:#151207;border:1px solid #C9A86A;border-radius:20px;padding:16px;margin-top:14px}
+label{display:block;font-size:10px;letter-spacing:1.5px;color:#E8C97A;margin:14px 0 6px;font-weight:800}
+input{width:100%;background:#0a0a0a;border:1px solid #3a2f14;color:#fff;padding:14px;border-radius:12px;outline:none;font-size:14px}
+textarea{width:100%;height:360px;background:#000;border:1px solid #3a2f14;color:#7CFC00;padding:12px;border-radius:12px;font-family:monospace;font-size:11px;outline:none}
+button{width:100%;background:linear-gradient(180deg,#F5D98A,#C9A86A);border:none;padding:15px;border-radius:13px;font-weight:900;font-size:14px;margin-top:12px;cursor:pointer;color:#000}
+.sec{background:#1a170e;color:#E8C97A;border:1px solid #C9A86A}
+.row{display:flex;gap:10px}.row>*{flex:1}
+.badge{display:inline-block;background:#221f10;border:1px solid #C9A86A;color:#E8C97A;padding:6px 11px;border-radius:20px;font-size:11px;margin-top:8px}
+.proj{display:flex;justify-content:space-between;align-items:center;background:#0a0a0a;border:1px solid #333;border-radius:14px;padding:12px;margin-top:10px;cursor:pointer}
+.proj.active{border-color:#E8C97A;background:#221f10}
+.proj small{color:#888;font-size:11px;display:block;margin-top:3px}
+.del{background:#333;color:#ff6b6b;border:none;padding:8px 12px;border-radius:8px;width:auto;margin:0;font-size:12px}
+#status,#sbStatus{font-size:12px;margin-top:10px;text-align:center;color:#8aff8a;line-height:1.5}
+small{color:#888;font-size:11px;line-height:1.5}
+</style></head><body>
+<h1>👑 MASTER</h1><div class="sub">D' LUSSO • KLIK PROJECT = AUTO ISI GITHUB + SUPABASE</div>
+
+<!-- 1. MASTER DATABASE - TEMPAT TABEL projects -->
+<div class="card"><b style="color:#E8C97A">👑 MASTER DATABASE - TEMPAT TABEL projects</b>
+<small>Ini Supabase tempat lu bikin tabel projects tadi. Isi sekali, simpan di HP.</small>
+<label>MASTER SUPABASE URL</label><input id="masterUrl" placeholder="https://xxx.supabase.co">
+<label>MASTER SUPABASE KEY</label><input id="masterKey" placeholder="sb_publishable_... / eyJ...">
+<button class="sec" onclick="saveMasterDb()">💾 SIMPAN MASTER DB DI HP</button>
+<div id="masterStatus" style="font-size:12px;margin-top:10px;text-align:center;color:#8aff8a"></div>
+</div>
+
+<!-- 2. DAFTAR PROJECT DARI DATABASE -->
+<div class="card"><b style="color:#E8C97A">📂 DAFTAR PROJECT - DARI DATABASE</b>
+<button class="sec" onclick="loadProjectsDariDb()">🔄 LOAD PROJECT DARI DATABASE</button>
+<div id="list"><p style="color:#888;font-size:12px;padding:10px 0">Belum ada project. Pencet LOAD di atas.</p></div>
+<div id="loadInfo" style="font-size:11px;color:#888;margin-top:6px"></div>
+</div>
+
+<!-- 3. FORM PROJECT - AUTO ISI -->
+<div class="card"><b style="color:#E8C97A">⚙️ PROJECT YANG DIPILIH - AUTO ISI</b>
+<label>NAMA PROJECT / NAMA PEMBELI</label><input id="projName" placeholder="Ammo Travel - Si A">
+<label>1️⃣ GITHUB REPO</label><input id="repoUrl" placeholder="https://github.com/si-A/ammo-travel">
+<label>2️⃣ GITHUB TOKEN - PUNYA DIA</label><input id="ghToken" type="password" placeholder="ghp_xxx punya si A">
+<label>3️⃣ API URL - SUPABASE URL PUNYA DIA</label><input id="sbUrl" placeholder="https://xxx-punya-si-A.supabase.co">
+<label>4️⃣ TOKEN - SUPABASE KEY PUNYA DIA</label><input id="sbKey" placeholder="sb_publishable_... punya si A">
+<span class="badge" id="parsed">Belum di-parse</span>
+<div class="row"><div><label>NAMA PROJECT (REPO)</label><input id="project" placeholder="nama-repo"></div><div><label>BRANCH</label><input id="branch" value="main"></div></div>
+<label>NAMA FILE</label><input id="fileName" value="index.html">
+<div class="row"><button class="sec" onclick="simpanProjectKeDb()">💾 SIMPAN PROJECT INI KE DATABASE</button><button class="sec" onclick="projectBaru()">➕ PROJECT BARU / KOSONGIN</button></div>
+<button class="sec" onclick="loadFile()">📥 LOAD FILE DARI GITHUB PROJECT INI</button>
+<div id="status">Belum load...</div>
+</div>
+
+<div class="card"><b style="color:#E8C97A">6️⃣ ISI FILE</b>
+<textarea id="content" placeholder="Klik LOAD FILE dulu..."></textarea>
+<div id="info" style="font-size:11px;color:#888;margin-top:8px">Karakter: 0</div>
+<button onclick="saveFile()">💾 SAVE KE GITHUB PROJECT INI</button></div>
+
+<div class="card"><b style="color:#E8C97A">⚡ GANTI CEPAT</b>
+<label>CARI (LAMA)</label><input id="findTxt" placeholder="6285899611111">
+<label>GANTI JADI (BARU)</label><input id="replaceTxt" placeholder="62812xxxx">
+<button class="sec" onclick="doReplace()">🔄 GANTI SEMUA</button></div>
+
+<script>
+var sha="", cacheFull="", daftarDb=[];
+var CLOSE_SCRIPT="<"+"/"+"script>";
+
+// --- MASTER DB ---
+function getMaster(){ return {url:document.getElementById('masterUrl').value.trim(), key:document.getElementById('masterKey').value.trim()}; }
+function saveMasterDb(){ localStorage.setItem('master_db', JSON.stringify(getMaster())); document.getElementById('masterStatus').textContent="✅ Master DB tersimpan di HP!"; }
+function loadMasterDb(){ try{ var d=JSON.parse(localStorage.getItem('master_db')||'{}'); if(d.url){ document.getElementById('masterUrl').value=d.url; document.getElementById('masterKey').value=d.key||''; } }catch(e){} }
+
+// --- LOAD PROJECT DARI DATABASE projects ---
+async function loadProjectsDariDb(){
+  var m=getMaster(); if(!m.url||!m.key){ alert("Isi MASTER DATABASE dulu di atas Ko! Itu Supabase tempat tabel projects lu."); return; }
+  document.getElementById('list').innerHTML='<p>⏳ Loading dari database...</p>';
+  try{
+    var r=await fetch(m.url+"/rest/v1/projects?select=*&order=created_at.desc",{headers:{apikey:m.key,Authorization:"Bearer "+m.key}});
+    var j=await r.json(); if(!Array.isArray(j)) throw new Error(JSON.stringify(j));
+    daftarDb=j; renderDb();
+    document.getElementById('loadInfo').textContent="✅ Ketemu "+j.length+" project dari database!";
+  }catch(e){ document.getElementById('list').innerHTML='❌ '+e.message; alert(e.message); }
+}
+function renderDb(){
+  var box=document.getElementById('list'); if(!daftarDb.length){ box.innerHTML='<p style="color:#888">Belum ada project di database. Isi form di bawah terus SIMPAN.</p>'; return; }
+  var html=""; for(var i=0;i<daftarDb.length;i++){ var p=daftarDb[i]; html+='<div class="proj" onclick="pilihDb('+i+')"><div><b>📁 '+(p.name||'-')+'</b><small>GitHub: '+(p.github_repo||'-')+'<br>API: '+(p.api_url||'-')+'</small></div><button class="del" onclick="event.stopPropagation();hapusDb('+p.id+')">✕</button></div>'; }
+  box.innerHTML=html;
+}
+// INI KUNCINYA KO - KLIK = AUTO ISI SEMUA 4 KOLOM
+function pilihDb(i){
+  var p=daftarDb[i]; if(!p) return;
+  document.getElementById('projName').value=p.name||'';
+  document.getElementById('repoUrl').value=p.github_repo||'';
+  document.getElementById('ghToken').value=p.github_token||'';
+  document.getElementById('sbUrl').value=p.api_url||'';
+  document.getElementById('sbKey').value=p.token||'';
+  parseRepo();
+  document.getElementById('status').textContent="✅ "+p.name+" dipilih! GitHub + API + Token udah keisi otomatis!";
+  // simpan id yang lagi dipilih biar bisa UPDATE bukan nambah baru terus
+  window._editId=p.id;
+}
+function projectBaru(){ window._editId=null; ['projName','repoUrl','ghToken','sbUrl','sbKey','project'].forEach(function(id){ document.getElementById(id).value=''; }); document.getElementById('status').textContent="Siap isi project baru..."; }
+async function simpanProjectKeDb(){
+  var m=getMaster(); if(!m.url||!m.key){ alert("Isi MASTER DATABASE dulu!"); return; }
+  var data={ name:document.getElementById('projName').value.trim(), github_repo:document.getElementById('repoUrl').value.trim(), github_token:document.getElementById('ghToken').value.trim(), api_url:document.getElementById('sbUrl').value.trim(), token:document.getElementById('sbKey').value.trim() };
+  if(!data.name){ alert("Isi Nama Project dulu Ko!"); return; }
+  try{
+    var url=m.url+"/rest/v1/projects", headers={apikey:m.key,Authorization:"Bearer "+m.key,"Content-Type":"application/json",Prefer:"return=representation"};
+    var r, j;
+    if(window._editId){ r=await fetch(url+"?id=eq."+window._editId,{method:"PATCH",headers:headers,body:JSON.stringify(data)}); }
+    else { r=await fetch(url,{method:"POST",headers:headers,body:JSON.stringify(data)}); }
+    j=await r.json(); if(!r.ok) throw new Error(JSON.stringify(j));
+    alert("✅ Project tersimpan ke database!"); loadProjectsDariDb();
+  }catch(e){ alert("Gagal simpan: "+e.message); }
+}
+async function hapusDb(id){ if(!confirm("Hapus project ini dari database?")) return; var m=getMaster(); await fetch(m.url+"/rest/v1/projects?id=eq."+id,{method:"DELETE",headers:{apikey:m.key,Authorization:"Bearer "+m.key}}); loadProjectsDariDb(); }
+
+function parseRepo(){ var u=document.getElementById('repoUrl').value.trim(); var mm=u.match(/github\.com\/([^\/]+)\/([^\/\s]+)/)||u.match(/^([^\/\s]+)\/([^\/\s]+)$/); if(mm){ document.getElementById('project').value=mm[2].replace('.git',''); document.getElementById('parsed').textContent="✅ "+mm[1]+" / "+mm[2]; return {owner:mm[1],repo:mm[2].replace('.git','')}; } return {owner:'',repo:document.getElementById('project').value.trim()}; }
+document.getElementById('repoUrl').addEventListener('input',parseRepo);
+function auth(){ var r=parseRepo(); return {owner:r.owner,repo:r.repo,token:document.getElementById('ghToken').value.trim(),file:document.getElementById('fileName').value.trim()||'index.html',branch:document.getElementById('branch').value.trim()||'main'}; }
+function decodeGithub(b64){ try{ var bin=atob(b64.replace(/\n/g,'')); var bytes=new Uint8Array(bin.length); for(var i=0;i<bin.length;i++){ bytes[i]=bin.charCodeAt(i); } return new TextDecoder('utf-8').decode(bytes); }catch(e){ return ""; } }
+async function loadFile(){ var a=auth(); if(!a.owner||!a.repo||!a.token){ alert("Pilih project dulu / isi GitHub + Token!"); return; } document.getElementById('status').textContent="⏳ Loading "+a.file+"..."; try{ var r=await fetch("https://api.github.com/repos/"+a.owner+"/"+a.repo+"/contents/"+a.file+"?ref="+a.branch,{headers:{Authorization:"Bearer "+a.token}}); var j=await r.json(); if(j.message){ alert(j.message); return; } sha=j.sha; cacheFull=decodeGithub(j.content); document.getElementById('content').value=cacheFull; document.getElementById('status').textContent="✅ Berhasil load! Total "+cacheFull.length+" karakter!"; }catch(e){ document.getElementById('status').textContent="❌ "+e.message; } }
+async function saveFile(){ var a=auth(); if(!cacheFull){ alert("Isi file kosong! LOAD dulu!"); return; } if(!confirm("SAVE "+a.file+" ke "+a.owner+"/"+a.repo+" ?")) return; document.getElementById('status').textContent="⏳ Saving..."; try{ var body={message:"Update via MASTER - "+new Date().toLocaleString('id-ID'),content:btoa(unescape(encodeURIComponent(cacheFull))),branch:a.branch}; if(sha) body.sha=sha; var r=await fetch("https://api.github.com/repos/"+a.owner+"/"+a.repo+"/contents/"+a.file,{method:"PUT",headers:{Authorization:"Bearer "+a.token,"Content-Type":"application/json"},body:JSON.stringify(body)}); var j=await r.json(); if(j.message && !j.content){ alert(j.message); return; } sha=j.content.sha; document.getElementById('status').textContent="✅ BERHASIL!"; alert("BERHASIL! ✅"); }catch(e){ alert(e.message); } }
+function doReplace(){ var f=document.getElementById('findTxt').value,r=document.getElementById('replaceTxt').value; if(!f){ alert("Isi Cari-nya!"); return; } var cnt=(cacheFull.match(new RegExp(f.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),'g'))||[]).length; if(!cnt){ alert("Gak ketemu!"); return; } if(!confirm("Ganti "+cnt+" tempat?")) return; cacheFull=cacheFull.split(f).join(r); document.getElementById('content').value=cacheFull; alert("Berhasil ganti "+cnt+" tempat! Tinggal SAVE!"); }
+loadMasterDb();
+</script></body></html>

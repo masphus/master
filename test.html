@@ -22,7 +22,6 @@ button{background:linear-gradient(180deg,#F5D98A,#C9A86A);border:none;padding:12
 small{color:#888;font-size:11px}
 </style></head><body>
 <h1>👑 MONA - D' LUSSO</h1><div class="sub">100% MURNI DARI DATABASE | <span id="statusDb">Menghubungkan...</span></div>
-
 <div class="card">
 <div class="mona-head">
   <img src="mona.png" onerror="this.src='https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100'">
@@ -33,18 +32,14 @@ small{color:#888;font-size:11px}
 <div id="skorHasil" class="skorBox" style="display:none"></div>
 <small>MONA tidak akan menjawab jika tidak ada di database. Tidak ada jawaban karangan.</small>
 </div>
-
 <script>
-// === API & URL UDAH DITEMPEL - BAJU LAMA, JANGAN DIUBAH ===
 var SUPABASE_URL = 'https://msfzsebownnsrpyjusoc.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_7VQcQXBLz4OYn_OJUzusSg_Zz1or9gq';
 var sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+var ATURAN = [];
+var FRASA_LIST = [];
 
-// === OTAK BARU: 2 TABEL - frasa (deteksi) + bot_rules (jawab) ===
-var ATURAN = []; // bot_rules
-var FRASA_LIST = []; // frasa
-
-// === Normalisasi - BAJU LAMA, TETEP SAMA ===
+// === NORMALISASI ANTI-TYPO - KAYA LU KO, SANTAI ===
 function normalisasiTeks(t){
   var s=' '+String(t||'').toLowerCase()+' ';
   s=s.replace(/[^a-z0-9\s]/g,' ');
@@ -54,41 +49,74 @@ function normalisasiTeks(t){
   s=s.replace(/\s+/g,' ').trim();
   return ' '+s+' ';
 }
-function escapeReg(s){ return s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'); }
-function kenaFrasa(chatNorm, frasaAsli){
-  var f=normalisasiTeks(frasaAsli).trim(); if(!f) return false;
-  var pola=f.split(/\s+/).map(function(w){ return escapeReg(w); }).join('\\s+');
-  return new RegExp('(?<![a-z0-9])'+pola+'(?![a-z0-9])').test(chatNorm);
+// Hilangin huruf double: hallo->halo, sedihh->sedih, hargaa->harga
+function hapusDouble(s){ return s.replace(/([a-z])\1+/g,'$1'); }
+// Jarak typo: hallo vs halo = 1, labar vs kabar = 1, hrga vs harga = 1
+function jarakTypo(a,b){
+  a=hapusDouble(a); b=hapusDouble(b);
+  if(a===b) return 0;
+  var m=a.length, n=b.length;
+  if(Math.abs(m-n)>2) return 99;
+  var d=[]; for(var i=0;i<=m;i++) d[i]=[i];
+  for(var j=0;j<=n;j++) d[0][j]=j;
+  for(var i=1;i<=m;i++) for(var j=1;j<=n;j++){
+    var cost = a[i-1]===b[j-1]?0:1;
+    d[i][j]=Math.min(d[i-1][j]+1, d[i][j-1]+1, d[i-1][j-1]+cost);
+  }
+  return d[m][n];
 }
-
-// === OTAK BARU: Hitung skor per kategori dari tabel frasa ===
+// Cek 1 kata: mirip apa nggak? Toleransi 1-2 huruf salah
+function kataMirip(kataChat, kataFrasa){
+  kataChat=hapusDouble(kataChat); kataFrasa=hapusDouble(kataFrasa);
+  if(kataChat===kataFrasa) return true;
+  if(kataChat.length<3 || kataFrasa.length<3) return false;
+  // labar vs kabar: beda 1 huruf depan, tapi tetep mirip
+  var j=jarakTypo(kataChat, kataFrasa);
+  if(kataFrasa.length<=4) return j<=1;
+  if(kataFrasa.length<=7) return j<=2;
+  return j<=2;
+}
+// Cek frasa: semua kata di frasa harus ada (mirip) di chat
+function frasaKenaTypo(chatNorm, frasaAsli){
+  var f=normalisasiTeks(frasaAsli).trim(); if(!f) return false;
+  var kataFrasa=f.split(/\s+/);
+  var kataChat=chatNorm.trim().split(/\s+/);
+  for(var i=0;i<kataFrasa.length;i++){
+    var ketemu=false;
+    for(var j=0;j<kataChat.length;j++){
+      if(kataMirip(kataChat[j], kataFrasa[i])){ ketemu=true; break; }
+    }
+    if(!ketemu) return false;
+  }
+  return true;
+}
+function ambilTeksFrasa(row){
+  return row.teks || row.frasa || row.kata || row.kalimat || row.isi || row.pertanyaan || row.text || '';
+}
 function hitungSkorBaru(chat){
   var n=normalisasiTeks(chat);
   var perKategori={};
-  // Kelompokin frasa per kategori
   for(var i=0;i<FRASA_LIST.length;i++){
     var kat=FRASA_LIST[i].kategori||'lain';
     if(!perKategori[kat]) perKategori[kat]={total:0, maks:0, kena:[]};
     perKategori[kat].maks+=1;
-    if(kenaFrasa(n, FRASA_LIST[i].teks||FRASA_LIST[i].frasa||'')){
+    var teks=ambilTeksFrasa(FRASA_LIST[i]);
+    if(frasaKenaTypo(n, teks)){
       perKategori[kat].total+=1;
-      perKategori[kat].kena.push(FRASA_LIST[i].teks||FRASA_LIST[i].frasa);
+      perKategori[kat].kena.push(teks);
     }
   }
   var hasil=[];
   for(var k in perKategori){
     var d=perKategori[k];
     var persen=d.maks>0?(d.total/d.maks*100):0;
-    // Cari jawaban di bot_rules untuk kategori ini
     var rule=null;
     for(var j=0;j<ATURAN.length;j++){ if(ATURAN[j].kategori===k){ rule=ATURAN[j]; break; } }
     if(rule) hasil.push({kategori:k, rule:rule, skor:{total:d.total, skorMaks:d.maks, persen:persen, kenaFrasa:d.kena}});
   }
-  hasil.sort(function(a,b){ return b.skor.persen-a.skor.persen; });
+  hasil.sort(function(a,b){ return b.skor.total-a.skor.total; });
   return hasil;
 }
-
-// === LOAD OTAK BARU: frasa + bot_rules ===
 async function loadSemua(){
   document.getElementById('statusDb').textContent='Memuat dari database...';
   try{
@@ -104,45 +132,30 @@ async function loadSemua(){
     document.getElementById('statusDb').textContent='❌ Gagal: '+e.message+' (Cek RLS / POLICY!)';
   }
 }
-
 function tambahChat(teks, siapa){
   var body=document.getElementById('chatBody');
   var d=document.createElement('div'); d.className='msg '+(siapa==='me'?'me':'bot'); d.innerHTML=teks; body.appendChild(d); body.scrollTop=body.scrollHeight;
 }
-
 async function kirimChat(){
   var inp=document.getElementById('chatInput'); var teks=inp.value.trim(); if(!teks) return;
   tambahChat(teks, 'me'); inp.value='';
-
   if(!ATURAN.length || !FRASA_LIST.length){
     tambahChat('Maaf kak, database belum terhubung / belum ada aturan. Mona tidak bisa menjawab karena tidak ada di database 🙏', 'bot');
     return;
   }
-
   var hasil = hitungSkorBaru(teks);
   var box=document.getElementById('skorHasil'); box.style.display='block';
-  var txt='PERTANYAAN: '+teks+'\nNORMALISASI: '+normalisasiTeks(teks).trim()+'\n\n=== HASIL (80% dari JAWABAN) - OTAK BARU: frasa + bot_rules ===\n';
-  for(var i=0;i<hasil.length;i++){ var h=hasil[i].skor; txt+='\n['+(i+1)+'] KATEGORI: '+hasil[i].kategori+' | TOTAL: '+h.total+' / Maks: '+h.skorMaks+' = '+h.persen.toFixed(1)+'% '+(h.persen>=80?'✅ LOLOS':'❌ GAK LOLOS')+'\nFrasa kena: '+(h.kenaFrasa.length?h.kenaFrasa.join(', '):'(nggak kena)')+'\nJawaban DB: '+hasil[i].rule.jawaban+'\n'; }
-  if(!hasil.length) txt+='\n(Tidak ada kategori yang kena)';
+  var txt='PERTANYAAN: '+teks+'\nNORMALISASI: '+normalisasiTeks(teks).trim()+'\n\n=== HASIL ANTI-TYPO ===\n';
+  for(var i=0;i<hasil.length;i++){ var h=hasil[i].skor; txt+='\n['+(i+1)+'] '+hasil[i].kategori+' | TOTAL: '+h.total+' / Maks: '+h.skorMaks+' = '+h.persen.toFixed(1)+'% '+(h.total>=1?'✅ LOLOS':'❌ GAK LOLOS')+'\nFrasa kena: '+(h.kenaFrasa.length?h.kenaFrasa.join(', '):'(nggak kena)')+'\nJawaban DB: '+hasil[i].rule.jawaban+'\n'; }
   box.textContent=txt;
-
-  // === ATURAN MUTLAK BAJU LAMA: HANYA JAWAB KALO LOLOS 80% ===
-  // Tapi karena frasa per kategori banyak (misal beli=94), 80% terlalu berat.
-  // Jadi kita pake aturan baru yang lebih adil: LOLOS kalo ada minimal 1 frasa yang kena + ada jawaban di bot_rules.
-  // Kalo mau tetep 80% murni, ganti baris di bawah jadi: if(hasil.length && hasil[0].skor.persen>=80)
   var jawaban=null;
-  if(hasil.length && hasil[0].skor.total>=1){
-    jawaban=hasil[0].rule.jawaban;
-  }
-
+  if(hasil.length && hasil[0].skor.total>=1){ jawaban=hasil[0].rule.jawaban; }
   if(!jawaban){
     tambahChat('Maaf kak, pertanyaan itu belum ada di database Mona 🙏<br>Mona hanya menjawab sesuai yang sudah diajarkan.', 'bot');
     try{ await sb.from('bot_antrian').insert([{pertanyaan:teks, status:'MENUNGGU'}]); }catch(e){}
     return;
   }
-
   setTimeout(function(){ tambahChat(jawaban, 'bot'); }, 300);
 }
-
 loadSemua();
 </script></body></html>

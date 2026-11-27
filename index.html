@@ -19,7 +19,6 @@ button{width:100%;background:linear-gradient(180deg,#F5D98A,#C9A86A);border:none
 .botBtn{background:linear-gradient(180deg,#7DF9FF,#00A8C9);color:#000}
 .row{display:flex;gap:8px}.row>*{flex:1}
 .proj{display:flex;justify-content:space-between;align-items:center;background:#0a0a0a;border:1px solid #333;border-radius:12px;padding:10px;margin-top:8px;cursor:pointer}
-.proj.active{border-color:#E8C97A;background:#221f10}
 .proj small{color:#888;font-size:11px;display:block;margin-top:2px;word-break:break-all}
 .del{background:#333;color:#ff6b6b;border:none;padding:7px 10px;border-radius:8px;width:auto;margin:0;font-size:12px}
 #status,#sbStatus,#botStatus{font-size:12px;margin-top:8px;text-align:center;color:#8aff8a;line-height:1.4}
@@ -45,56 +44,7 @@ small{color:#888;font-size:11px;line-height:1.4}
 .menu3 button{flex:1;padding:14px 4px;font-size:12px;margin-top:10px}
 .menu3 button small{display:block;font-size:10px;font-weight:400;margin-top:3px;opacity:.8}
 </style></head><body>
-<div id="gerbang" style="position:fixed;inset:0;background:#0a0a0a;z-index:9999;padding:20px;overflow:auto">
-  <div class="card" style="margin-top:80px">
-    <input id="loginCode" autocomplete="off">
-    <button onclick="cekCode()">LOGOUT</button>
-    <div id="loginMsg" style="font-size:12px;margin-top:8px;text-align:center;color:#8aff8a;line-height:1.4"></div>
-  </div>
-</div>
-<div id="lockPopup" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);backdrop-filter:blur(8px);z-index:10000;align-items:center;justify-content:center;padding:20px">
-  <div style="width:100%;max-width:340px;background:radial-gradient(circle at 50% 0%,#2a2100 0%,#0a0a0a 60%);border:1px solid #C9A86A;border-radius:28px;padding:28px 20px 20px;text-align:center;box-shadow:0 0 50px rgba(201,168,106,.35)">
-    <div style="font-size:40px">👑</div>
-    <div style="color:#E8C97A;font-family:Georgia;letter-spacing:4px;font-size:18px;margin-top:6px">D' LUSSO</div>
-    <div id="lockNama" style="color:#fff;font-size:14px;margin-top:10px">Welcome Back</div>
-    <div style="color:#888;font-size:11px;margin-top:2px">Masukkan PIN untuk membuka 🔐 AES</div>
-    <div id="pinDots" style="display:flex;gap:12px;justify-content:center;margin:22px 0">
-      <span class="dot" style="width:14px;height:14px;border:1px solid #C9A86A;border-radius:50%"></span>
-      <span class="dot" style="width:14px;height:14px;border:1px solid #C9A86A;border-radius:50%"></span>
-      <span class="dot" style="width:14px;height:14px;border:1px solid #C9A86A;border-radius:50%"></span>
-      <span class="dot" style="width:14px;height:14px;border:1px solid #C9A86A;border-radius:50%"></span>
-      <span class="dot" style="width:14px;height:14px;border:1px solid #C9A86A;border-radius:50%"></span>
-      <span class="dot" style="width:14px;height:14px;border:1px solid #C9A86A;border-radius:50%"></span>
-    </div>
-    <div id="keypadBox" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
-      <button onclick="tekanPin('1')" style="background:#1a170e;border:1px solid #3a2f14;color:#fff;border-radius:50%;height:60px;font-size:20px;margin:0">1</button>
-      <button onclick="tekanPin('2')" style="background:#1a170e;border:1px solid #3a2f14;color:#fff;border-radius:50%;height:60px;font-size:20px;margin:0">2</button>
-      <button onclick="tekanPin('3')" style="background:#1a170e;border:1px solid #3a2f14;color:#fff;border-radius:50%;height:60px;font-size:20px;margin:0">3</button>
-      <button onclick="tekanPin('4')" style="background:#1a170e;border:1px solid #3a2f14;color:#fff;border-radius:50%;height:60px;font-size:20px;margin:0">4</button>
-      <button onclick="tekanPin('5')" style="background:#1a170e;border:1px solid #3a2f14;color:#fff;border-radius:50%;height:60px;font-size:20px;margin:0">5</button>
-      <button onclick="tekanPin('6')" style="background:#1a170e;border:1px solid #3a2f14;color:#fff;border-radius:50%;height:60px;font-size:20px;margin:0">6</button>
-      <button onclick="tekanPin('7')" style="background:#1a170e;border:1px solid #3a2f14;color:#fff;border-radius:50%;height:60px;font-size:20px;margin:0">7</button>
-      <button onclick="tekanPin('8')" style="background:#1a170e;border:1px solid #3a2f14;color:#fff;border-radius:50%;height:60px;font-size:20px;margin:0">8</button>
-      <button onclick="tekanPin('9')" style="background:#1a170e;border:1px solid #3a2f14;color:#fff;border-radius:50%;height:60px;font-size:20px;margin:0">9</button>
-      <button onclick="hapusPin()" style="background:transparent;border:none;color:#888;border-radius:50%;height:60px;font-size:16px;margin:0">⌫</button>
-      <button onclick="tekanPin('0')" style="background:#1a170e;border:1px solid #3a2f14;color:#fff;border-radius:50%;height:60px;font-size:20px;margin:0">0</button>
-      <button onclick="tutupLock()" style="background:transparent;border:none;color:#888;border-radius:50%;height:60px;font-size:16px;margin:0">✕</button>
-    </div>
-    <div id="lockMsg" style="font-size:12px;color:#ff6b6b;margin-top:12px;min-height:16px"></div>
-    <div onclick="bukaReset()" style="color:#E8C97A;font-size:12px;margin-top:8px;cursor:pointer;text-decoration:underline">Lupa PIN? Reset di sini</div>
-    <div id="resetBox" style="display:none;text-align:left;margin-top:14px;background:#0a0a0a;border:1px solid #C9A86A;border-radius:14px;padding:12px">
-      <div style="color:#E8C97A;font-size:12px;font-weight:900;text-align:center">🔐 RESET PIN</div>
-      <label style="margin-top:10px">KUNCI RAHASIA</label>
-      <input id="resetKunci" placeholder="Dlusso-Kunci-Rahasia-123" autocomplete="off">
-      <label>PIN BARU (6 ANGKA)</label>
-      <input id="resetPinBaru" placeholder="123456" inputmode="numeric" autocomplete="off">
-      <button onclick="prosesResetPin()">SIMPAN PIN BARU</button>
-      <div onclick="tutupReset()" style="color:#888;font-size:12px;text-align:center;margin-top:8px;cursor:pointer">Batal, balik ke keypad</div>
-      <div id="resetMsg" style="font-size:12px;text-align:center;margin-top:8px;color:#8aff8a;min-height:16px"></div>
-    </div>
-  </div>
-</div>
-<h1>👑 MASTER</h1><div class="sub">D' LUSSO</div>
+<h1>👑 MASTER</h1><div class="sub">D' LUSSO - BERSIH 7 KOLOM - PENGAMAN OFF</div>
 <div class="tabs">
 <button class="tabBtn active" id="btnHome" onclick="pindahHalaman('home')">🏠 DEPAN</button>
 <button class="tabBtn" id="btnGithub" onclick="pindahHalaman('github')">📂 GITHUB</button>
@@ -112,16 +62,16 @@ small{color:#888;font-size:11px;line-height:1.4}
 <input id="topNama" placeholder="Fashion-gw" autocomplete="off" oninput="simpanSementara()">
 <label>🌐 URL - URL GITHUB</label>
 <input id="topUrl" placeholder="github.com/masphus/fashion-gw" autocomplete="off" oninput="simpanSementara()">
-<small>Link Github, bukan github.io</small>
+<small>Link Github, bukan github.io - ini ALAMATNYA</small>
 <label>🗄️ API - API SUPABASE</label>
 <input id="topApi" placeholder="https://xxx.supabase.co" autocomplete="off" oninput="simpanSementara()">
-<small>Project URL Supabase, yang ada supabase.co</small>
+<small>Project URL Supabase - ini PINTUNYA</small>
 <label>🔑 TOKEN GH - TOKEN GITHUB</label>
 <input id="topTokenGH" placeholder="ghp_..." autocomplete="off" oninput="simpanSementara()">
-<small>Cuma buat EDIT FILE Github</small>
+<small>Cuma buat EDIT FILE Github - KUNCI 1</small>
 <label>🔑 TOKEN SB - TOKEN SUPABASE</label>
 <input id="topTokenSB" placeholder="sb_publishable_... / eyJ..." autocomplete="off" oninput="simpanSementara()">
-<small>Cuma buat BACKUP Supabase</small>
+<small>Cuma buat BACKUP Supabase - KUNCI 2</small>
 <div class="row"><button class="sec" onclick="bukaProjectBaru()">➕ PROJECT BARU</button><button class="sec" onclick="salin5Kolom()">📋 SALIN</button></div>
 <div class="row"><button onclick="simpanProjectKeDb()">💾 SIMPAN PROJECT INI</button></div>
 <div id="topStatus" style="font-size:12px;margin-top:8px;text-align:center;color:#8aff8a"></div>
@@ -237,50 +187,5 @@ async function kirimBackupKeSupabase(){ var s=getSb(),tabel=getSb().tabel; if(!i
 async function backupDatabase(){ var s=getSb(),tabel=getSb().tabel; try{ var r=await fetch(s.url+"/rest/v1/"+tabel+"?select=*",{headers:{apikey:s.key,Authorization:"Bearer "+s.key}}); var j=await r.json(); var blob=new Blob([JSON.stringify(j,null,2)],{type:"application/json"}); var a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download="backup-"+tabel+"-"+new Date().toISOString().slice(0,10)+".json"; a.click(); alert("Berhasil! Cek Download!"); }catch(e){ alert(e.message); } }
 async function backupSemuaTabel(){ var s=getSb(); var daftar=["products","members","admins","pegawai","orders","riwayat_saldo","bot_faq","bot_antrian","order_items","member_notifications"]; var tambahan=v('tabelTambahan'); if(tambahan) tambahan.split(",").forEach(function(t){ t=t.trim(); if(t && daftar.indexOf(t)===-1) daftar.push(t); }); var hasil={}; try{ for(var i=0;i<daftar.length;i++){ var r=await fetch(s.url+"/rest/v1/"+daftar[i]+"?select=*",{headers:{apikey:s.key,Authorization:"Bearer "+s.key}}); var j=await r.json(); hasil[daftar[i]]=Array.isArray(j)?j:[]; } var blob=new Blob([JSON.stringify(hasil,null,2)],{type:"application/json"}); var a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download="backup-SEMUA-"+new Date().toISOString().slice(0,10)+".json"; a.click(); alert("BERHASIL! ✅"); }catch(e){ alert(e.message); } }
 async function kirimBackupSemuaKeSupabase(){ var s=getSb(); if(!isiBackup){ alert("Pilih backup-SEMUA.json dulu!"); return; } if(Array.isArray(isiBackup)){ alert("File ini cuma 1 tabel!"); return; } var daftar=Object.keys(isiBackup); if(!confirm("Kirim RESTORE "+daftar.length+" tabel?")) return; try{ for(var t=0;t<daftar.length;t++){ var tabel=daftar[t], data=isiBackup[tabel]||[]; for(var i=0;i<data.length;i+=100){ await fetch(s.url+"/rest/v1/"+tabel,{method:"POST",headers:{apikey:s.key,Authorization:"Bearer "+s.key,"Content-Type":"application/json",Prefer:"resolution=merge-duplicates"},body:JSON.stringify(data.slice(i,i+100))}); } } alert("RESTORE BERHASIL! ✅"); }catch(e){ alert(e.message); } }
-var userLogin = null;
-var pinSementara = "";
-async function cekCode(){
-  var raw = (document.getElementById('loginCode').value||'').trim();
-  if(!raw.startsWith('@')) return;
-  var code = raw.slice(1).toLowerCase();
-  try{
-    var m = getMaster();
-    var r = await fetch(m.url+"/rest/v1/akses?select=*&code=eq."+code, {headers:{apikey:m.key, Authorization:"Bearer "+m.key}});
-    var j = await r.json();
-    if(!j || !j.length) return;
-    userLogin = j[0];
-    pinSementara = "";
-    updateDots();
-    document.getElementById('lockNama').textContent = "Welcome Back, " + (userLogin.nama || "");
-    document.getElementById('lockMsg').textContent = "";
-    document.getElementById('resetBox').style.display = 'none';
-    document.getElementById('keypadBox').style.display = 'grid';
-    document.getElementById('lockPopup').style.display = 'flex';
-  }catch(e){}
-}
-function updateDots(){ var dots = document.querySelectorAll('#pinDots .dot'); for(var i=0;i<dots.length;i++){ dots[i].style.background = i < pinSementara.length ? "#E8C97A" : "transparent"; } }
-function tekanPin(angka){ if(pinSementara.length >= 6) return; pinSementara += angka; updateDots(); if(pinSementara.length === 6){ setTimeout(function(){ var pinAsli = bukaAES(userLogin.pin); if(String(pinSementara) === String(pinAsli)){ document.getElementById('lockPopup').style.display = 'none'; document.getElementById('gerbang').style.display = 'none'; } else { document.getElementById('lockMsg').textContent = "PIN Salah"; pinSementara = ""; updateDots(); } }, 200); } }
-function hapusPin(){ pinSementara = pinSementara.slice(0,-1); updateDots(); }
-function tutupLock(){ document.getElementById('lockPopup').style.display = 'none'; pinSementara=""; updateDots(); }
-function bukaReset(){ document.getElementById('resetBox').style.display='block'; document.getElementById('keypadBox').style.display='none'; document.getElementById('resetMsg').textContent=''; }
-function tutupReset(){ document.getElementById('resetBox').style.display='none'; document.getElementById('keypadBox').style.display='grid'; }
-async function prosesResetPin(){
-  var kunciInput = (document.getElementById('resetKunci').value||'').trim();
-  var pinBaru = (document.getElementById('resetPinBaru').value||'').trim();
-  var msg = document.getElementById('resetMsg');
-  if(kunciInput !== KUNCI_AES){ msg.style.color='#ff6b6b'; msg.textContent='Kunci rahasia salah!'; return; }
-  if(pinBaru.length !== 6 || !/^[0-9]{6}$/.test(pinBaru)){ msg.style.color='#ff6b6b'; msg.textContent='PIN baru harus 6 angka!'; return; }
-  if(!userLogin){ msg.style.color='#ff6b6b'; msg.textContent='Login dulu pake @code!'; return; }
-  try{
-    var m = getMaster();
-    var pinTerkunci = kunciAES(pinBaru);
-    var r = await fetch(m.url+"/rest/v1/akses?code=eq."+String(userLogin.code).toLowerCase(),{method:"PATCH",headers:{apikey:m.key,Authorization:"Bearer "+m.key,"Content-Type":"application/json"},body:JSON.stringify({pin:pinTerkunci})});
-    if(!r.ok) throw new Error(await r.text());
-    userLogin.pin = pinTerkunci;
-    msg.style.color='#8aff8a'; msg.textContent='✅ PIN baru tersimpan! Balik ke keypad, masuk pake PIN baru!';
-    pinSementara=''; updateDots();
-    setTimeout(function(){ tutupReset(); document.getElementById('lockMsg').textContent='PIN baru udah aktif, silakan masuk!'; }, 800);
-  }catch(e){ msg.style.color='#ff6b6b'; msg.textContent='Gagal: '+e.message; }
-}
 loadSettingBot(); loadSementara(); pindahHalaman('home');
 </script></body></html>

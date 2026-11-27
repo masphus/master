@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="id"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>👑 MASTER D' LUSSO - FIX SIMPAN HP</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial}
+body{background:#0a0a0a;color:#fff;padding:14px 14px 40px;background:radial-gradient(circle at 50% 0%,#2a2100 0%,#0a0a0a 55%)}
+h1{text-align:center;font-family:Georgia;font-size:28px;letter-spacing:4px;color:#E8C97A;margin-top:14px}
+.sub{text-align:center;color:#aaa;font-size:11px;letter-spacing:1.5px;margin:6px 0 14px}
+.line{height:1px;background:linear-gradient(90deg,transparent,#C9A86A,transparent);margin:10px 0}
+.card{background:#151207;border:1px solid #C9A86A;border-radius:20px;padding:16px;margin-top:14px}
+.card.bot{border-color:#00E5FF;background:#0a1a20}
+label{display:block;font-size:10px;letter-spacing:1.5px;color:#E8C97A;margin:14px 0 6px;font-weight:800}
+input{width:100%;background:#0a0a0a;border:1px solid #3a2f14;color:#fff;padding:14px;border-radius:12px;outline:none;font-size:14px}
+textarea{width:100%;height:360px;background:#000;border:1px solid #3a2f14;color:#7CFC00;padding:12px;border-radius:12px;font-family:monospace;font-size:11px;outline:none}
+textarea.botArea{border-color:#00E5FF;color:#7DF9FF;height:280px}
+button{width:100%;background:linear-gradient(180deg,#F5D98A,#C9A86A);border:none;padding:15px;border-radius:13px;font-weight:900;font-size:14px;margin-top:12px;cursor:pointer;color:#000}
+.sec{background:#1a170e;color:#E8C97A;border:1px solid #C9A86A}
+.botBtn{background:linear-gradient(180deg,#7DF9FF,#00A8C9);color:#000}
+.row{display:flex;gap:10px}.row>*{flex:1}
+.badge{display:inline-block;background:#221f10;border:1px solid #C9A86A;color:#E8C97A;padding:6px 11px;border-radius:20px;font-size:11px;margin-top:8px}
+.proj{display:flex;justify-content:space-between;align-items:center;background:#0a0a0a;border:1px solid #333;border-radius:14px;padding:12px;margin-top:10px;cursor:pointer}
+.proj.active{border-color:#E8C97A;background:#221f10}
+.proj small{color:#888;font-size:11px;display:block;margin-top:3px}
+.del{background:#333;color:#ff6b6b;border:none;padding:8px 12px;border-radius:8px;width:auto;margin:0;font-size:12px}
+#status,#sbStatus,#botStatus{font-size:12px;margin-top:10px;text-align:center;color:#8aff8a;line-height:1.5}
+small{color:#888;font-size:11px;line-height:1.5}
+.tabs{display:flex;gap:10px;position:sticky;top:0;z-index:99;background:#0a0a0a;padding:10px 0}
+.tabBtn{flex:1;padding:14px;border-radius:14px;font-weight:900;font-size:14px;cursor:pointer;border:1px solid #3a2f14;background:#1a170e;color:#aaa;margin:0}
+.tabBtn.active{background:linear-gradient(180deg,#F5D98A,#C9A86A);color:#000}
+.tabBtn.botActive{background:linear-gradient(180deg,#7DF9FF,#00A8C9);color:#000}
+.page{display:none}.page.active{display:block}
+.tabTitle{text-align:center;color:#E8C97A;font-weight:900;letter-spacing:2px;font-size:13px;margin:8px 0 2px}
+.eTabs{display:flex;flex-wrap:wrap;gap:8px;padding:8px 0}
+.eTabs .tabBtn{flex:1;min-width:100px;padding:12px;font-size:12px}
+.faqItem{background:#0a0a0a;border:1px solid #333;border-radius:12px;padding:12px;margin-top:10px}
+.faqItem b{color:#7DF9FF;font-size:13px}.faqItem p{color:#ccc;font-size:12px;margin-top:4px}
+.debug{background:#000;border:1px solid #ffcc00;color:#ffcc00;padding:10px;border-radius:10px;font-size:11px;margin-top:10px;white-space:pre-wrap;word-break:break-all;max-height:150px;overflow:auto}
+</style></head><body>
+<h1>👑 MASTER</h1><div class="sub">D' LUSSO • FIX SIMPAN DI HP - FILE NGGAK HILANG LAGI!</div>
+<div class="tabs">
+<button class="tabBtn active" id="btnGithub" onclick="pindahHalaman('github')">📂 GITHUB</button>
+<button class="tabBtn" id="btnSupabase" onclick="pindahHalaman('supabase')">🗄️ SUPABASE</button>
+<button class="tabBtn" id="btnBot" onclick="pindahHalaman('bot')">🤖 BOT</button>
+</div>
+<div class="line"></div>
+<div id="page-github" class="page active">
+<div class="tabTitle">📂 HALAMAN GITHUB</div>
+<div class="card"><b style="color:#E8C97A">📂 DAFTAR PROJECT</b>
+<button class="sec" onclick="loadDaftar()">🔄 LOAD DAFTAR PROJECT DARI GITHUB</button>
+<div id="list"><p style="color:#888;font-size:12px;padding:10px 0">Belum ada project.</p></div>
+<div class="row"><input id="newProj" placeholder="Nama project baru: toko-tas"><button class="sec" style="width:100px" onclick="tambahManual()">+ TAMBAH</button></div></div>
+<div class="card"><b style="color:#E8C97A">⚙️ SETTING GITHUB</b>
+<label>1️⃣ LINK GITHUB</label><input id="repoUrl" placeholder="https://github.com/username/nama-repo">
+<span class="badge" id="parsed">Belum di-parse</span>
+<label>2️⃣ USERNAME GITHUB</label><input id="ghUser" placeholder="username github">
+<label>3️⃣ TOKEN GITHUB</label><input id="ghToken" type="password" placeholder="ghp_xxxx...">
+<div class="row"><div><label>4️⃣ NAMA PROJECT</label><input id="project" placeholder="nama-repo"></div><div><label>BRANCH</label><input id="branch" value="main"></div></div>
+<label>5️⃣ NAMA FILE</label><input id="fileName" value="index.html">
+<button class="sec" onclick="loadFile()">📥 LOAD FILE DARI GITHUB</button>
+<button class="sec" onclick="isiTemplate()">✨ ISI OTOMATIS DARI TEMPLATE</button>
+<div id="status">Belum load...</div>
+<div id="debugBox" class="debug" style="display:none"></div>
+<button class="sec" onclick="pulihkanDariHP()">♻️ PULIHKAN FILE TERAKHIR DARI HP</button>
+<small>👆 Kalo abis LOAD terus kosong, pencet ini Ko! Ini ngambil file yang terakhir ke-save di HP lu!</small></div>
+<div class="card"><b style="color:#E8C97A">6️⃣ ISI FILE - EDIT PER BAGIAN!</b>
+<div class="eTabs">
+<button class="tabBtn active" id="eBtnStyle" onclick="tampilEditor('style')">🎨 STYLE</button>
+<button class="tabBtn" id="eBtnBody" onclick="tampilEditor('body')">📝 BODY</button>
+<button class="tabBtn" id="eBtnScript" onclick="tampilEditor('script')">🧠 SCRIPT</button>
+<button class="tabBtn" id="eBtnHead" onclick="tampilEditor('head')">🏷️ HEAD</button>
+<button class="tabBtn" id="eBtnFull" onclick="tampilEditor('full')">📄 FULL</button>
+</div>
+<div id="editorInfo" style="font-size:12px;color:#E8C97A;text-align:center;padding:8px;background:#0a0a0a;border-radius:10px;border:1px solid #3a2f14">🎨 Lagi edit: STYLE</div>
+<textarea id="content" placeholder="Klik LOAD FILE dulu..."></textarea>
+<div id="info" style="font-size:11px;color:#888;margin-top:8px">Karakter: 0</div>
+<button onclick="saveFile()">💾 SAVE KE GITHUB</button>
+<button class="sec" onclick="saveLocal()">💾 SIMPAN SETTING DI HP</button></div>
+<div class="card"><b style="color:#E8C97A">⚡ GANTI CEPAT</b>
+<label>CARI (LAMA)</label><input id="findTxt" placeholder="6285899611111">
+<label>GANTI JADI (BARU)</label><input id="replaceTxt" placeholder="62812xxxx">
+<button class="sec" onclick="doReplace()">🔄 GANTI SEMUA</button></div>
+<div class="card"><b style="color:#E8C97A">📱 FILE HP → GITHUB</b>
+<input type="file" id="fileHP" accept=".html,.css,.js,.txt,.json" style="padding:10px">
+<div id="fileHPInfo" style="font-size:11px;color:#888;margin-top:6px">Belum ada file dipilih</div>
+<button class="sec" onclick="kirimFileHPKeGithub()">📤 KIRIM FILE HP KE GITHUB</button></div>
+</div>
+<div id="page-supabase" class="page">
+<div class="tabTitle">🗄️ HALAMAN SUPABASE</div>
+<div class="card"><b style="color:#E8C97A">🗄️ SETTING SUPABASE</b>
+<label>SUPABASE URL</label><input id="sbUrl" placeholder="https://xxx.supabase.co">
+<label>SUPABASE KEY (ANON / PUBLISHABLE)</label><input id="sbKey" placeholder="sb_publishable_... / eyJ...">
+<button class="sec" onclick="saveSbLocal()">💾 SIMPAN SUPABASE DI HP</button>
+<div id="sbStatus"></div></div>
+<div class="card"><b style="color:#E8C97A">⬇️ BACKUP - KE FOLDER DOWNLOAD HP!</b>
+<label>NAMA TABEL (1 TABEL DOANG)</label><input id="sbTable" value="products">
+<button class="sec" onclick="backupDatabase()">⬇️ BACKUP 1 TABEL</button>
+<div class="line"></div>
+<label>TABEL TAMBAHAN (PISAH KOMA)</label><input id="tabelTambahan" placeholder="promo,diskon,voucher">
+<button onclick="backupSemuaTabel()">⬇️ BACKUP SEMUA TABEL - 1 FILE JSON</button></div>
+<div class="card"><b style="color:#E8C97A">🗄️ RESTORE - DARI HP KE SUPABASE</b>
+<input type="file" id="backupHP" accept=".json" style="padding:10px">
+<div id="backupHPInfo" style="font-size:11px;color:#888;margin-top:6px">Belum ada backup dipilih.</div>
+<button onclick="kirimBackupKeSupabase()">🗄️ KIRIM BACKUP 1 TABEL</button>
+<button class="sec" onclick="kirimBackupSemuaKeSupabase()">🗄️ KIRIM BACKUP SEMUA TABEL</button></div>
+</div>
+<div id="page-bot" class="page">
+<div class="tabTitle" style="color:#7DF9FF">🤖 HALAMAN BOT - KHUSUS BOT DOANG!</div>
+<div class="card bot"><b style="color:#7DF9FF">🤖 KOTAK KHUSUS EDIT BOT</b>
+<div id="botInfo" style="font-size:11px;color:#aaa;margin-top:6px">File di HP: belum ada. LOAD dulu di GITHUB.</div>
+<label>🤖 KODE BOT-nya DOANG</label>
+<textarea id="botCode" class="botArea" placeholder="1. LOAD FILE dulu di GITHUB&#10;2. Pencet AMBIL BOT&#10;3. Edit disini doang!"></textarea>
+<div class="row"><button class="botBtn" onclick="ambilBotDariFile()">🤖 AMBIL BOT DARI FILE</button><button class="botBtn" onclick="simpanBotKeFile()">💾 SIMPAN BOT + GITHUB</button></div>
+<div id="botStatus"></div></div>
+<div class="card bot"><b style="color:#7DF9FF">💬 BOT FAQ - Dari Supabase - Tabel bot_faq</b>
+<button class="botBtn" onclick="loadBotFaq()">🔄 LIHAT SEMUA FAQ BOT</button>
+<div id="faqList"><p style="color:#888;font-size:12px;padding:10px 0">Belum load.</p></div>
+<label>❓ PERTANYAAN BARU</label><input id="faqQ" placeholder="contoh: harga, ongkir">
+<label>💬 JAWABAN BOT</label><input id="faqA" placeholder="contoh: Harga mulai 50rb kak...">
+<button class="botBtn" onclick="tambahFaq()">+ TAMBAH FAQ BARU</button>
+<div id="faqStatus" style="font-size:12px;color:#8aff8a;text-align:center;margin-top:8px"></div></div>
+<div class="card bot"><b style="color:#7DF9FF">📋 BOT ANTRIAN</b>
+<button class="botBtn" onclick="loadAntrian()">🔄 LIHAT ANTRIAN BOT</button>
+<div id="antrianList"><p style="color:#888;font-size:12px;padding:10px 0">Belum load.</p></div></div>
+<div class="card bot"><b style="color:#7DF9FF">⚙️ SETTING BOT</b>
+<label>NAMA BOT</label><input id="botNama" value="Admin D'Lusso">
+<label>PESAN PEMBUKA BOT</label><input id="botSalam" value="Halo kak! Selamat datang di D'Lusso!">
+<label>NOMOR WA BOT</label><input id="botWa" placeholder="6285899611111">
+<button class="botBtn" onclick="simpanSettingBot()">💾 SIMPAN SETTING BOT DI HP</button></div>
+</div>
+<script>
+function pindahHalaman(ke){
+  document.getElementById('page-github').style.display = (ke==='github' ? 'block' : 'none');
+  document.getElementById('page-supabase').style.display = (ke==='supabase' ? 'block' : 'none');
+  document.getElementById('page-bot').style.display = (ke==='bot' ? 'block' : 'none');
+  document.getElementById('btnGithub').className = 'tabBtn' + (ke==='github' ? ' active' : '');
+  document.getElementById('btnSupabase').className = 'tabBtn' + (ke==='supabase' ? ' active' : '');
+  document.getElementById('btnBot').className = 'tabBtn' + (ke==='bot' ? ' botActive' : '');
+  try{ localStorage.setItem('master_halaman',ke); }catch(e){}
+  if(ke==='bot'){ updateBotInfo(); }
+}
+var sha="",isiFileHP="",isiBackup=null;
+var editorMode='full', cacheFull="";
+var labelEditor={style:"🎨 Lagi edit: STYLE - Warna, ukuran, tombol!",body:"📝 Lagi edit: BODY - Tulisan, harga, produk!",script:"🧠 Lagi edit: SCRIPT - Otak toko!",head:"🏷️ Lagi edit: HEAD - Judul tab!",full:"📄 Lagi edit: FULL - Semua kode!"};
+var CLOSE_SCRIPT = "<" + "/" + "script>";
+function simpanCacheKeHP(){ try{ localStorage.setItem('master_cache',cacheFull); localStorage.setItem('master_cache_nama',document.getElementById('fileName').value); }catch(e){} updateBotInfo(); }
+function pulihkanDariHP(){ try{ var c=localStorage.getItem('master_cache')||""; if(!c){ alert("Di HP nggak ada file tersimpan Ko! LOAD dulu!"); return; } cacheFull=c; document.getElementById('content').value=c; editorMode='full'; document.getElementById('status').textContent="✅ Dipulihkan dari HP! Total "+c.length+" karakter!"; tampilEditor('full'); }catch(e){ alert(e.message); } }
+function updateBotInfo(){ var el=document.getElementById('botInfo'); if(!el) return; if(cacheFull){ el.textContent="✅ File di HP: ADA! Total "+cacheFull.length+" karakter, file: "+document.getElementById('fileName').value+" - BOT bisa dipake!"; el.style.color="#8aff8a"; } else { var c=""; try{ c=localStorage.getItem('master_cache')||""; }catch(e){} if(c){ cacheFull=c; el.textContent="✅ File dipulihkan dari HP! Total "+c.length+" karakter - BOT bisa dipake!"; el.style.color="#8aff8a"; } else { el.textContent="❌ File di HP: belum ada. LOAD dulu di GITHUB."; el.style.color="#ff9999"; } } }
+function decodeGithub(b64){ try{ var bin=atob(b64.replace(/\n/g,'')); var bytes=new Uint8Array(bin.length); for(var i=0;i<bin.length;i++){ bytes[i]=bin.charCodeAt(i); } try{ return new TextDecoder('utf-8').decode(bytes); }catch(e2){ return decodeURIComponent(escape(bin)); } }catch(e){ return ""; } }
+function simpanBagianKeFull(){
+  var isi=document.getElementById('content').value;
+  if(!cacheFull && !isi) return;
+  if(isi==="" && cacheFull!==""){ return; }
+  if(editorMode==='full'){ cacheFull=isi; simpanCacheKeHP(); return; }
+  if(editorMode==='style'){ var m=cacheFull.match(/<style[^>]*>[\s\S]*?<\/style>/i); if(m){ cacheFull=cacheFull.replace(/<style[^>]*>[\s\S]*?<\/style>/i,"<style>"+isi+"</style>"); } else { cacheFull="<style>"+isi+"</style>\n"+cacheFull; } simpanCacheKeHP(); return; }
+  if(editorMode==='head'){ cacheFull=cacheFull.replace(/<head[^>]*>[\s\S]*?<\/head>/i,"<head>"+isi+"</head>"); simpanCacheKeHP(); return; }
+  if(editorMode==='body'){ var mm=cacheFull.match(/<body[^>]*>/i); if(mm){ var s=cacheFull.indexOf(mm[0])+mm[0].length; var e=cacheFull.lastIndexOf("</body>"); cacheFull=cacheFull.slice(0,s)+isi+cacheFull.slice(e); } simpanCacheKeHP(); return; }
+  if(editorMode==='script'){ var idx=cacheFull.lastIndexOf("<script"); if(idx>=0){ var eT=cacheFull.indexOf(">",idx); var eC=cacheFull.indexOf(CLOSE_SCRIPT,eT); if(eT>=0 && eC>=0){ cacheFull=cacheFull.slice(0,eT+1)+isi+cacheFull.slice(eC); } } simpanCacheKeHP(); return; }
+}
+function ambilBagian(tag){ var m=cacheFull.match(new RegExp("<"+tag+"[^>]*>([\\s\\S]*?)<\\/"+tag+">","i")); return m?m[1]:""; }
+function tampilEditor(mode){
+  if(mode!==editorMode){ simpanBagianKeFull(); }
+  editorMode=mode;
+  var ids={style:'eBtnStyle',body:'eBtnBody',script:'eBtnScript',head:'eBtnHead',full:'eBtnFull'};
+  for(var k in ids){ var b=document.getElementById(ids[k]); if(b) b.className='tabBtn'+(k===mode?' active':''); }
+  document.getElementById('editorInfo').textContent=labelEditor[mode];
+  if(mode==='full'){ document.getElementById('content').value=cacheFull; }
+  else if(mode==='style'){ var v=ambilBagian('style'); if(v){ document.getElementById('content').value=v; } else { document.getElementById('content').value="/* File ini TIDAK ADA <style> Ko! */\n/* Artinya file lu nggak pake STYLE di dalam file ini! */\n/* Coba pencet BODY atau FULL, pasti ada isinya! Total file: "+cacheFull.length+" karakter */"; } }
+  else if(mode==='head'){ var hv=ambilBagian('head'); document.getElementById('content').value=hv?hv:"<!-- File ini TIDAK ADA <head> Ko! Coba FULL! Total: "+cacheFull.length+" -->"; }
+  else if(mode==='body'){ var bv=ambilBagian('body'); document.getElementById('content').value=bv?bv:"<!-- File ini TIDAK ADA <body> Ko! Coba FULL! Total: "+cacheFull.length+" -->\n"+cacheFull.slice(0,500); }
+  else if(mode==='script'){
+    var hasil=""; var re=new RegExp("<script[^>]*>([\\s\\S]*?)<\\/script>","gi"); var mm; while((mm=re.exec(cacheFull))!==null){ hasil=mm[1]; }
+    document.getElementById('content').value=hasil? hasil : "// File ini TIDAK ADA <script> Ko! Coba FULL! Total: "+cacheFull.length;
+  }
+  document.getElementById('info').textContent="Karakter bagian ini: "+document.getElementById('content').value.length+" | Total: "+cacheFull.length;
+}
+var cacheBot="";
+function ambilBotDariFile(){
+  if(!cacheFull){ try{ cacheFull=localStorage.getItem('master_cache')||""; }catch(e){} }
+  if(!cacheFull){ alert("LOAD FILE dulu di GITHUB Ko! File belum ada di HP!"); pindahHalaman('github'); return; }
+  var lines=cacheFull.split("\n"); var botLines=[];
+  for(var i=0;i<lines.length;i++){ if(/bot|faq|antrian|balas|chat/i.test(lines[i])){ botLines.push(lines[i]); } }
+  cacheBot=botLines.join("\n");
+  if(!cacheBot){ cacheBot="// Di file ini nggak ada kata BOT / FAQ / ANTRIAN Ko!\n// Berarti file lu ini BUKAN file BOT!\n// Coba LOAD file lain yang ada BOT-nya, atau tulis BOT baru disini!\n// Contoh:\n// function balasBot(pesan){ if(pesan.includes('harga')) return 'Harga mulai 50rb kak!'; }"; }
+  document.getElementById('botCode').value=cacheBot;
+  document.getElementById('botStatus').textContent="✅ File ketemu! Total "+cacheFull.length+" karakter! Ketemu "+botLines.length+" baris BOT!";
+}
+function simpanBotKeFile(){
+  var baru=document.getElementById('botCode').value;
+  if(!baru){ alert("Isi BOT-nya dulu Ko!"); return; }
+  if(!cacheFull){ try{ cacheFull=localStorage.getItem('master_cache')||""; }catch(e){} }
+  if(!cacheFull){ alert("LOAD FILE dulu di GITHUB!"); return; }
+  if(!confirm("Simpan BOT ini balik ke file + SAVE ke GitHub?")) return;
+  var lines=cacheFull.split("\n"); var sisa=[];
+  for(var i=0;i<lines.length;i++){ if(!/bot|faq|antrian|balas|chat/i.test(lines[i])){ sisa.push(lines[i]); } }
+  cacheFull=sisa.join("\n");
+  var idx=cacheFull.lastIndexOf(CLOSE_SCRIPT);
+  if(idx>=0){ cacheFull=cacheFull.slice(0,idx)+"\n/* === BOT - EDIT DI HALAMAN BOT === */\n"+baru+"\n"+cacheFull.slice(idx); }
+  else{ cacheFull=cacheFull+"\n<script>\n"+baru+"\n"+CLOSE_SCRIPT; }
+  simpanCacheKeHP();
+  document.getElementById('content').value=cacheFull; editorMode='full';
+  document.getElementById('botStatus').textContent="✅ BOT udah ditempel! Lagi SAVE...";
+  saveFile();
+}
+function simpanSettingBot(){ try{ localStorage.setItem('master_bot',JSON.stringify({nama:document.getElementById('botNama').value,salam:document.getElementById('botSalam').value,wa:document.getElementById('botWa').value})); }catch(e){} alert("Setting BOT tersimpan! ✅"); }
+function loadSettingBot(){ try{ var d=JSON.parse(localStorage.getItem('master_bot')||'{}'); if(d.nama) document.getElementById('botNama').value=d.nama; if(d.salam) document.getElementById('botSalam').value=d.salam; if(d.wa) document.getElementById('botWa').value=d.wa; }catch(e){} }
+async function loadBotFaq(){
+  var url=document.getElementById('sbUrl').value.trim(),key=document.getElementById('sbKey').value.trim();
+  if(!url||!key){ alert("Isi Supabase dulu di halaman SUPABASE!"); pindahHalaman('supabase'); return; }
+  document.getElementById('faqList').innerHTML='<p>⏳ Loading FAQ...</p>';
+  try{ var r=await fetch(url+"/rest/v1/bot_faq?select=*&order=id",{headers:{apikey:key,Authorization:"Bearer "+key}}); var j=await r.json();
+  if(!Array.isArray(j)||!j.length){ document.getElementById('faqList').innerHTML='<p style="color:#888">Belum ada FAQ.</p>'; return; }
+  var html=""; for(var i=0;i<j.length;i++){ var f=j[i]; html+='<div class="faqItem"><b>❓ '+(f.pertanyaan||f.question||f.keyword||'-')+'</b><p>💬 '+(f.jawaban||f.answer||f.response||'-')+'</p><button class="del" onclick="hapusFaq('+f.id+')">Hapus</button></div>'; }
+  document.getElementById('faqList').innerHTML=html;
+  }catch(e){ document.getElementById('faqList').innerHTML='❌ '+e.message; }
+}
+async function tambahFaq(){
+  var url=document.getElementById('sbUrl').value.trim(),key=document.getElementById('sbKey').value.trim();
+  var q=document.getElementById('faqQ').value.trim(),a=document.getElementById('faqA').value.trim();
+  if(!q||!a){ alert("Isi pertanyaan + jawaban!"); return; }
+  try{ var r=await fetch(url+"/rest/v1/bot_faq",{method:"POST",headers:{apikey:key,Authorization:"Bearer "+key,"Content-Type":"application/json",Prefer:"return=representation"},body:JSON.stringify({pertanyaan:q,jawaban:a})});
+  if(!r.ok){ throw new Error(await r.text()); }
+  document.getElementById('faqStatus').textContent="✅ FAQ ditambah!"; document.getElementById('faqQ').value=''; document.getElementById('faqA').value=''; loadBotFaq();
+  }catch(e){ alert("Gagal! Cek kolom tabel bot_faq lu Ko! Harusnya pertanyaan/jawaban. Error: "+e.message); }
+}
+async function hapusFaq(id){ if(!confirm("Hapus FAQ ini?")) return; var url=document.getElementById('sbUrl').value.trim(),key=document.getElementById('sbKey').value.trim(); await fetch(url+"/rest/v1/bot_faq?id=eq."+id,{method:"DELETE",headers:{apikey:key,Authorization:"Bearer "+key}}); loadBotFaq(); }
+async function loadAntrian(){
+  var url=document.getElementById('sbUrl').value.trim(),key=document.getElementById('sbKey').value.trim();
+  if(!url||!key){ alert("Isi Supabase dulu!"); pindahHalaman('supabase'); return; }
+  document.getElementById('antrianList').innerHTML='<p>⏳ Loading...</p>';
+  try{ var r=await fetch(url+"/rest/v1/bot_antrian?select=*&order=id.desc&limit=20",{headers:{apikey:key,Authorization:"Bearer "+key}}); var j=await r.json();
+  if(!Array.isArray(j)||!j.length){ document.getElementById('antrianList').innerHTML='<p style="color:#888">Antrian kosong, aman Ko!</p>'; return; }
+  var html=""; for(var i=0;i<j.length;i++){ var x=j[i]; html+='<div class="faqItem"><b>📋 '+(x.nama||x.name||x.nomor||'-')+'</b><p>'+(x.pesan||x.message||JSON.stringify(x))+'</p></div>'; }
+  document.getElementById('antrianList').innerHTML=html;
+  }catch(e){ document.getElementById('antrianList').innerHTML='❌ '+e.message; }
+}
+function getP(){ try{ return JSON.parse(localStorage.getItem('master_projects')||'[]'); }catch(e){ return []; } }
+function setP(a){ localStorage.setItem('master_projects',JSON.stringify(a)); render(); }
+function render(){
+  var arr=getP(),box=document.getElementById('list'),cur=document.getElementById('project').value;
+  if(!arr.length){ box.innerHTML='<p style="color:#888;font-size:12px;padding:10px 0">Belum ada project. Pencet LOAD di atas, atau isi nama project + username di bawah terus + TAMBAH.</p>'; return; }
+  var html=""; for(var i=0;i<arr.length;i++){ var p=arr[i]; html+='<div class="proj '+(p.repo===cur?'active':'')+'" onclick="pilih('+i+')"><div><b>📁 '+p.repo+'</b><small>'+p.owner+' / '+p.repo+' • '+p.branch+' • '+p.file+'</small></div><button class="del" onclick="event.stopPropagation();hapus('+i+')">✕</button></div>'; }
+  box.innerHTML=html;
+}
+function pilih(i){ var p=getP()[i]; document.getElementById('repoUrl').value="https://github.com/"+p.owner+"/"+p.repo; document.getElementById('ghUser').value=p.owner; document.getElementById('project').value=p.repo; document.getElementById('branch').value=p.branch; document.getElementById('fileName').value=p.file; parseRepo(); render(); document.getElementById('status').textContent="✅ "+p.repo+" dipilih! Tinggal LOAD FILE!"; }
+function hapus(i){ if(!confirm("Hapus?")) return; var a=getP(); a.splice(i,1); setP(a); }
+function tambahManual(){ var n=document.getElementById('newProj').value.trim(),o=document.getElementById('ghUser').value.trim(); if(!n||!o){ alert("Isi Username + Nama Project!"); return; } var a=getP(); for(var i=0;i<a.length;i++){ if(a[i].repo===n){ alert("Udah ada!"); return; } } a.push({owner:o,repo:n,branch:'main',file:'index.html'}); setP(a); document.getElementById('newProj').value=''; }
+async function loadDaftar(){ var t=document.getElementById('ghToken').value.trim(); if(!t){ alert("Isi Token dulu!"); return; } document.getElementById('list').innerHTML='<p style="padding:10px 0">⏳ Loading...</p>'; try{ var r=await fetch("https://api.github.com/user/repos?per_page=100&sort=updated",{headers:{Authorization:"Bearer "+t}}); var j=await r.json(); if(j.message){ alert(j.message); render(); return; } var a=getP(); for(var i=0;i<j.length;i++){ var x=j[i]; var ada=false; for(var k=0;k<a.length;k++){ if(a[k].repo===x.name) ada=true; } if(!ada) a.push({owner:x.owner.login,repo:x.name,branch:x.default_branch||'main',file:'index.html'}); } setP(a); alert("Ketemu "+j.length+" project!"); }catch(e){ alert(e.message); render(); } }
+function parseRepo(){ var u=document.getElementById('repoUrl').value.trim(); var m=u.match(/github\.com\/([^\/]+)\/([^\/\s]+)/)||u.match(/^([^\/\s]+)\/([^\/\s]+)$/); if(m){ document.getElementById('ghUser').value=m[1]; document.getElementById('project').value=m[2].replace('.git',''); document.getElementById('parsed').textContent="✅ "+m[1]+" / "+m[2]; return {owner:m[1],repo:m[2].replace('.git','')}; } return {owner:document.getElementById('ghUser').value.trim(),repo:document.getElementById('project').value.trim()}; }
+document.getElementById('repoUrl').addEventListener('input',parseRepo);
+function auth(){ var r=parseRepo(); return {owner:r.owner,repo:r.repo,token:document.getElementById('ghToken').value.trim(),file:document.getElementById('fileName').value.trim()||'index.html',branch:document.getElementById('branch').value.trim()||'main'}; }
+async function loadFile(){ var a=auth(); if(!a.owner||!a.repo||!a.token){ alert("Isi Link + Token + File!"); return; } document.getElementById('status').textContent="⏳ Loading "+a.file+"..."; document.getElementById('debugBox').style.display='block'; document.getElementById('debugBox').textContent="⏳ Loading..."; try{ var r=await fetch("https://api.github.com/repos/"+a.owner+"/"+a.repo+"/contents/"+a.file+"?ref="+a.branch,{headers:{Authorization:"Bearer "+a.token}}); var j=await r.json(); if(j.message==="Not Found"){ sha=""; cacheFull=""; document.getElementById('content').value=""; document.getElementById('status').textContent="⚠️ Repo masih KOSONG / File tidak ketemu! Nama file lu bener nggak Ko? Coba cek di GitHub, nama file-nya apa?"; document.getElementById('debugBox').textContent="❌ File "+a.file+" tidak ketemu di repo "+a.owner+"/"+a.repo+" branch "+a.branch; alert("File tidak ketemu! Cek nama file-nya Ko!"); return; } if(j.message){ alert(j.message); return; } sha=j.sha; var d=decodeGithub(j.content); cacheFull=d; simpanCacheKeHP(); document.getElementById('content').value=d; editorMode='full'; var preview=d.slice(0,300); document.getElementById('debugBox').textContent="✅ DEBUG - File ketemu!\nNama: "+a.file+"\nTotal: "+d.length+" karakter\nAda <style>? "+(d.indexOf("<style")>=0?"ADA ✅":"TIDAK ADA ❌")+"\nAda <body>? "+(d.indexOf("<body")>=0?"ADA ✅":"TIDAK ADA ❌")+"\nAda <script>? "+(d.indexOf("<script")>=0?"ADA ✅":"TIDAK ADA ❌")+"\nAda kata BOT? "+(d.toLowerCase().indexOf("bot")>=0?"ADA ✅":"TIDAK ADA ❌")+"\n\n--- 300 huruf pertama file lu ---\n"+preview; tampilEditor('full'); document.getElementById('status').textContent="✅ Berhasil load! Total "+d.length+" karakter! Lihat kotak kuning di atas buat DEBUG!"; var arr=getP(); var ada=false; for(var i=0;i<arr.length;i++){ if(arr[i].repo===a.repo) ada=true; } if(!ada){ arr.push({owner:a.owner,repo:a.repo,branch:a.branch,file:a.file}); setP(arr); } }catch(e){ document.getElementById('status').textContent="❌ "+e.message; document.getElementById('debugBox').textContent="❌ ERROR: "+e.message; } }
+async function saveFile(){ var a=auth(); simpanBagianKeFull(); var c=cacheFull; if(!c){ alert("Isi file kosong!"); return; } if(!confirm("SAVE "+a.file+" ke "+a.owner+"/"+a.repo+" ?")) return; document.getElementById('status').textContent="⏳ Saving..."; try{ var body={message:"Update via MASTER - "+new Date().toLocaleString('id-ID'),content:btoa(unescape(encodeURIComponent(c))),branch:a.branch}; if(sha) body.sha=sha; var r=await fetch("https://api.github.com/repos/"+a.owner+"/"+a.repo+"/contents/"+a.file,{method:"PUT",headers:{Authorization:"Bearer "+a.token,"Content-Type":"application/json"},body:JSON.stringify(body)}); var j=await r.json(); if(j.message && !j.content){ alert(j.message); return; } sha=j.content.sha; document.getElementById('status').textContent="✅ BERHASIL!"; alert("BERHASIL! ✅"); tampilEditor(editorMode); }catch(e){ alert(e.message); } }
+function isiTemplate(){ if(!confirm("Isi dengan TEMPLATE?")) return; var t='<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>TOKO BARU</title><style>body{background:#0a0a0a;color:#fff;text-align:center;padding:40px;font-family:Georgia}h1{color:#E8C97A}</style></head><body><h1>TOKO BARU</h1><p>WA: 6285899611111</p><script>function balasBot(pesan){ if(pesan.includes("harga")) return "Harga mulai 50rb kak!"; return "Halo kak!"; }' + CLOSE_SCRIPT + '</body></html>'; cacheFull=t; simpanCacheKeHP(); document.getElementById('content').value=t; editorMode='full'; tampilEditor('style'); alert("Template terisi!"); }
+function doReplace(){ var f=document.getElementById('findTxt').value,r=document.getElementById('replaceTxt').value; if(!f){ alert("Isi Cari-nya!"); return; } simpanBagianKeFull(); var cnt=(cacheFull.match(new RegExp(f.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),'g'))||[]).length; if(!cnt){ alert("Gak ketemu!"); return; } if(!confirm("Ganti "+cnt+" tempat?")) return; cacheFull=cacheFull.split(f).join(r); simpanCacheKeHP(); tampilEditor(editorMode); alert("Berhasil ganti "+cnt+" tempat! Tinggal SAVE!"); }
+function saveLocal(){ var d={repoUrl:document.getElementById('repoUrl').value,ghUser:document.getElementById('ghUser').value,ghToken:document.getElementById('ghToken').value,project:document.getElementById('project').value,branch:document.getElementById('branch').value,fileName:document.getElementById('fileName').value}; localStorage.setItem('master_github',JSON.stringify(d)); alert("Tersimpan di HP!"); }
+function saveSbLocal(){ localStorage.setItem('master_supabase',JSON.stringify({sbUrl:document.getElementById('sbUrl').value,sbKey:document.getElementById('sbKey').value})); alert("Supabase tersimpan di HP!"); }
+function loadLocal(){
+  try{ var d=JSON.parse(localStorage.getItem('master_github')||'{}'); if(d.repoUrl){ document.getElementById('repoUrl').value=d.repoUrl||''; document.getElementById('ghUser').value=d.ghUser||''; document.getElementById('ghToken').value=d.ghToken||''; document.getElementById('project').value=d.project||''; document.getElementById('branch').value=d.branch||'main'; document.getElementById('fileName').value=d.fileName||'index.html'; parseRepo(); } }catch(e){}
+  try{ var s=JSON.parse(localStorage.getItem('master_supabase')||'{}'); if(s.sbUrl){ document.getElementById('sbUrl').value=s.sbUrl||''; document.getElementById('sbKey').value=s.sbKey||''; } }catch(e){}
+  try{ var c=localStorage.getItem('master_cache')||""; if(c){ cacheFull=c; document.getElementById('content').value=c; document.getElementById('status').textContent="✅ File terakhir dipulihkan dari HP! Total "+c.length+" karakter! Nggak perlu LOAD lagi!"; } }catch(e){}
+  loadSettingBot();
+  pindahHalaman('github');
+  if(cacheFull){ tampilEditor('full'); }
+}
+document.getElementById('content').addEventListener('input',function(e){ document.getElementById('info').textContent="Karakter bagian ini: "+e.target.value.length+" | Total: "+cacheFull.length; });
+document.getElementById('fileHP').addEventListener('change',function(e){ var f=e.target.files[0]; if(!f) return; var rd=new FileReader(); rd.onload=function(ev){ isiFileHP=ev.target.result; document.getElementById('fileHPInfo').textContent="✅ "+f.name+" siap!"; document.getElementById('fileName').value=f.name; }; rd.readAsText(f); });
+async function kirimFileHPKeGithub(){ var a=auth(); if(!isiFileHP){ alert("Pilih file dari HP dulu!"); return; } if(!a.token){ alert("Isi Token dulu!"); return; } if(!confirm("Kirim "+document.getElementById('fileName').value+" ke "+a.owner+"/"+a.repo+" ?")) return; document.getElementById('status').textContent="⏳ Uploading..."; try{ var cek=await fetch("https://api.github.com/repos/"+a.owner+"/"+a.repo+"/contents/"+a.file+"?ref="+a.branch,{headers:{Authorization:"Bearer "+a.token}}); var cekJ=await cek.json(); var body={message:"Upload dari HP via MASTER - "+new Date().toLocaleString('id-ID'),content:btoa(unescape(encodeURIComponent(isiFileHP))),branch:a.branch}; if(cekJ.sha) body.sha=cekJ.sha; var r=await fetch("https://api.github.com/repos/"+a.owner+"/"+a.repo+"/contents/"+a.file,{method:"PUT",headers:{Authorization:"Bearer "+a.token,"Content-Type":"application/json"},body:JSON.stringify(body)}); var j=await r.json(); if(j.message && !j.content){ alert(j.message); return; } document.getElementById('status').textContent="✅ BERHASIL!"; alert("BERHASIL! ✅"); }catch(e){ alert(e.message); } }
+document.getElementById('backupHP').addEventListener('change',function(e){ var f=e.target.files[0]; if(!f) return; var rd=new FileReader(); rd.onload=function(ev){ try{ isiBackup=JSON.parse(ev.target.result); var jml=Array.isArray(isiBackup)?isiBackup.length:Object.keys(isiBackup).length; document.getElementById('backupHPInfo').textContent="✅ "+f.name+" terbaca! Isi: "+jml; }catch(err){ alert("File JSON rusak!"); } }; rd.readAsText(f); });
+async function kirimBackupKeSupabase(){ var url=document.getElementById('sbUrl').value.trim(),key=document.getElementById('sbKey').value.trim(),tabel=document.getElementById('sbTable').value.trim()||"products"; if(!isiBackup){ alert("Pilih backup.json dulu!"); return; } if(!url||!key){ alert("Isi Supabase dulu!"); return; } var dataKirim=Array.isArray(isiBackup)?isiBackup:(isiBackup[tabel]||[isiBackup]); if(!confirm("Kirim "+dataKirim.length+" data ke "+tabel+" ?")) return; document.getElementById('sbStatus').textContent="⏳ Mengirim..."; try{ var sukses=0,gagal=0; for(var i=0;i<dataKirim.length;i+=100){ var potong=dataKirim.slice(i,i+100); var r=await fetch(url+"/rest/v1/"+tabel,{method:"POST",headers:{apikey:key,Authorization:"Bearer "+key,"Content-Type":"application/json",Prefer:"resolution=merge-duplicates"},body:JSON.stringify(potong)}); if(r.ok) sukses+=potong.length; else gagal+=potong.length; } document.getElementById('sbStatus').textContent="✅ Selesai! Sukses: "+sukses+", Gagal: "+gagal; alert("BERHASIL! ✅"); }catch(e){ alert(e.message); } }
+async function backupDatabase(){ var url=document.getElementById('sbUrl').value.trim(),key=document.getElementById('sbKey').value.trim(),tabel=document.getElementById('sbTable').value.trim()||"products"; if(!url||!key){ alert("Isi Supabase dulu!"); return; } document.getElementById('sbStatus').textContent="⏳ Backup "+tabel+"..."; try{ var r=await fetch(url+"/rest/v1/"+tabel+"?select=*",{headers:{apikey:key,Authorization:"Bearer "+key}}); var j=await r.json(); var blob=new Blob([JSON.stringify(j,null,2)],{type:"application/json"}); var a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download="backup-"+tabel+"-"+new Date().toISOString().slice(0,10)+".json"; a.click(); document.getElementById('sbStatus').textContent="✅ Berhasil! Cek folder Download!"; alert("Berhasil! ✅ Cek folder Download!"); }catch(e){ alert(e.message); } }
+async function backupSemuaTabel(){ var url=document.getElementById('sbUrl').value.trim(),key=document.getElementById('sbKey').value.trim(); if(!url||!key){ alert("Isi Supabase dulu!"); return; } var daftarTabel=[]; try{ var rTabel=await fetch(url+"/rest/v1/rpc/get_all_tables",{method:"POST",headers:{apikey:key,Authorization:"Bearer "+key,"Content-Type":"application/json"},body:"{}"}); var jTabel=await rTabel.json(); if(Array.isArray(jTabel)&&jTabel.length) daftarTabel=jTabel; }catch(e){} if(!daftarTabel.length){ daftarTabel=["products","members","admins","pegawai","orders","riwayat_saldo","bot_faq","bot_antrian","order_items","member_notifications"]; var tambahan=document.getElementById('tabelTambahan').value.trim(); if(tambahan){ var parts=tambahan.split(","); for(var i=0;i<parts.length;i++){ var t=parts[i].trim(); if(t && daftarTabel.indexOf(t)===-1) daftarTabel.push(t); } } } var hasilSemua={}; document.getElementById('sbStatus').textContent="⏳ Ketemu "+daftarTabel.length+" tabel! Backup..."; try{ for(var i=0;i<daftarTabel.length;i++){ var tabel=daftarTabel[i]; document.getElementById('sbStatus').textContent="⏳ Backup "+tabel+"... "+(i+1)+"/"+daftarTabel.length; var r=await fetch(url+"/rest/v1/"+tabel+"?select=*",{headers:{apikey:key,Authorization:"Bearer "+key}}); var j=await r.json(); hasilSemua[tabel]=Array.isArray(j)?j:[]; } var blob=new Blob([JSON.stringify(hasilSemua,null,2)],{type:"application/json"}); var a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download="backup-SEMUA-"+new Date().toISOString().slice(0,10)+".json"; a.click(); var total=0; for(var k in hasilSemua){ total+=hasilSemua[k].length; } document.getElementById('sbStatus').textContent="✅ Berhasil! Cek Download! Total: "+total+" data dari "+daftarTabel.length+" tabel"; alert("BERHASIL! ✅ Cek folder Download!"); }catch(e){ alert(e.message); } }
+async function kirimBackupSemuaKeSupabase(){ var url=document.getElementById('sbUrl').value.trim(),key=document.getElementById('sbKey').value.trim(); if(!isiBackup){ alert("Pilih backup-SEMUA.json dulu!"); return; } if(!url||!key){ alert("Isi Supabase dulu!"); return; } if(Array.isArray(isiBackup)){ alert("File ini cuma 1 tabel!"); return; } var daftarTabel=Object.keys(isiBackup); if(!confirm("Kirim RESTORE "+daftarTabel.length+" tabel?")) return; document.getElementById('sbStatus').textContent="⏳ Restore..."; try{ var totalSukses=0,totalGagal=0; for(var t=0;t<daftarTabel.length;t++){ var tabel=daftarTabel[t]; var dataKirim=isiBackup[tabel]||[]; if(!dataKirim.length) continue; for(var i=0;i<dataKirim.length;i+=100){ var potong=dataKirim.slice(i,i+100); var r=await fetch(url+"/rest/v1/"+tabel,{method:"POST",headers:{apikey:key,Authorization:"Bearer "+key,"Content-Type":"application/json",Prefer:"resolution=merge-duplicates"},body:JSON.stringify(potong)}); if(r.ok) totalSukses+=potong.length; else totalGagal+=potong.length; } } document.getElementById('sbStatus').textContent="✅ Restore selesai! Sukses: "+totalSukses; alert("RESTORE BERHASIL! ✅"); }catch(e){ alert(e.message); } }
+loadLocal(); render();
+</script></body></html>

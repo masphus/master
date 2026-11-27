@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="id"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>👑 MASTER D' LUSSO - BAJU BARU</title>
+<title>👑 MASTER D' LUSSO</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:Arial}
 body{background:#0a0a0a;color:#fff;padding:12px 12px 40px;background:radial-gradient(circle at 50% 0%,#2a2100 0%,#0a0a0a 55%)}
@@ -24,7 +24,6 @@ button{width:100%;background:linear-gradient(180deg,#F5D98A,#C9A86A);border:none
 .del{background:#333;color:#ff6b6b;border:none;padding:7px 10px;border-radius:8px;width:auto;margin:0;font-size:12px}
 #status,#sbStatus,#botStatus{font-size:12px;margin-top:8px;text-align:center;color:#8aff8a;line-height:1.4}
 small{color:#888;font-size:11px;line-height:1.4}
-/* === 3 KOLOM BERJEJER - DIGEDEIN DIKIT === */
 .top3{background:#1a170e;border:1px solid #E8C97A;padding:14px}
 .top3-grid{display:flex;gap:10px}
 .top3-grid>div{flex:1;min-width:0}
@@ -42,7 +41,6 @@ small{color:#888;font-size:11px;line-height:1.4}
 </style></head><body>
 <h1>👑 MASTER</h1><div class="sub">D' LUSSO</div>
 
-<!-- ===== ATAS: 3 KOLOM BERJEJER - UDAH DIBERSIHIN ===== -->
 <div class="card top3">
 <div class="top3-grid">
 <div><label>🌐 URL</label><input id="topUrl" placeholder="github.com/..." autocomplete="off"></div>
@@ -53,11 +51,6 @@ small{color:#888;font-size:11px;line-height:1.4}
 <div class="row"><button onclick="simpanProjectKeDb()">💾 SIMPAN PROJECT INI</button><button class="sec" onclick="salin3Kolom()">📋 SALIN 3 KOLOM</button></div>
 <div id="topStatus" style="font-size:12px;margin-top:8px;text-align:center;color:#8aff8a"></div>
 </div>
-
-<div class="card"><b style="color:#E8C97A">👑 MASTER DB</b>
-<label>MASTER URL</label><input id="masterUrl" class="kecil" placeholder="https://xxx.supabase.co">
-<label>MASTER KEY</label><input id="masterKey" class="kecil" placeholder="sb_... / eyJ...">
-<button class="sec" onclick="saveMasterDb()">💾 SIMPAN MASTER DB</button><div id="masterStatus" style="font-size:11px;text-align:center;color:#8aff8a;margin-top:6px"></div></div>
 
 <div class="card"><b style="color:#E8C97A">📂 DAFTAR PROJECT</b>
 <div class="row"><button class="sec" onclick="loadProjectsDariDb()">🗄️ LOAD DARI DATABASE</button><button class="sec" onclick="loadDaftar()">📂 LOAD DARI GITHUB</button></div>
@@ -71,7 +64,7 @@ small{color:#888;font-size:11px;line-height:1.4}
 </div>
 
 <div id="page-github" class="page active">
-<div class="card"><b style="color:#E8C97A">📂 GITHUB - PROJECT YANG DIPILIH</b>
+<div class="card"><b style="color:#E8C97A">📂 GITHUB</b>
 <label>NAMA PROJECT / PEMBELI</label><input id="projName" class="kecil" placeholder="Ammo Travel - Si A">
 <div class="row"><div><label>NAMA REPO</label><input id="project" class="kecil" placeholder="nama-repo"></div><div><label>BRANCH</label><input id="branch" class="kecil" value="main"></div></div>
 <label>NAMA FILE</label><input id="fileName" class="kecil" value="index.html">
@@ -107,11 +100,15 @@ small{color:#888;font-size:11px;line-height:1.4}
 </div>
 
 <script>
+// ===== MASTER DB - UDAH DITANAM PERMANEN PUNYA KO CHENG =====
+var MASTER_DB_URL = "https://lrnnosiewovhaoyyvsmc.supabase.co";
+var MASTER_DB_KEY = "sb_publishable_2tzMRe0rQriqi4q3GLYWkQ_8A2scdc5";
+// ==============================================================
 function pindahHalaman(ke){ ['github','supabase','bot'].forEach(function(x){ document.getElementById('page-'+x).style.display=(ke===x?'block':'none'); }); document.getElementById('btnGithub').className='tabBtn'+(ke==='github'?' active':''); document.getElementById('btnSupabase').className='tabBtn'+(ke==='supabase'?' active':''); document.getElementById('btnBot').className='tabBtn'+(ke==='bot'?' botActive':''); try{ localStorage.setItem('master_halaman',ke); }catch(e){} if(ke==='bot') updateBotInfo(); }
 var sha="",isiFileHP="",isiBackup=null,editorMode='full',cacheFull="",daftarDb=[],_editId=null,terkunci=false;
 var CLOSE_SCRIPT="<"+"/"+"script>";
 var labelEditor={style:"🎨 Lagi edit: STYLE",body:"📝 Lagi edit: BODY",script:"🧠 Lagi edit: SCRIPT",head:"🏷️ Lagi edit: HEAD",full:"📄 Lagi edit: FULL"};
-function setKunci(k){ terkunci=k; ['topUrl','topApi','topToken'].forEach(function(id){ document.getElementById(id).disabled=k; }); document.getElementById('btnLock').textContent=k?"🔓 BUKA KUNCI":"🔒 KUNCI"; document.getElementById('btnLock').style.opacity=k?"1":"0.9"; }
+function setKunci(k){ terkunci=k; ['topUrl','topApi','topToken'].forEach(function(id){ document.getElementById(id).disabled=k; }); document.getElementById('btnLock').textContent=k?"🔓 BUKA KUNCI":"🔒 KUNCI"; }
 function toggleKunci(){ if(terkunci){ if(!confirm("Buka kunci?")) return; setKunci(false); } else setKunci(true); }
 function bukaProjectBaru(){ _editId=null; ['topUrl','topApi','topToken','projName','project'].forEach(function(id){ var el=document.getElementById(id); if(el) el.value=''; }); setKunci(false); document.getElementById('topStatus').textContent="Siap isi project baru..."; }
 function salin3Kolom(){ var t="URL: "+document.getElementById('topUrl').value+"\nAPI: "+document.getElementById('topApi').value+"\nTOKEN: "+document.getElementById('topToken').value; try{ navigator.clipboard.writeText(t); document.getElementById('topStatus').textContent="✅ Tersalin!"; }catch(e){ alert(t); } }
@@ -134,13 +131,11 @@ async function loadBotFaq(){ var s=getSb(); if(!s.url||!s.key){ alert("Klik proj
 async function tambahFaq(){ var s=getSb(); var q=v('faqQ'),a=v('faqA'); if(!q||!a){ alert("Isi pertanyaan + jawaban!"); return; } try{ var r=await fetch(s.url+"/rest/v1/bot_faq",{method:"POST",headers:{apikey:s.key,Authorization:"Bearer "+s.key,"Content-Type":"application/json",Prefer:"return=representation"},body:JSON.stringify({pertanyaan:q,jawaban:a})}); if(!r.ok) throw new Error(await r.text()); document.getElementById('faqQ').value=''; document.getElementById('faqA').value=''; loadBotFaq(); }catch(e){ alert("Gagal: "+e.message); } }
 async function hapusFaq(id){ if(!confirm("Hapus FAQ ini?")) return; var s=getSb(); await fetch(s.url+"/rest/v1/bot_faq?id=eq."+id,{method:"DELETE",headers:{apikey:s.key,Authorization:"Bearer "+s.key}}); loadBotFaq(); }
 async function loadAntrian(){ var s=getSb(); if(!s.url||!s.key){ alert("Klik project dulu!"); return; } document.getElementById('antrianList').innerHTML='<p>⏳ Loading...</p>'; try{ var r=await fetch(s.url+"/rest/v1/bot_antrian?select=*&order=id.desc&limit=20",{headers:{apikey:s.key,Authorization:"Bearer "+s.key}}); var j=await r.json(); if(!Array.isArray(j)||!j.length){ document.getElementById('antrianList').innerHTML='<p style="color:#888">Antrian kosong!</p>'; return; } var html=""; for(var i=0;i<j.length;i++){ var x=j[i]; html+='<div class="faqItem"><b>📋 '+(x.nama||x.name||'-')+'</b><p>'+(x.pesan||x.message||JSON.stringify(x))+'</p></div>'; } document.getElementById('antrianList').innerHTML=html; }catch(e){ document.getElementById('antrianList').innerHTML='❌ '+e.message; } }
-function getMaster(){ return {url:v('masterUrl'), key:v('masterKey')}; }
-function saveMasterDb(){ localStorage.setItem('master_db',JSON.stringify(getMaster())); document.getElementById('masterStatus').textContent="✅ Master DB tersimpan!"; }
-function loadMasterDb(){ try{ var d=JSON.parse(localStorage.getItem('master_db')||'{}'); if(d.url){ document.getElementById('masterUrl').value=d.url; document.getElementById('masterKey').value=d.key||''; } }catch(e){} }
-async function loadProjectsDariDb(){ var m=getMaster(); if(!m.url||!m.key){ alert("Isi MASTER DB dulu!"); return; } document.getElementById('list').innerHTML='<p>⏳ Loading...</p>'; try{ var r=await fetch(m.url+"/rest/v1/projects?select=*&order=created_at.desc",{headers:{apikey:m.key,Authorization:"Bearer "+m.key}}); var j=await r.json(); if(!Array.isArray(j)) throw new Error(JSON.stringify(j)); daftarDb=j; renderDb(); }catch(e){ alert(e.message); } }
+function getMaster(){ return {url:MASTER_DB_URL, key:MASTER_DB_KEY}; }
+async function loadProjectsDariDb(){ var m=getMaster(); document.getElementById('list').innerHTML='<p>⏳ Loading...</p>'; try{ var r=await fetch(m.url+"/rest/v1/projects?select=*&order=created_at.desc",{headers:{apikey:m.key,Authorization:"Bearer "+m.key}}); var j=await r.json(); if(!Array.isArray(j)) throw new Error(JSON.stringify(j)); daftarDb=j; renderDb(); }catch(e){ alert(e.message); } }
 function renderDb(){ var box=document.getElementById('list'); if(!daftarDb.length){ box.innerHTML='<p style="color:#888">Belum ada project di database.</p>'; return; } var html=""; for(var i=0;i<daftarDb.length;i++){ var p=daftarDb[i]; html+='<div class="proj" onclick="pilihDb('+i+')"><div><b>📁 '+(p.name||'-')+'</b><small>'+(p.github_repo||'')+'<br>API: '+(p.api_url||'')+'</small></div><button class="del" onclick="event.stopPropagation();hapusDb('+p.id+')">✕</button></div>'; } box.innerHTML=html; }
 function pilihDb(i){ var p=daftarDb[i]; if(!p) return; _editId=p.id; document.getElementById('projName').value=p.name||''; document.getElementById('topUrl').value=p.github_repo||''; document.getElementById('topApi').value=p.api_url||''; document.getElementById('topToken').value=p.token||p.github_token||''; var m=(p.github_repo||'').match(/github\.com\/([^\/]+)\/([^\/\s]+)/); if(m) document.getElementById('project').value=m[2].replace('.git',''); setKunci(true); document.getElementById('topStatus').textContent="✅ "+(p.name||'')+" dipilih! 3 kolom terkunci 🔒"; document.getElementById('status').textContent="✅ "+(p.name||'')+" dipilih! Tinggal LOAD FILE / BACKUP!"; }
-async function simpanProjectKeDb(){ var m=getMaster(); if(!m.url||!m.key){ alert("Isi MASTER DB dulu!"); return; } var data={ name:v('projName')||v('project')||"Project Baru", github_repo:v('topUrl'), github_token:v('topToken'), api_url:v('topApi'), token:v('topToken') }; if(!data.github_repo && !data.api_url){ alert("Isi URL / API dulu Ko!"); return; } try{ var url=m.url+"/rest/v1/projects", headers={apikey:m.key,Authorization:"Bearer "+m.key,"Content-Type":"application/json",Prefer:"return=representation"}; var r; if(_editId) r=await fetch(url+"?id=eq."+_editId,{method:"PATCH",headers:headers,body:JSON.stringify(data)}); else r=await fetch(url,{method:"POST",headers:headers,body:JSON.stringify(data)}); var j=await r.json(); if(!r.ok) throw new Error(JSON.stringify(j)); alert("✅ Tersimpan!"); setKunci(true); loadProjectsDariDb(); }catch(e){ alert("Gagal: "+e.message); } }
+async function simpanProjectKeDb(){ var m=getMaster(); var data={ name:v('projName')||v('project')||"Project Baru", github_repo:v('topUrl'), github_token:v('topToken'), api_url:v('topApi'), token:v('topToken') }; if(!data.github_repo && !data.api_url){ alert("Isi URL / API dulu Ko!"); return; } try{ var url=m.url+"/rest/v1/projects", headers={apikey:m.key,Authorization:"Bearer "+m.key,"Content-Type":"application/json",Prefer:"return=representation"}; var r; if(_editId) r=await fetch(url+"?id=eq."+_editId,{method:"PATCH",headers:headers,body:JSON.stringify(data)}); else r=await fetch(url,{method:"POST",headers:headers,body:JSON.stringify(data)}); var j=await r.json(); if(!r.ok) throw new Error(JSON.stringify(j)); alert("✅ Tersimpan!"); setKunci(true); loadProjectsDariDb(); }catch(e){ alert("Gagal: "+e.message); } }
 async function hapusDb(id){ if(!confirm("Hapus project ini?")) return; var m=getMaster(); await fetch(m.url+"/rest/v1/projects?id=eq."+id,{method:"DELETE",headers:{apikey:m.key,Authorization:"Bearer "+m.key}}); loadProjectsDariDb(); }
 function getP(){ try{ return JSON.parse(localStorage.getItem('master_projects')||'[]'); }catch(e){ return []; } }
 function setP(a){ localStorage.setItem('master_projects',JSON.stringify(a)); render(); }
@@ -161,5 +156,5 @@ async function kirimBackupKeSupabase(){ var s=getSb(),tabel=v('sbTable')||"produ
 async function backupDatabase(){ var s=getSb(),tabel=v('sbTable')||"products"; try{ var r=await fetch(s.url+"/rest/v1/"+tabel+"?select=*",{headers:{apikey:s.key,Authorization:"Bearer "+s.key}}); var j=await r.json(); var blob=new Blob([JSON.stringify(j,null,2)],{type:"application/json"}); var a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download="backup-"+tabel+"-"+new Date().toISOString().slice(0,10)+".json"; a.click(); alert("Berhasil! Cek Download!"); }catch(e){ alert(e.message); } }
 async function backupSemuaTabel(){ var s=getSb(); var daftar=["products","members","admins","pegawai","orders","riwayat_saldo","bot_faq","bot_antrian","order_items","member_notifications"]; var tambahan=v('tabelTambahan'); if(tambahan) tambahan.split(",").forEach(function(t){ t=t.trim(); if(t && daftar.indexOf(t)===-1) daftar.push(t); }); var hasil={}; try{ for(var i=0;i<daftar.length;i++){ var r=await fetch(s.url+"/rest/v1/"+daftar[i]+"?select=*",{headers:{apikey:s.key,Authorization:"Bearer "+s.key}}); var j=await r.json(); hasil[daftar[i]]=Array.isArray(j)?j:[]; } var blob=new Blob([JSON.stringify(hasil,null,2)],{type:"application/json"}); var a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download="backup-SEMUA-"+new Date().toISOString().slice(0,10)+".json"; a.click(); alert("BERHASIL! ✅"); }catch(e){ alert(e.message); } }
 async function kirimBackupSemuaKeSupabase(){ var s=getSb(); if(!isiBackup){ alert("Pilih backup-SEMUA.json dulu!"); return; } if(Array.isArray(isiBackup)){ alert("File ini cuma 1 tabel!"); return; } var daftar=Object.keys(isiBackup); if(!confirm("Kirim RESTORE "+daftar.length+" tabel?")) return; try{ for(var t=0;t<daftar.length;t++){ var tabel=daftar[t], data=isiBackup[tabel]||[]; for(var i=0;i<data.length;i+=100){ await fetch(s.url+"/rest/v1/"+tabel,{method:"POST",headers:{apikey:s.key,Authorization:"Bearer "+s.key,"Content-Type":"application/json",Prefer:"resolution=merge-duplicates"},body:JSON.stringify(data.slice(i,i+100))}); } } alert("RESTORE BERHASIL! ✅"); }catch(e){ alert(e.message); } }
-loadMasterDb(); loadSettingBot(); setKunci(false); pindahHalaman('github');
+loadSettingBot(); setKunci(false); pindahHalaman('github');
 </script></body></html>

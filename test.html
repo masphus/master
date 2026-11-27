@@ -39,7 +39,7 @@ var sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 var ATURAN = [];
 var FRASA_LIST = [];
 
-// === NORMALISASI ANTI-TYPO - KAYA LU KO, SANTAI ===
+// === NORMALISASI ANTI-TYPO ===
 function normalisasiTeks(t){
   var s=' '+String(t||'').toLowerCase()+' ';
   s=s.replace(/[^a-z0-9\s]/g,' ');
@@ -49,9 +49,7 @@ function normalisasiTeks(t){
   s=s.replace(/\s+/g,' ').trim();
   return ' '+s+' ';
 }
-// Hilangin huruf double: hallo->halo, sedihh->sedih, hargaa->harga
 function hapusDouble(s){ return s.replace(/([a-z])\1+/g,'$1'); }
-// Jarak typo: hallo vs halo = 1, labar vs kabar = 1, hrga vs harga = 1
 function jarakTypo(a,b){
   a=hapusDouble(a); b=hapusDouble(b);
   if(a===b) return 0;
@@ -65,30 +63,29 @@ function jarakTypo(a,b){
   }
   return d[m][n];
 }
-// Cek 1 kata: mirip apa nggak? Toleransi 1-2 huruf salah
 function kataMirip(kataChat, kataFrasa){
   kataChat=hapusDouble(kataChat); kataFrasa=hapusDouble(kataFrasa);
   if(kataChat===kataFrasa) return true;
   if(kataChat.length<3 || kataFrasa.length<3) return false;
-  // labar vs kabar: beda 1 huruf depan, tapi tetep mirip
   var j=jarakTypo(kataChat, kataFrasa);
   if(kataFrasa.length<=4) return j<=1;
   if(kataFrasa.length<=7) return j<=2;
   return j<=2;
 }
-// Cek frasa: semua kata di frasa harus ada (mirip) di chat
+// SANTAI - 1 kata kena aja udah cukup!
 function frasaKenaTypo(chatNorm, frasaAsli){
   var f=normalisasiTeks(frasaAsli).trim(); if(!f) return false;
   var kataFrasa=f.split(/\s+/);
   var kataChat=chatNorm.trim().split(/\s+/);
+  var kena=0;
   for(var i=0;i<kataFrasa.length;i++){
-    var ketemu=false;
     for(var j=0;j<kataChat.length;j++){
-      if(kataMirip(kataChat[j], kataFrasa[i])){ ketemu=true; break; }
+      if(kataMirip(kataChat[j], kataFrasa[i])){ kena++; break; }
     }
-    if(!ketemu) return false;
   }
-  return true;
+  if(kataFrasa.length===1) return kena>=1;
+  if(kataFrasa.length===2) return kena>=1;
+  return kena >= Math.ceil(kataFrasa.length/2);
 }
 function ambilTeksFrasa(row){
   return row.teks || row.frasa || row.kata || row.kalimat || row.isi || row.pertanyaan || row.text || '';

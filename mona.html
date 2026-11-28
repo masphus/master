@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>MONA - Chat</title>
+<title>MONA - Chat Hybrid Full</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   *{margin:0;padding:0;box-sizing:border-box;font-family:sans-serif}
@@ -29,9 +29,9 @@
 <body>
 <div id="head">
   <img src="mona.png" onerror="this.src='https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100'">
-  <div><b>MONA</b><br><span>● Online</span></div>
+  <div><b>MONA</b><br><span>● Online - Hybrid</span></div>
 </div>
-<div id="status">Memuat otak Mona...</div>
+<div id="status">Memuat otak Mona Hybrid...</div>
 <div id="chat"></div>
 <div id="box">
   <input id="pesan" placeholder="Ketik pesan..." autocomplete="off">
@@ -45,129 +45,146 @@ const chat = document.getElementById('chat');
 const input = document.getElementById('pesan');
 const statusEl = document.getElementById('status');
 
-let DB = { penentu:[], kunci:[], frasa:[], rules:[], sinonim:[] };
+let DB = { penentu:[], kunci:[], frasa:[], rules:[], sinonim:[], mona_kata:[], mona_aturan:[] };
 let otakReady = false;
-
-function timeout(ms){ return new Promise(r=>setTimeout(()=>r(null), ms)); }
-
-async function getOtak(){
-  if(otakReady) return DB;
-  statusEl.textContent = 'Menghubungi Supabase...';
-  try{
-    let [rPenentu, rKunci, rFrasa, rRules, rSinonim] = await Promise.all([
-      Promise.race([supabaseClient.from('kata_penentu').select('kategori,kata'), timeout(3000)]),
-      Promise.race([supabaseClient.from('kata_kunci').select('kategori,kata1,kata2'), timeout(3000)]),
-      Promise.race([supabaseClient.from('frasa').select('kategori,teks'), timeout(3000)]),
-      Promise.race([supabaseClient.from('bot_rules').select('kategori,jawaban'), timeout(3000)]),
-      Promise.race([supabaseClient.from('sinonim').select('kata_utama,daftar_sinonim'), timeout(3000)]),
-    ]);
-    if(rPenentu && rPenentu.data) DB.penentu = rPenentu.data;
-    if(rKunci && rKunci.data) DB.kunci = rKunci.data;
-    if(rFrasa && rFrasa.data) DB.frasa = rFrasa.data;
-    if(rRules && rRules.data) DB.rules = rRules.data;
-    if(rSinonim && rSinonim.data) DB.sinonim = rSinonim.data;
-    if(DB.rules.length || DB.penentu.length){
-      otakReady = true;
-      statusEl.textContent = 'Otak siap: Penentu ' + DB.penentu.length + ' • Kunci ' + DB.kunci.length + ' • Frasa ' + DB.frasa.length + ' • Rules ' + DB.rules.length + ' • Supabase ✅';
-      statusEl.style.background = '#d4edda';
-      return DB;
-    }
-    throw new Error('Supabase kosong / timeout');
-  }catch(e){
-    console.log('Supabase gagal:', e);
-    statusEl.textContent = 'Supabase lambat / RLS terkunci ⚠️';
-    statusEl.style.background = '#f8d7da';
-    otakReady = true;
-    return DB;
-  }
-}
 
 function norm(s){ return (s||'').toLowerCase().replace(/[^a-z0-9 ]/g,' ').replace(/\s+/g,' ').trim(); }
 
-// === RANGKAI KATA JADI KALIMAT ===
-// Database cuma gudang kata, jadi kalimat dibikin di sini, bukan diambil dari bot_rules!
+// === BACA TABEL ANTI ERROR ===
+// 1 tabel salah nama / belum dibikin / RLS kekunci -> balik [], jangan bikin semua gagal
+// Gak ada SELECT * sendirian, semua selalu ada kolomnya
+async function bacaTabel(namaTabel, kolom){
+  try{
+    let res = await supabaseClient.from(namaTabel).select(kolom);
+    if(res.error){
+      console.log('Tabel ' + namaTabel + ' gagal dibaca:', res.error.message);
+      return [];
+    }
+    return res.data || [];
+  }catch(e){
+    console.log('Tabel ' + namaTabel + ' error:', e);
+    return [];
+  }
+}
+
+async function getOtak(){
+  if(otakReady) return DB;
+  statusEl.textContent = 'Menghubungi Supabase Hybrid...';
+  // Baca satu-satu, JANGAN Promise.all, biar 1 gagal gak semua gagal
+  DB.penentu = await bacaTabel('kata_penentu', 'kategori,kata');
+  DB.kunci = await bacaTabel('kata_kunci', 'kategori,kata1,kata2');
+  DB.frasa = await bacaTabel('frasa', 'kategori,teks');
+  DB.rules = await bacaTabel('bot_rules', 'kategori,jawaban');
+  DB.sinonim = await bacaTabel('sinonim', 'kata_utama,daftar_sinonim');
+  DB.mona_kata = await bacaTabel('mona_kata', 'kata,jenis');
+  DB.mona_aturan = await bacaTabel('mona_aturan', 'arah_pertanyaan,pola,jenis_jawaban');
+  // Cadangan kalo nama tabel beda
+  if(DB.mona_kata.length === 0) DB.mona_kata = await bacaTabel('mona_kata_baru', 'kata,jenis');
+  if(DB.mona_aturan.length === 0) DB.mona_aturan = await bacaTabel('mona_rules', 'arah_pertanyaan,pola,jenis_jawaban');
+
+  otakReady = true;
+  let totalLoad = DB.penentu.length + DB.kunci.length + DB.frasa.length + DB.mona_kata.length + DB.mona_aturan.length;
+  let statusText = 'Hybrid siap: Penentu '+DB.penentu.length+' • Kunci '+DB.kunci.length+' • Frasa '+DB.frasa.length+' • MonaKata '+DB.mona_kata.length+' • Aturan '+DB.mona_aturan.length+' ✅';
+  if(DB.mona_kata.length === 0) statusText += ' | MonaKata kosong, cek nama tabel!';
+  if(totalLoad === 0){
+    statusText = 'Semua tabel gagal dibaca, cek RLS / nama tabel ⚠️ Tapi chat tetep jalan';
+    statusEl.style.background = '#f8d7da';
+  } else {
+    statusEl.style.background = '#d4edda';
+  }
+  statusEl.textContent = statusText;
+  return DB;
+}
+
+// === HYBRID 1: RANGKAI DARI MONA_KATA, BUKAN AMBIL KALIMAT JADI ===
+// mona_kata = gudang kata per kata, mona_aturan = pola urutan jenis
+// Contoh pola: "persetujuan + pemanis + kemampuan + syarat + keberadaan + subjek"
+// Hasilnya dirangkai di sini, bukan dari bot_rules!
+function rangkaiDariMonaKata(pola){
+  if(!pola || !DB.mona_kata || !DB.mona_kata.length) return null;
+  let jenisList = pola.split('+').map(x=>norm(x)).filter(x=>x);
+  let hasil = [];
+  for(let jenis of jenisList){
+    // Ambil 1 kata per jenis, DISTINCT biar gak dobel kayak ayolah tadi
+    let calon = DB.mona_kata.filter(k=>norm(k.jenis)===jenis);
+    if(calon.length){
+      let pilih = calon[Math.floor(Math.random()*calon.length)];
+      hasil.push(pilih.kata);
+    }
+  }
+  if(!hasil.length) return null;
+  return hasil.join(' ');
+}
+
+function cariPolaMona(nq){
+  if(!DB.mona_aturan || !DB.mona_aturan.length) return null;
+  for(let a of DB.mona_aturan){
+    let kunciAturan = norm(a.arah_pertanyaan).split(' ').filter(x=>x.length>2);
+    let cocok = kunciAturan.filter(k=>nq.includes(' '+k+' ')).length;
+    if(cocok>0) return a;
+  }
+  return null;
+}
+
+// === HYBRID 2: RANGKAI DARI OTAK LAMA ===
 function rangkaiKalimat(kataKetemu, kategori, pertanyaanAsli){
-  // kataKetemu = array kata dari gudang, misal ['tau','bandung']
-  let kataStr = kataKetemu.join(' ');
-  // Bersihin nama kategori biar enak dibaca: tanya_tau_bandung -> tau bandung
+  let kataStr = (kataKetemu||[]).join(' ');
   let topik = kategori ? kategori.replace(/^tanya_|^sapaan_/,'').replace(/_/g,' ') : kataStr;
   if(!topik) topik = kataStr;
-
-  // Template rangkai - pilih berdasarkan kata yang ketemu
-  // Ini bukan jawaban dari DB, ini kalimat yang dirangkai dari kata gudang!
   let pembuka = ['Iya Kak,', 'Oh iya Kak,', 'Halo Kak,', 'Betul Kak,'][Math.floor(Math.random()*4)];
   let kalimat = pembuka + ' soal <b>' + topik + '</b> ya? ';
-  if(kataKetemu.length >= 2){
-    kalimat += 'Kakak nanya soal <b>' + kataStr + '</b>. ';
-  } else if(kataKetemu.length === 1){
-    kalimat += 'Kakak nyebut kata <b>' + kataStr + '</b>. ';
-  }
+  if(kataKetemu.length >= 2) kalimat += 'Kakak nanya soal <b>' + kataStr + '</b>. ';
+  else if(kataKetemu.length === 1) kalimat += 'Kakak nyebut kata <b>' + kataStr + '</b>. ';
   kalimat += 'Coba ceritain lebih detail dong Kak, biar Mona bisa bantu jawab soal ' + topik + ' dengan pas. Kakak maksudnya gimana soal ' + topik + ' itu?';
   return kalimat;
 }
 
 function cariJawaban(q){
-  // === LANGKAH 1: HITUNG DULU PERTANYAANNYA ===
+  if(!DB) return null;
   let nq = ' ' + norm(q) + ' ';
-  for(let s of DB.sinonim){
+  for(let s of (DB.sinonim || [])){
     let utama = norm(s.kata_utama);
     let list = String(s.daftar_sinonim||'').toLowerCase().split(/[,|]/).map(x=>norm(x));
-    for(let sin of list){
-      if(sin && nq.includes(' '+sin+' ')) nq = nq.replace(' '+sin+' ', ' '+utama+' ');
+    for(let sin of list){ if(sin && nq.includes(' '+sin+' ')) nq = nq.replace(' '+sin+' ', ' '+utama+' '); }
+  }
+
+  // HYBRID 1: MONA_KATA DULUAN (MANDIRI)
+  if(DB.mona_aturan && DB.mona_aturan.length > 0){
+    let aturan = cariPolaMona(nq);
+    if(aturan && aturan.pola){
+      let rangkai = rangkaiDariMonaKata(aturan.pola);
+      if(rangkai){
+        let final = rangkai.charAt(0).toUpperCase() + rangkai.slice(1);
+        return final + ', Kak. Ada lagi yang mau Kakak tanya?';
+      }
     }
   }
-  let kataPertanyaan = nq.trim().split(' ').filter(x=>x);
-  let jumlahKata = kataPertanyaan.length;
 
-  // === LANGKAH 2: CARI KATA DI GUDANG BERDASARKAN FRASA DULU ===
-  let kataKetemu = [];
-  let kategoriTerpilih = null;
-
-  // 2a. Frasa dulu - paling lengkap
+  // HYBRID 2: OTAK LAMA - FRASA DULU
   let bestFrasa = null, bestPanjang = 0;
-  for(let f of DB.frasa){
+  for(let f of (DB.frasa || [])){
     let teksFrasa = norm(f.teks);
-    if(teksFrasa && nq.includes(' '+teksFrasa+' ')){
-      if(teksFrasa.length > bestPanjang){ bestPanjang = teksFrasa.length; bestFrasa = f; }
-    }
+    if(teksFrasa && nq.includes(' '+teksFrasa+' ')){ if(teksFrasa.length > bestPanjang){ bestPanjang = teksFrasa.length; bestFrasa = f; } }
   }
-  if(bestFrasa){
-    kategoriTerpilih = bestFrasa.kategori;
-    kataKetemu = norm(bestFrasa.teks).split(' ');
-    // RANGKAI, bukan ambil jawaban DB!
-    return rangkaiKalimat(kataKetemu, kategoriTerpilih, q);
-  }
+  if(bestFrasa) return rangkaiKalimat(norm(bestFrasa.teks).split(' '), bestFrasa.kategori, q);
 
-  // 2b. Kalo frasa nggak ada, cari kata_penentu (2 poin) + kata_kunci (1 poin)
-  let skorKategori = {};
-  let kataPerKategori = {};
-  for(let p of DB.penentu){
+  // HYBRID 2 LANJUTAN: PENENTU (2 poin) + KUNCI (1 poin)
+  let skorKategori = {}; let kataPerKategori = {};
+  for(let p of (DB.penentu || [])){
     if(p.kata && nq.includes(' '+norm(p.kata)+' ')){
       skorKategori[p.kategori] = (skorKategori[p.kategori]||0) + 2;
       if(!kataPerKategori[p.kategori]) kataPerKategori[p.kategori] = [];
       kataPerKategori[p.kategori].push(norm(p.kata));
     }
   }
-  for(let k of DB.kunci){
+  for(let k of (DB.kunci || [])){
     let k1 = norm(k.kata1), k2 = norm(k.kata2);
-    if(k1 && nq.includes(' '+k1+' ')){
-      skorKategori[k.kategori] = (skorKategori[k.kategori]||0) + 1;
-      if(!kataPerKategori[k.kategori]) kataPerKategori[k.kategori] = [];
-      kataPerKategori[k.kategori].push(k1);
-    }
-    if(k2 && nq.includes(' '+k2+' ')){
-      skorKategori[k.kategori] = (skorKategori[k.kategori]||0) + 1;
-      if(!kataPerKategori[k.kategori]) kataPerKategori[k.kategori] = [];
-      kataPerKategori[k.kategori].push(k2);
-    }
+    if(k1 && nq.includes(' '+k1+' ')){ skorKategori[k.kategori] = (skorKategori[k.kategori]||0) + 1; if(!kataPerKategori[k.kategori]) kataPerKategori[k.kategori] = []; kataPerKategori[k.kategori].push(k1); }
+    if(k2 && nq.includes(' '+k2+' ')){ skorKategori[k.kategori] = (skorKategori[k.kategori]||0) + 1; if(!kataPerKategori[k.kategori]) kataPerKategori[k.kategori] = []; kataPerKategori[k.kategori].push(k2); }
   }
   let bestKat = null, bestSkor = 0;
   for(let kat in skorKategori){ if(skorKategori[kat] > bestSkor){ bestSkor = skorKategori[kat]; bestKat = kat; } }
-  if(bestKat){
-    kataKetemu = [...new Set(kataPerKategori[bestKat] || [])];
-    // RANGKAI, bukan ambil jawaban DB!
-    return rangkaiKalimat(kataKetemu, bestKat, q);
-  }
+  if(bestKat) return rangkaiKalimat([...new Set(kataPerKategori[bestKat] || [])], bestKat, q);
 
   return null;
 }
@@ -194,10 +211,11 @@ async function kirim(){
   let rowBot = tambah('Mona lagi mikir...', 'bot');
   let botMsg = rowBot.querySelector('.msg');
   if(!otakReady){ await getOtak(); }
-  let jawaban = cariJawaban(teks);
+  let jawaban = null;
+  try{ jawaban = cariJawaban(teks); }catch(e){ console.log('cariJawaban error:', e); jawaban = null; }
   if(!jawaban){
     jawaban = 'Halo kak, aku Mona 🙏<br><br>Untuk "'+teks+'" aku belum nemu katanya di gudang. Boleh ceritain lebih detail nggak kak?';
-    try{ await supabaseClient.from('bot_antrian').insert([{pertanyaan: teks, status: 'MENUNGGU'}]); }catch(e){ console.log(e); }
+    try{ await supabaseClient.from('bot_antrian').insert([{pertanyaan: teks, status: 'MENUNGGU'}]); }catch(e){ console.log('antrian gagal:', e); }
   }
   botMsg.innerHTML = jawaban;
   chat.scrollTop = chat.scrollHeight;

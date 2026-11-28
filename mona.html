@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>MONA - Chat Hybrid Full</title>
+<title>MONA - Chat Hybrid Berkembang</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   *{margin:0;padding:0;box-sizing:border-box;font-family:sans-serif}
@@ -21,6 +21,9 @@
   .msg{padding:10px 13px;border-radius:14px;font-size:14px;line-height:1.45;word-break:break-word}
   .msg.bot{background:#fff;color:#111}
   .msg.me{background:#dcf8c6;color:#111}
+  .btn-salah{margin-top:8px;padding:6px 10px;border:1px solid #ddd;border-radius:12px;background:#fff7ed;font-size:11px;cursor:pointer}
+  .btn-salah:hover{background:#ffedd5}
+  .analisa{margin-top:8px;padding:8px;background:#fef9c3;border-radius:10px;font-size:12px;line-height:1.4}
   #box{position:fixed;left:0;right:0;bottom:0;display:flex;gap:8px;padding:10px;padding-bottom:calc(10px + env(safe-area-inset-bottom));background:#fff;border-top:1px solid #ddd;z-index:99}
   #pesan{flex:1;padding:14px;border-radius:20px;border:1px solid #ddd;outline:none;font-size:15px;min-width:0}
   button{padding:12px 18px;border:none;border-radius:20px;background:#111;color:#fff;font-weight:bold;cursor:pointer;flex-shrink:0}
@@ -29,9 +32,9 @@
 <body>
 <div id="head">
   <img src="mona.png" onerror="this.src='https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100'">
-  <div><b>MONA</b><br><span>● Online - Hybrid</span></div>
+  <div><b>MONA</b><br><span>● Online - Berkembang Sendiri</span></div>
 </div>
-<div id="status">Memuat otak Mona Hybrid...</div>
+<div id="status">Memuat bahan ajar Mona...</div>
 <div id="chat"></div>
 <div id="box">
   <input id="pesan" placeholder="Ketik pesan..." autocomplete="off">
@@ -47,30 +50,21 @@ const statusEl = document.getElementById('status');
 
 let DB = { penentu:[], kunci:[], frasa:[], rules:[], sinonim:[], mona_kata:[], mona_aturan:[] };
 let otakReady = false;
+let riwayatSalah = []; // Ingatan salahnya, bukan kalimatnya
 
 function norm(s){ return (s||'').toLowerCase().replace(/[^a-z0-9 ]/g,' ').replace(/\s+/g,' ').trim(); }
 
-// === BACA TABEL ANTI ERROR ===
-// 1 tabel salah nama / belum dibikin / RLS kekunci -> balik [], jangan bikin semua gagal
-// Gak ada SELECT * sendirian, semua selalu ada kolomnya
 async function bacaTabel(namaTabel, kolom){
   try{
     let res = await supabaseClient.from(namaTabel).select(kolom);
-    if(res.error){
-      console.log('Tabel ' + namaTabel + ' gagal dibaca:', res.error.message);
-      return [];
-    }
+    if(res.error){ console.log('Tabel ' + namaTabel + ' gagal:', res.error.message); return []; }
     return res.data || [];
-  }catch(e){
-    console.log('Tabel ' + namaTabel + ' error:', e);
-    return [];
-  }
+  }catch(e){ console.log('Tabel ' + namaTabel + ' error:', e); return []; }
 }
 
 async function getOtak(){
   if(otakReady) return DB;
-  statusEl.textContent = 'Menghubungi Supabase Hybrid...';
-  // Baca satu-satu, JANGAN Promise.all, biar 1 gagal gak semua gagal
+  statusEl.textContent = 'Menghubungi Supabase...';
   DB.penentu = await bacaTabel('kata_penentu', 'kategori,kata');
   DB.kunci = await bacaTabel('kata_kunci', 'kategori,kata1,kata2');
   DB.frasa = await bacaTabel('frasa', 'kategori,teks');
@@ -78,56 +72,39 @@ async function getOtak(){
   DB.sinonim = await bacaTabel('sinonim', 'kata_utama,daftar_sinonim');
   DB.mona_kata = await bacaTabel('mona_kata', 'kata,jenis');
   DB.mona_aturan = await bacaTabel('mona_aturan', 'arah_pertanyaan,pola,jenis_jawaban');
-  // Cadangan kalo nama tabel beda
   if(DB.mona_kata.length === 0) DB.mona_kata = await bacaTabel('mona_kata_baru', 'kata,jenis');
   if(DB.mona_aturan.length === 0) DB.mona_aturan = await bacaTabel('mona_rules', 'arah_pertanyaan,pola,jenis_jawaban');
-
   otakReady = true;
-  let totalLoad = DB.penentu.length + DB.kunci.length + DB.frasa.length + DB.mona_kata.length + DB.mona_aturan.length;
-  let statusText = 'Hybrid siap: Penentu '+DB.penentu.length+' • Kunci '+DB.kunci.length+' • Frasa '+DB.frasa.length+' • MonaKata '+DB.mona_kata.length+' • Aturan '+DB.mona_aturan.length+' ✅';
-  if(DB.mona_kata.length === 0) statusText += ' | MonaKata kosong, cek nama tabel!';
-  if(totalLoad === 0){
-    statusText = 'Semua tabel gagal dibaca, cek RLS / nama tabel ⚠️ Tapi chat tetep jalan';
-    statusEl.style.background = '#f8d7da';
-  } else {
-    statusEl.style.background = '#d4edda';
-  }
-  statusEl.textContent = statusText;
+  let total = DB.penentu.length + DB.kunci.length + DB.frasa.length + DB.mona_kata.length + DB.mona_aturan.length;
+  if(total === 0){ statusEl.textContent = 'Semua tabel gagal dibaca ⚠️ Tapi chat tetep jalan'; statusEl.style.background = '#f8d7da'; }
+  else { statusEl.textContent = 'Berkembang: Penentu '+DB.penentu.length+' • Kunci '+DB.kunci.length+' • Frasa '+DB.frasa.length+' • MonaKata '+DB.mona_kata.length+' • Aturan '+DB.mona_aturan.length+' ✅'; statusEl.style.background = '#d4edda'; }
   return DB;
 }
 
-// === HYBRID 1: RANGKAI DARI MONA_KATA, BUKAN AMBIL KALIMAT JADI ===
-// mona_kata = gudang kata per kata, mona_aturan = pola urutan jenis
-// Contoh pola: "persetujuan + pemanis + kemampuan + syarat + keberadaan + subjek"
-// Hasilnya dirangkai di sini, bukan dari bot_rules!
 function rangkaiDariMonaKata(pola){
   if(!pola || !DB.mona_kata || !DB.mona_kata.length) return null;
   let jenisList = pola.split('+').map(x=>norm(x)).filter(x=>x);
   let hasil = [];
   for(let jenis of jenisList){
-    // Ambil 1 kata per jenis, DISTINCT biar gak dobel kayak ayolah tadi
     let calon = DB.mona_kata.filter(k=>norm(k.jenis)===jenis);
-    if(calon.length){
-      let pilih = calon[Math.floor(Math.random()*calon.length)];
-      hasil.push(pilih.kata);
-    }
+    if(calon.length){ let pilih = calon[Math.floor(Math.random()*calon.length)]; hasil.push(pilih.kata); }
   }
   if(!hasil.length) return null;
-  return hasil.join(' ');
+  return { teks: hasil.join(' '), polaDipakai: pola, jenisDipakai: jenisList };
 }
 
 function cariPolaMona(nq){
   if(!DB.mona_aturan || !DB.mona_aturan.length) return null;
+  let best = null, bestSkor = 0;
   for(let a of DB.mona_aturan){
     let kunciAturan = norm(a.arah_pertanyaan).split(' ').filter(x=>x.length>2);
     let cocok = kunciAturan.filter(k=>nq.includes(' '+k+' ')).length;
-    if(cocok>0) return a;
+    if(cocok > bestSkor){ bestSkor = cocok; best = a; }
   }
-  return null;
+  return best ? { aturan: best, skor: bestSkor } : null;
 }
 
-// === HYBRID 2: RANGKAI DARI OTAK LAMA ===
-function rangkaiKalimat(kataKetemu, kategori, pertanyaanAsli){
+function rangkaiKalimat(kataKetemu, kategori){
   let kataStr = (kataKetemu||[]).join(' ');
   let topik = kategori ? kategori.replace(/^tanya_|^sapaan_/,'').replace(/_/g,' ') : kataStr;
   if(!topik) topik = kataStr;
@@ -135,8 +112,48 @@ function rangkaiKalimat(kataKetemu, kategori, pertanyaanAsli){
   let kalimat = pembuka + ' soal <b>' + topik + '</b> ya? ';
   if(kataKetemu.length >= 2) kalimat += 'Kakak nanya soal <b>' + kataStr + '</b>. ';
   else if(kataKetemu.length === 1) kalimat += 'Kakak nyebut kata <b>' + kataStr + '</b>. ';
-  kalimat += 'Coba ceritain lebih detail dong Kak, biar Mona bisa bantu jawab soal ' + topik + ' dengan pas. Kakak maksudnya gimana soal ' + topik + ' itu?';
-  return kalimat;
+  kalimat += 'Coba ceritain lebih detail dong Kak, biar Mona bisa bantu jawab soal ' + topik + ' dengan pas.';
+  return { teks: kalimat, polaDipakai: 'rangkai_topik:'+kategori, jenisDipakai: kataKetemu };
+}
+
+// === MODE BERKEMBANG: KALO SALAH, CARI SALAHNYA, BUKAN TAMBAH KALIMAT ===
+function analisaSalah(pertanyaan, jawabanObj){
+  let nq = ' ' + norm(pertanyaan) + ' ';
+  let analisa = [];
+  analisa.push('<b>🔍 Mona bedah salahnya:</b><br>');
+  if(jawabanObj && jawabanObj.polaDipakai){
+    analisa.push('1. Pola yang gw pake: <b>'+jawabanObj.polaDipakai+'</b><br>');
+    analisa.push('2. Jenis kata yang gw ambil: <b>'+(jawabanObj.jenisDipakai||[]).join(' + ')+'</b><br>');
+    // Cek kata yang mungkin salah jenis
+    let kataDiPertanyaan = nq.trim().split(' ');
+    for(let k of kataDiPertanyaan){
+      let diDB = (DB.mona_kata||[]).find(x=>norm(x.kata)===k);
+      if(diDB) analisa.push('- Kata <b>'+k+'</b> di DB jenisnya: <b>'+diDB.jenis+'</b>. Bener gak Ko jenisnya?<br>');
+      else if(k.length>2) analisa.push('- Kata <b>'+k+'</b> GAK ADA di mona_kata. Berarti gw nebak, bukan tau.<br>');
+    }
+    analisa.push('<br>3. Jadi salah gw BUKAN di kalimatnya, tapi di <b>jenis / pola / skor</b> di atas.<br>');
+    analisa.push('Ko gak perlu kasih kalimat benernya. Ko cukup bilang: "jenis ayolah salah" atau "pola nya salah".');
+  } else {
+    analisa.push('Gw gak nemu pola yang cocok. Berarti bukan kalimatnya yang kurang, tapi <b>pola / kata</b> nya yang belum ada / skornya kalah.<br>');
+    analisa.push('Cek: kata di pertanyaan Ko ada di mona_kata gak? Pola di mona_aturan ada yang nyambung gak?');
+  }
+  return analisa.join('');
+}
+
+async function tandaiSalah(btn, pertanyaan, jawabanObj, jawabanTeks){
+  let box = btn.parentElement.querySelector('.analisa');
+  if(box){ box.remove(); btn.textContent = '❌ Salah - Cari Salahnya'; return; }
+  let div = document.createElement('div');
+  div.className = 'analisa';
+  div.innerHTML = analisaSalah(pertanyaan, jawabanObj);
+  btn.parentElement.appendChild(div);
+  btn.textContent = 'Tutup Analisa';
+  // Simpan ke antrian sebagai ANALISA, BUKAN kalimat bener
+  riwayatSalah.push({ pertanyaan: pertanyaan, jawaban_salah: jawabanTeks, pola: jawabanObj ? jawabanObj.polaDipakai : null });
+  try{
+    // Kita simpen pertanyaan + analisa, JANGAN simpen kalimat bener
+    await supabaseClient.from('bot_antrian').insert([{ pertanyaan: pertanyaan, status: 'SALAH_CARI_SALAHNYA' }]);
+  }catch(e){ console.log('antrian gagal:', e); }
 }
 
 function cariJawaban(q){
@@ -147,28 +164,25 @@ function cariJawaban(q){
     let list = String(s.daftar_sinonim||'').toLowerCase().split(/[,|]/).map(x=>norm(x));
     for(let sin of list){ if(sin && nq.includes(' '+sin+' ')) nq = nq.replace(' '+sin+' ', ' '+utama+' '); }
   }
-
-  // HYBRID 1: MONA_KATA DULUAN (MANDIRI)
   if(DB.mona_aturan && DB.mona_aturan.length > 0){
-    let aturan = cariPolaMona(nq);
-    if(aturan && aturan.pola){
-      let rangkai = rangkaiDariMonaKata(aturan.pola);
+    let hasilPola = cariPolaMona(nq);
+    if(hasilPola && hasilPola.aturan && hasilPola.aturan.pola){
+      let rangkai = rangkaiDariMonaKata(hasilPola.aturan.pola);
       if(rangkai){
-        let final = rangkai.charAt(0).toUpperCase() + rangkai.slice(1);
-        return final + ', Kak. Ada lagi yang mau Kakak tanya?';
+        let final = rangkai.teks.charAt(0).toUpperCase() + rangkai.teks.slice(1);
+        return { teks: final + ', Kak. Ada lagi yang mau Kakak tanya?', polaDipakai: rangkai.polaDipakai, jenisDipakai: rangkai.jenisDipakai };
       }
     }
   }
-
-  // HYBRID 2: OTAK LAMA - FRASA DULU
   let bestFrasa = null, bestPanjang = 0;
   for(let f of (DB.frasa || [])){
     let teksFrasa = norm(f.teks);
     if(teksFrasa && nq.includes(' '+teksFrasa+' ')){ if(teksFrasa.length > bestPanjang){ bestPanjang = teksFrasa.length; bestFrasa = f; } }
   }
-  if(bestFrasa) return rangkaiKalimat(norm(bestFrasa.teks).split(' '), bestFrasa.kategori, q);
-
-  // HYBRID 2 LANJUTAN: PENENTU (2 poin) + KUNCI (1 poin)
+  if(bestFrasa){
+    let r = rangkaiKalimat(norm(bestFrasa.teks).split(' '), bestFrasa.kategori);
+    return r;
+  }
   let skorKategori = {}; let kataPerKategori = {};
   for(let p of (DB.penentu || [])){
     if(p.kata && nq.includes(' '+norm(p.kata)+' ')){
@@ -184,17 +198,25 @@ function cariJawaban(q){
   }
   let bestKat = null, bestSkor = 0;
   for(let kat in skorKategori){ if(skorKategori[kat] > bestSkor){ bestSkor = skorKategori[kat]; bestKat = kat; } }
-  if(bestKat) return rangkaiKalimat([...new Set(kataPerKategori[bestKat] || [])], bestKat, q);
-
+  if(bestKat) return rangkaiKalimat([...new Set(kataPerKategori[bestKat] || [])], bestKat);
   return null;
 }
 
-function tambah(teks, siapa){
+function tambah(teks, siapa, pertanyaanAsli, jawabanObj){
   let row = document.createElement('div');
   row.className = 'row ' + (siapa==='me'?'me':'');
   if(siapa==='bot'){
     row.innerHTML = '<img src="mona.png" class="avatar" onerror="this.src=\'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100\'"><div class="msg bot"></div>';
     row.querySelector('.msg').innerHTML = teks;
+    // Tombol Salah ditempel di tiap jawaban Mona, bukan cuma di chat
+    if(pertanyaanAsli){
+      let btn = document.createElement('button');
+      btn.className = 'btn-salah';
+      btn.textContent = '❌ Salah - Cari Salahnya';
+      btn.onclick = ()=>tandaiSalah(btn, pertanyaanAsli, jawabanObj, teks);
+      row.querySelector('.msg').appendChild(document.createElement('br'));
+      row.querySelector('.msg').appendChild(btn);
+    }
   } else {
     row.innerHTML = '<div class="msg me"></div>';
     row.querySelector('.msg').textContent = teks;
@@ -211,13 +233,28 @@ async function kirim(){
   let rowBot = tambah('Mona lagi mikir...', 'bot');
   let botMsg = rowBot.querySelector('.msg');
   if(!otakReady){ await getOtak(); }
-  let jawaban = null;
-  try{ jawaban = cariJawaban(teks); }catch(e){ console.log('cariJawaban error:', e); jawaban = null; }
-  if(!jawaban){
-    jawaban = 'Halo kak, aku Mona 🙏<br><br>Untuk "'+teks+'" aku belum nemu katanya di gudang. Boleh ceritain lebih detail nggak kak?';
+  let jawabanObj = null;
+  try{ jawabanObj = cariJawaban(teks); }catch(e){ console.log('cariJawaban error:', e); jawabanObj = null; }
+  if(!jawabanObj){
+    let jawaban = 'Halo kak, aku Mona 🙏<br><br>Untuk "'+teks+'" aku belum nemu katanya di gudang. Boleh ceritain lebih detail nggak kak?';
+    botMsg.innerHTML = jawaban;
+    // Tombol salah tetep ada, biar bisa dibedah kenapa gak nemu
+    let btn = document.createElement('button');
+    btn.className = 'btn-salah';
+    btn.textContent = '❌ Salah - Cari Salahnya';
+    btn.onclick = ()=>tandaiSalah(btn, teks, null, jawaban);
+    botMsg.appendChild(document.createElement('br'));
+    botMsg.appendChild(btn);
     try{ await supabaseClient.from('bot_antrian').insert([{pertanyaan: teks, status: 'MENUNGGU'}]); }catch(e){ console.log('antrian gagal:', e); }
+  } else {
+    botMsg.innerHTML = jawabanObj.teks;
+    let btn = document.createElement('button');
+    btn.className = 'btn-salah';
+    btn.textContent = '❌ Salah - Cari Salahnya';
+    btn.onclick = ()=>tandaiSalah(btn, teks, jawabanObj, jawabanObj.teks);
+    botMsg.appendChild(document.createElement('br'));
+    botMsg.appendChild(btn);
   }
-  botMsg.innerHTML = jawaban;
   chat.scrollTop = chat.scrollHeight;
 }
 input.addEventListener('keydown', e=>{ if(e.key==='Enter') kirim(); });

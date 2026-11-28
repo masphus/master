@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>MONA - Full Tabel Asli</title>
+<title>MONA - Full Tabel Asli - URL Fixed</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   *{margin:0;padding:0;box-sizing:border-box;font-family:sans-serif}
@@ -22,9 +22,7 @@
   .msg.bot{background:#fff;color:#111}
   .msg.me{background:#dcf8c6;color:#111}
   .btn-salah{margin-top:8px;padding:6px 10px;border:1px solid #ddd;border-radius:12px;background:#fff7ed;font-size:11px;cursor:pointer}
-  .btn-salah:hover{background:#ffedd5}
   .analisa{margin-top:8px;padding:8px;background:#fef9c3;border-radius:10px;font-size:12px;line-height:1.4}
-  .debug{font-size:11px;color:#666;margin-top:6px}
   #box{position:fixed;left:0;right:0;bottom:0;display:flex;gap:8px;padding:10px;padding-bottom:calc(10px + env(safe-area-inset-bottom));background:#fff;border-top:1px solid #ddd;z-index:99}
   #pesan{flex:1;padding:14px;border-radius:20px;border:1px solid #ddd;outline:none;font-size:15px;min-width:0}
   button{padding:12px 18px;border:none;border-radius:20px;background:#111;color:#fff;font-weight:bold;cursor:pointer;flex-shrink:0}
@@ -42,57 +40,56 @@
   <button onclick="kirim()">Kirim</button>
 </div>
 <script>
+// === PERBAIKAN URL & KEY KO ===
+// URL: TANPA /rest/v1/ - kalo pake /rest/v1/ jadi dobel, semua gagal!
+// KEY: key publishable Ko yang asli, jangan diubah
 const SUPABASE_URL = 'https://msfzsebownnsrpyjusoc.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_7VQcQXBLz4OYn_OJUzusSg_Zz1or9gq';
 const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 const chat = document.getElementById('chat');
 const input = document.getElementById('pesan');
 const statusEl = document.getElementById('status');
-
 let DB = {};
 let otakReady = false;
-
 function norm(s){ return (s||'').toLowerCase().replace(/[^a-z0-9 ]/g,' ').replace(/\s+/g,' ').trim(); }
 function getKata(row){ return norm(row.kata || row.kata_utama || row.topik || row.kalimat || row.teks || ''); }
 function getJenis(row){ return norm(row.jenis || row.jenis_jawaban || row.kategori || ''); }
 
-// Baca tabel asli Ko, pake select(*) biar gak salah kolom lagi
+// Baca tabel: coba supabase-js dulu, kalo gagal coba fetch REST langsung
 async function bacaTabel(nama){
   try{
     let res = await supabaseClient.from(nama).select('*').limit(500);
-    if(res.error){ console.log('Tabel '+nama+' gagal:', res.error.message); return []; }
-    return res.data || [];
-  }catch(e){ console.log('Tabel '+nama+' error:', e); return []; }
+    if(!res.error) return res.data || [];
+    console.log('Tabel '+nama+' supabase-js gagal:', res.error.message, 'coba fetch REST...');
+  }catch(e){ console.log('Tabel '+nama+' supabase-js error:', e); }
+  try{
+    let r2 = await fetch(SUPABASE_URL + '/rest/v1/' + nama + '?select=*&limit=500', { headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY } });
+    if(!r2.ok){ console.log('Tabel '+nama+' REST gagal:', r2.status, await r2.text()); return []; }
+    return await r2.json();
+  }catch(e2){ console.log('Tabel '+nama+' REST error:', e2); return []; }
 }
-
 async function getOtak(){
   if(otakReady) return DB;
   statusEl.textContent = 'Menghubungi Supabase...';
-
-  // === TABEL ASLI KO, SESUAI LIST KO ===
   const daftarTabel = ['kata','kata_angka','kata_benda','kata_ganti','kata_jawab','kata_kerja','kata_orang','kata_penunjuk','kata_sambung','kata_sapa','kata_sehari_hari','kata_sifat','kata_tanya','kata_tempat','kata_waktu','mona_aturan','mona_jawaban','mona_kata','pasangan_kata','perasaan','sinonim','tanda','topik_obrolan','tujuan','anonim','kalimat_hasil','aturan_tatar'];
   for(let t of daftarTabel){ DB[t] = await bacaTabel(t); }
-
   otakReady = true;
-  let totalKata = (DB.mona_kata?.length||0) + (DB.kata?.length||0) + (DB.kata_sapa?.length||0);
-  statusEl.textContent = 'Ke-load ✅ MonaKata '+(DB.mona_kata?.length||0)+' • Aturan '+(DB.mona_aturan?.length||0)+' • KataSapa '+(DB.kata_sapa?.length||0)+' • KataKerja '+(DB.kata_kerja?.length||0)+' • Pasangan '+(DB.pasangan_kata?.length||0);
-  statusEl.style.background = '#d4edda';
+  let total = 0; for(let t of daftarTabel) total += (DB[t]?.length||0);
+  if(total===0){
+    statusEl.textContent = 'Semua tabel gagal dibaca, cek RLS / nama tabel ⚠️ Tapi chat tetep jalan - Cek Console (F12) buat liat error aslinya';
+    statusEl.style.background = '#f8d7da';
+  } else {
+    statusEl.textContent = 'Ke-load ✅ Total '+total+' baris • MonaKata '+(DB.mona_kata?.length||0)+' • Aturan '+(DB.mona_aturan?.length||0)+' • KataSapa '+(DB.kata_sapa?.length||0)+' • KataKerja '+(DB.kata_kerja?.length||0)+' • Pasangan '+(DB.pasangan_kata?.length||0);
+    statusEl.style.background = '#d4edda';
+  }
   return DB;
 }
-
-// === GABUNG SEMUA GUDANG KATA JADI SATU, BIAR MONA BISA RANGKAI ===
 function semuaKata(){
   let gabung = [];
   const sumber = ['mona_kata','mona_jawaban','kata','kata_sapa','kata_tanya','kata_kerja','kata_benda','kata_sifat','kata_ganti','kata_jawab','kata_orang','kata_tempat','kata_waktu','kata_penunjuk','kata_sambung','kata_angka','kata_sehari_hari','perasaan','tanda','tujuan','anonim'];
-  for(let s of sumber){
-    for(let r of (DB[s]||[])){
-      let k = getKata(r); let j = getJenis(r) || s.replace('kata_','');
-      if(k) gabung.push({kata:k, jenis:j, sumber:s});
-    }
-  }
+  for(let s of sumber){ for(let r of (DB[s]||[])){ let k = getKata(r); let j = getJenis(r) || s.replace('kata_',''); if(k) gabung.push({kata:k, jenis:j, sumber:s}); } }
   return gabung;
 }
-
 function rangkaiDariPola(pola){
   if(!pola) return null;
   let jenisList = pola.split('+').map(x=>norm(x)).filter(x=>x);
@@ -106,7 +103,6 @@ function rangkaiDariPola(pola){
   if(!hasil.length) return null;
   return { teks: hasil.join(' '), polaDipakai: pola, jenisDipakai: jenisList };
 }
-
 function cariPolaMona(nq){
   let semuaAturan = [...(DB.mona_aturan||[]), ...(DB.aturan_tatar||[])];
   if(!semuaAturan.length) return null;
@@ -118,7 +114,6 @@ function cariPolaMona(nq){
   }
   return best ? { aturan: best, skor: bestSkor } : null;
 }
-
 function cariPasangan(nq){
   for(let p of (DB.pasangan_kata||[])){
     let k1 = norm(p.kata1), k2 = norm(p.kata2);
@@ -126,7 +121,6 @@ function cariPasangan(nq){
   }
   return null;
 }
-
 function cariTopik(nq){
   for(let t of (DB.topik_obrolan||[])){
     let topik = norm(t.topik); let kataTopik = norm(t.kata);
@@ -134,19 +128,15 @@ function cariTopik(nq){
   }
   return null;
 }
-
 function cariJawaban(q){
   let nq = ' ' + norm(q) + ' ';
-  // 1. Sinonim dulu - biar kata lain ke-detect
   for(let s of (DB.sinonim||[])){
     let utama = norm(s.kata_utama);
     let list = String(s.daftar_sinonim||'').toLowerCase().split(/[,|]/).map(x=>norm(x));
     for(let sin of list){ if(sin && nq.includes(' '+sin+' ')) nq = nq.replace(' '+sin+' ', ' '+utama+' '); }
   }
-  // 2. Pasangan kata
   let pas = cariPasangan(nq);
   if(pas) return { teks: pas.teks.charAt(0).toUpperCase()+pas.teks.slice(1)+', Kak.', polaDipakai: pas.polaDipakai, jenisDipakai: pas.jenisDipakai };
-  // 3. Aturan Mona - rangkai dari pola, BUKAN hafal kalimat
   let hasilPola = cariPolaMona(nq);
   if(hasilPola && hasilPola.aturan && hasilPola.aturan.pola){
     let rangkai = rangkaiDariPola(hasilPola.aturan.pola);
@@ -155,10 +145,8 @@ function cariJawaban(q){
       return { teks: final + ', Kak. Ada lagi yang mau Kakak tanya?', polaDipakai: rangkai.polaDipakai, jenisDipakai: rangkai.jenisDipakai };
     }
   }
-  // 4. Topik obrolan
   let top = cariTopik(nq);
   if(top) return top;
-  // 5. Kalimat hasil - cuma dipake kalo pola gak ketemu, buat contoh aja
   if(DB.kalimat_hasil && DB.kalimat_hasil.length){
     for(let kh of DB.kalimat_hasil){
       let kal = norm(kh.kalimat || kh.teks || '');
@@ -167,8 +155,6 @@ function cariJawaban(q){
   }
   return null;
 }
-
-// === MODE BERKEMBANG: KALO SALAH, CARI SALAHNYA, BUKAN TAMBAH KALIMAT ===
 function analisaSalah(pertanyaan, jawabanObj){
   let nq = ' ' + norm(pertanyaan) + ' ';
   let analisa = [];
@@ -192,7 +178,6 @@ function analisaSalah(pertanyaan, jawabanObj){
   }
   return analisa.join('');
 }
-
 async function tandaiSalah(btn, pertanyaan, jawabanObj, jawabanTeks){
   let box = btn.parentElement.querySelector('.analisa');
   if(box){ box.remove(); btn.textContent = '❌ Salah - Cari Salahnya'; return; }
@@ -202,7 +187,6 @@ async function tandaiSalah(btn, pertanyaan, jawabanObj, jawabanTeks){
   btn.parentElement.appendChild(div);
   btn.textContent = 'Tutup Analisa';
 }
-
 function tambah(teks, siapa, pertanyaanAsli, jawabanObj){
   let row = document.createElement('div');
   row.className = 'row ' + (siapa==='me'?'me':'');

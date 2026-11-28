@@ -128,8 +128,50 @@ function cariTopik(nq){
   }
   return null;
 }
+// === OTAK BARU MONA - 4 ATURAN (dari latihan tadi) ===
+// Aturan 1: ngopi -> butuh kopi
+// Aturan 2: kopi -> kategori makanan/minuman
+// Aturan 3: sifat cuma boleh yang cocok buat minuman + khusus kopi
+// Aturan 4: tempat cuma boleh yang cocok buat ngopi
+function jawab4Aturan(q){
+  let nq = ' ' + norm(q) + ' ';
+  if(!nq.includes(' ngopi ')) return null;
+  let kerja = (DB.kata_kerja||[]).find(r => norm(r.kata)==='ngopi');
+  let butuh = kerja ? norm(kerja.butuh_objek || kerja.butuh || '') : 'kopi';
+  let calonBenda = (DB.kata_benda||[]).filter(r => {
+    let kat = norm(r.kategori || r.jenis || '');
+    let kata = norm(r.kata);
+    return kat === butuh || kata === butuh;
+  });
+  let benda = calonBenda.length ? calonBenda[Math.floor(Math.random()*calonBenda.length)] : { kata: 'kopi' };
+  let namaBenda = norm(benda.kata) || 'kopi';
+  let sifatBoleh = ['manis','pahit','enak','panas','dingin','kental'];
+  let calonSifat = (DB.kata_sifat||[]).filter(r => {
+    let kata = norm(r.kata);
+    let cocok = norm(r.cocok_untuk || r.cocok || r.kategori || '');
+    return sifatBoleh.includes(kata) && (cocok==='' || cocok.includes('minuman') || cocok.includes('makanan') || cocok.includes('kopi'));
+  });
+  if(!calonSifat.length) calonSifat = sifatBoleh.map(k=>({kata:k}));
+  let sifat = calonSifat[Math.floor(Math.random()*calonSifat.length)];
+  let namaSifat = norm(sifat.kata);
+  let calonTempat = (DB.kata_tempat||[]).filter(r => {
+    let cocok = norm(r.cocok_untuk || r.cocok_untuk_verb || r.kategori || '');
+    return cocok==='' || cocok.includes('ngopi');
+  });
+  if(!calonTempat.length) calonTempat = [{kata:'warung'},{kata:'rumah'},{kata:'kafe'}];
+  let tempat = calonTempat[Math.floor(Math.random()*calonTempat.length)];
+  let namaTempat = norm(tempat.kata);
+  return {
+    teks: 'Mona: ' + namaBenda + ' yang ' + namaSifat + ' di ' + namaTempat + ', Kak.',
+    polaDipakai: '4-aturan: ngopi->'+namaBenda+' + sifat-minuman:'+namaSifat+' + tempat-ngopi:'+namaTempat,
+    jenisDipakai: ['kata_kerja','kata_benda','kata_sifat','kata_tempat']
+  };
+}
 function cariJawaban(q){
   let nq = ' ' + norm(q) + ' ';
+  // OTAK BARU DULUAN - biar gak keambil pola lama
+  let j4 = jawab4Aturan(q);
+  if(j4) return j4;
   for(let s of (DB.sinonim||[])){
     let utama = norm(s.kata_utama);
     let list = String(s.daftar_sinonim||'').toLowerCase().split(/[,|]/).map(x=>norm(x));

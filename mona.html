@@ -40,9 +40,6 @@
   <button onclick="kirim()">Kirim</button>
 </div>
 <script>
-// === PERBAIKAN URL & KEY KO ===
-// URL: TANPA /rest/v1/ - kalo pake /rest/v1/ jadi dobel, semua gagal!
-// KEY: key publishable Ko yang asli, jangan diubah
 const SUPABASE_URL = 'https://msfzsebownnsrpyjusoc.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_7VQcQXBLz4OYn_OJUzusSg_Zz1or9gq';
 const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -54,19 +51,16 @@ let otakReady = false;
 function norm(s){ return (s||'').toLowerCase().replace(/[^a-z0-9 ]/g,' ').replace(/\s+/g,' ').trim(); }
 function getKata(row){ return norm(row.kata || row.kata_utama || row.topik || row.kalimat || row.teks || ''); }
 function getJenis(row){ return norm(row.jenis || row.jenis_jawaban || row.kategori || ''); }
-
-// Baca tabel: coba supabase-js dulu, kalo gagal coba fetch REST langsung
 async function bacaTabel(nama){
   try{
     let res = await supabaseClient.from(nama).select('*').limit(500);
     if(!res.error) return res.data || [];
-    console.log('Tabel '+nama+' supabase-js gagal:', res.error.message, 'coba fetch REST...');
-  }catch(e){ console.log('Tabel '+nama+' supabase-js error:', e); }
+  }catch(e){}
   try{
     let r2 = await fetch(SUPABASE_URL + '/rest/v1/' + nama + '?select=*&limit=500', { headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY } });
-    if(!r2.ok){ console.log('Tabel '+nama+' REST gagal:', r2.status, await r2.text()); return []; }
+    if(!r2.ok) return [];
     return await r2.json();
-  }catch(e2){ console.log('Tabel '+nama+' REST error:', e2); return []; }
+  }catch(e2){ return []; }
 }
 async function getOtak(){
   if(otakReady) return DB;
@@ -128,11 +122,7 @@ function cariTopik(nq){
   }
   return null;
 }
-// === OTAK BARU MONA - 4 ATURAN (dari latihan tadi) ===
-// Aturan 1: ngopi -> butuh kopi
-// Aturan 2: kopi -> kategori makanan/minuman
-// Aturan 3: sifat cuma boleh yang cocok buat minuman + khusus kopi
-// Aturan 4: tempat cuma boleh yang cocok buat ngopi
+// === OTAK BARU MONA - 4 ATURAN NGOPI ===
 function jawab4Aturan(q){
   let nq = ' ' + norm(q) + ' ';
   if(!nq.includes(' ngopi ')) return null;
@@ -167,11 +157,51 @@ function jawab4Aturan(q){
     jenisDipakai: ['kata_kerja','kata_benda','kata_sifat','kata_tempat']
   };
 }
+// === OTAK BARU 2 - PUNYA + TAWARIN ALTERNATIF ===
+// Rumus: Kalau ditanya punya X, Mona jujur ga punya, tapi nawarin Y yang nyambung sama X
+// Contoh: punya duit gak? -> Kalau duit gw gak punya, tapi kalau cara cari duit gw bisa ikut mikir.
+function jawabPunyaAlternatif(q){
+  let nq = ' ' + norm(q) + ' ';
+  if(!nq.includes(' punya ')) return null;
+  if(!nq.includes(' gak ') && !nq.includes(' ga ') && !nq.includes(' nggak ') && !nq.includes(' tidak ') && !nq.includes(' ada ')) return null;
+  // Ambil kata setelah "punya" = barang yang ditanya
+  let m = nq.match(/ punya ([a-z ]+?)( gak| ga| nggak| tidak| ada| \?|$)/);
+  let barang = m ? norm(m[1]) : '';
+  // Buang kata gak penting: lu, kamu, mona, lo, gak
+  barang = barang.replace(/\b(lu|kamu|mona|lo|ko|kak)\b/g,' ').trim().split(' ').filter(x=>x).pop() || '';
+  if(!barang) return null;
+  // Daftar alternatif yang nyambung - bisa Ko tambah sendiri di sini!
+  const alternatifMap = {
+    'duit': 'cara cari duit',
+    'uang': 'cara cari uang',
+    'motor': 'cara jalan kaki / naik angkot bareng',
+    'mobil': 'cara naik angkot / nebeng bareng',
+    'pacar': 'cara kenalan sama orang baru',
+    'kerjaan': 'cara cari kerjaan',
+    'kerja': 'cara cari kerja',
+    'rumah': 'cara nabung buat rumah',
+    'hp': 'cara benerin hp lama Ko',
+    'pulsa': 'cara cari wifi gratisan',
+    'kuota': 'cara cari wifi gratisan',
+    'makan': 'cara masak dari bahan yang ada',
+    'makanan': 'cara masak dari bahan yang ada',
+    'kopi': 'cara bikin kopi sachet yang enak',
+    'waktu': 'cara atur waktu biar sempet',
+    'ide': 'cara cari ide bareng-bareng',
+  };
+  let alternatif = alternatifMap[barang] || ('cara dapetin ' + barang + ' / cara mikirin ' + barang + ' bareng-bareng');
+  return {
+    teks: 'Kalau ' + barang + ' gw gak punya, Kak. Tapi kalau ' + alternatif + ', gw bisa ikut mikir.',
+    polaDipakai: 'punya-alternatif: punya ' + barang + ' -> gak punya + tawar ' + alternatif,
+    jenisDipakai: ['punya', barang, 'alternatif']
+  };
+}
 function cariJawaban(q){
   let nq = ' ' + norm(q) + ' ';
-  // OTAK BARU DULUAN - biar gak keambil pola lama
   let j4 = jawab4Aturan(q);
   if(j4) return j4;
+  let jPunya = jawabPunyaAlternatif(q);
+  if(jPunya) return jPunya;
   for(let s of (DB.sinonim||[])){
     let utama = norm(s.kata_utama);
     let list = String(s.daftar_sinonim||'').toLowerCase().split(/[,|]/).map(x=>norm(x));

@@ -122,7 +122,6 @@ function cariTopik(nq){
   }
   return null;
 }
-// === OTAK BARU MONA - 4 ATURAN NGOPI ===
 function jawab4Aturan(q){
   let nq = ' ' + norm(q) + ' ';
   if(!nq.includes(' ngopi ')) return null;
@@ -157,20 +156,16 @@ function jawab4Aturan(q){
     jenisDipakai: ['kata_kerja','kata_benda','kata_sifat','kata_tempat']
   };
 }
-// === OTAK BARU 2 - PUNYA + TAWARIN ALTERNATIF ===
-// Rumus: Kalau ditanya punya X, Mona jujur ga punya, tapi nawarin Y yang nyambung sama X
-// Contoh: punya duit gak? -> Kalau duit gw gak punya, tapi kalau cara cari duit gw bisa ikut mikir.
+// === OTAK PUNYA + ALTERNATIF - FIX SODARA ===
 function jawabPunyaAlternatif(q){
   let nq = ' ' + norm(q) + ' ';
   if(!nq.includes(' punya ')) return null;
   if(!nq.includes(' gak ') && !nq.includes(' ga ') && !nq.includes(' nggak ') && !nq.includes(' tidak ') && !nq.includes(' ada ')) return null;
-  // Ambil kata setelah "punya" = barang yang ditanya
-  let m = nq.match(/ punya ([a-z ]+?)( gak| ga| nggak| tidak| ada| \?|$)/);
+  let m = nq.match(/ punya ([a-z ]+?)( gak| ga| nggak| tidak| ada|$)/);
   let barang = m ? norm(m[1]) : '';
-  // Buang kata gak penting: lu, kamu, mona, lo, gak
-  barang = barang.replace(/\b(lu|kamu|mona|lo|ko|kak)\b/g,' ').trim().split(' ').filter(x=>x).pop() || '';
+  barang = barang.replace(/\b(lu|kamu|mona|mon|lo|ko|kak|luu)\b/g,' ').trim().split(' ').filter(x=>x).pop() || '';
   if(!barang) return null;
-  // Daftar alternatif yang nyambung - bisa Ko tambah sendiri di sini!
+  // 1. Barang / benda
   const alternatifMap = {
     'duit': 'cara cari duit',
     'uang': 'cara cari uang',
@@ -189,7 +184,34 @@ function jawabPunyaAlternatif(q){
     'waktu': 'cara atur waktu biar sempet',
     'ide': 'cara cari ide bareng-bareng',
   };
-  let alternatif = alternatifMap[barang] || ('cara dapetin ' + barang + ' / cara mikirin ' + barang + ' bareng-bareng');
+  // 2. Orang / keluarga - BEDA! Gak bisa "cara dapetin"
+  const orangMap = {
+    'sodara': 'dengerin cerita soal sodara Ko',
+    'saudara': 'dengerin cerita soal saudara Ko',
+    'kakak': 'dengerin cerita soal kakak Ko',
+    'adik': 'dengerin cerita soal adik Ko',
+    'abang': 'dengerin cerita soal abang Ko',
+    'kaka': 'dengerin cerita soal kakak Ko',
+    'teman': 'jadi temen ngobrol Ko',
+    'temen': 'jadi temen ngobrol Ko',
+    'pacar': 'dengerin cerita soal pacar Ko',
+    'suami': 'dengerin cerita soal suami Ko',
+    'istri': 'dengerin cerita soal istri Ko',
+    'anak': 'dengerin cerita soal anak Ko',
+    'ibu': 'dengerin cerita soal ibu Ko',
+    'bapak': 'dengerin cerita soal bapak Ko',
+    'ayah': 'dengerin cerita soal ayah Ko',
+    'mama': 'dengerin cerita soal mama Ko',
+    'papa': 'dengerin cerita soal papa Ko',
+  };
+  if(orangMap[barang]){
+    return {
+      teks: 'Kalau ' + barang + ' gw gak punya, Kak. Tapi kalau ' + orangMap[barang] + ', gw bisa kok.',
+      polaDipakai: 'punya-alternatif-orang: punya ' + barang + ' -> gak punya + tawar ' + orangMap[barang],
+      jenisDipakai: ['punya', barang, 'alternatif-orang']
+    };
+  }
+  let alternatif = alternatifMap[barang] || ('cara mikirin ' + barang + ' bareng-bareng');
   return {
     teks: 'Kalau ' + barang + ' gw gak punya, Kak. Tapi kalau ' + alternatif + ', gw bisa ikut mikir.',
     polaDipakai: 'punya-alternatif: punya ' + barang + ' -> gak punya + tawar ' + alternatif,

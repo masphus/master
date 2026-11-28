@@ -156,7 +156,6 @@ function jawab4Aturan(q){
     jenisDipakai: ['kata_kerja','kata_benda','kata_sifat','kata_tempat']
   };
 }
-// === OTAK PUNYA + ALTERNATIF - FIX SODARA ===
 function jawabPunyaAlternatif(q){
   let nq = ' ' + norm(q) + ' ';
   if(!nq.includes(' punya ')) return null;
@@ -165,57 +164,49 @@ function jawabPunyaAlternatif(q){
   let barang = m ? norm(m[1]) : '';
   barang = barang.replace(/\b(lu|kamu|mona|mon|lo|ko|kak|luu)\b/g,' ').trim().split(' ').filter(x=>x).pop() || '';
   if(!barang) return null;
-  // 1. Barang / benda
   const alternatifMap = {
-    'duit': 'cara cari duit',
-    'uang': 'cara cari uang',
-    'motor': 'cara jalan kaki / naik angkot bareng',
-    'mobil': 'cara naik angkot / nebeng bareng',
-    'pacar': 'cara kenalan sama orang baru',
-    'kerjaan': 'cara cari kerjaan',
-    'kerja': 'cara cari kerja',
-    'rumah': 'cara nabung buat rumah',
-    'hp': 'cara benerin hp lama Ko',
-    'pulsa': 'cara cari wifi gratisan',
-    'kuota': 'cara cari wifi gratisan',
-    'makan': 'cara masak dari bahan yang ada',
-    'makanan': 'cara masak dari bahan yang ada',
-    'kopi': 'cara bikin kopi sachet yang enak',
-    'waktu': 'cara atur waktu biar sempet',
-    'ide': 'cara cari ide bareng-bareng',
+    'duit': 'cara cari duit', 'uang': 'cara cari uang', 'motor': 'cara jalan kaki / naik angkot bareng',
+    'mobil': 'cara naik angkot / nebeng bareng', 'pacar': 'cara kenalan sama orang baru',
+    'kerjaan': 'cara cari kerjaan', 'kerja': 'cara cari kerja', 'rumah': 'cara nabung buat rumah',
+    'hp': 'cara benerin hp lama Ko', 'pulsa': 'cara cari wifi gratisan', 'kuota': 'cara cari wifi gratisan',
+    'makan': 'cara masak dari bahan yang ada', 'makanan': 'cara masak dari bahan yang ada',
+    'kopi': 'cara bikin kopi sachet yang enak', 'waktu': 'cara atur waktu biar sempet', 'ide': 'cara cari ide bareng-bareng',
   };
-  // 2. Orang / keluarga - BEDA! Gak bisa "cara dapetin"
   const orangMap = {
-    'sodara': 'dengerin cerita soal sodara Ko',
-    'saudara': 'dengerin cerita soal saudara Ko',
-    'kakak': 'dengerin cerita soal kakak Ko',
-    'adik': 'dengerin cerita soal adik Ko',
-    'abang': 'dengerin cerita soal abang Ko',
-    'kaka': 'dengerin cerita soal kakak Ko',
-    'teman': 'jadi temen ngobrol Ko',
-    'temen': 'jadi temen ngobrol Ko',
-    'pacar': 'dengerin cerita soal pacar Ko',
-    'suami': 'dengerin cerita soal suami Ko',
-    'istri': 'dengerin cerita soal istri Ko',
-    'anak': 'dengerin cerita soal anak Ko',
-    'ibu': 'dengerin cerita soal ibu Ko',
-    'bapak': 'dengerin cerita soal bapak Ko',
-    'ayah': 'dengerin cerita soal ayah Ko',
-    'mama': 'dengerin cerita soal mama Ko',
-    'papa': 'dengerin cerita soal papa Ko',
+    'sodara': 'dengerin cerita soal sodara Ko', 'saudara': 'dengerin cerita soal saudara Ko',
+    'kakak': 'dengerin cerita soal kakak Ko', 'adik': 'dengerin cerita soal adik Ko',
+    'abang': 'dengerin cerita soal abang Ko', 'teman': 'jadi temen ngobrol Ko', 'temen': 'jadi temen ngobrol Ko',
+    'pacar': 'dengerin cerita soal pacar Ko', 'suami': 'dengerin cerita soal suami Ko',
+    'istri': 'dengerin cerita soal istri Ko', 'anak': 'dengerin cerita soal anak Ko',
+    'ibu': 'dengerin cerita soal ibu Ko', 'bapak': 'dengerin cerita soal bapak Ko',
+    'ayah': 'dengerin cerita soal ayah Ko', 'mama': 'dengerin cerita soal mama Ko', 'papa': 'dengerin cerita soal papa Ko',
   };
   if(orangMap[barang]){
-    return {
-      teks: 'Kalau ' + barang + ' gw gak punya, Kak. Tapi kalau ' + orangMap[barang] + ', gw bisa kok.',
-      polaDipakai: 'punya-alternatif-orang: punya ' + barang + ' -> gak punya + tawar ' + orangMap[barang],
-      jenisDipakai: ['punya', barang, 'alternatif-orang']
-    };
+    return { teks: 'Kalau ' + barang + ' gw gak punya, Kak. Tapi kalau ' + orangMap[barang] + ', gw bisa kok.', polaDipakai: 'punya-alternatif-orang: punya ' + barang, jenisDipakai: ['punya', barang, 'alternatif-orang'] };
   }
   let alternatif = alternatifMap[barang] || ('cara mikirin ' + barang + ' bareng-bareng');
+  return { teks: 'Kalau ' + barang + ' gw gak punya, Kak. Tapi kalau ' + alternatif + ', gw bisa ikut mikir.', polaDipakai: 'punya-alternatif: punya ' + barang, jenisDipakai: ['punya', barang, 'alternatif'] };
+}
+// === OTAK BARU 3 - ORANG + SIFAT + GAK ===
+// Contoh: Saudara lu cantik gak? Kakak lu ganteng gak? Pacar lu baik gak?
+// Rumus: Mona gak punya orang itu -> gak bisa nilai -> balik tanya soal orang-nya Ko
+function jawabOrangSifat(q){
+  let nq = ' ' + norm(q) + ' ';
+  if(nq.includes(' punya ')) return null;
+  if(!nq.includes(' gak ') && !nq.includes(' ga ') && !nq.includes(' nggak ') && !nq.includes(' kah ') && !nq.includes(' ya ')) return null;
+  let daftarOrang = ['saudara','sodara','kakak','adik','abang','kaka','pacar','teman','temen','suami','istri','anak','ibu','bapak','ayah','mama','papa','bos','tetangga','kawan','doi','mantan'];
+  let orang = daftarOrang.find(o => nq.includes(' '+o+' '));
+  if(!orang) return null;
+  // Cari sifatnya: kata di antara orang dan gak
+  let m = nq.match(new RegExp(orang + ' (?:lu |kamu |lo |ko |mona |mon )?([a-z ]+?)( gak| ga| nggak| kah| ya|$)'));
+  let sifat = m ? norm(m[1]) : '';
+  // Buang kata lu/kamu
+  sifat = sifat.replace(/\b(lu|kamu|lo|ko|mona|mon)\b/g,' ').trim();
+  if(!sifat) sifat = 'gitu';
   return {
-    teks: 'Kalau ' + barang + ' gw gak punya, Kak. Tapi kalau ' + alternatif + ', gw bisa ikut mikir.',
-    polaDipakai: 'punya-alternatif: punya ' + barang + ' -> gak punya + tawar ' + alternatif,
-    jenisDipakai: ['punya', barang, 'alternatif']
+    teks: 'Gw gak punya ' + orang + ', Kak. Jadi gw gak bisa bilang ' + sifat + ' apa enggak. Tapi kalau ' + orang + ' Ko yang ' + sifat + ', ceritain dong!',
+    polaDipakai: 'orang-sifat: ' + orang + ' + ' + sifat + ' -> gak punya orang, balik tanya',
+    jenisDipakai: ['kata_orang', 'kata_sifat', 'alternatif']
   };
 }
 function cariJawaban(q){
@@ -224,6 +215,8 @@ function cariJawaban(q){
   if(j4) return j4;
   let jPunya = jawabPunyaAlternatif(q);
   if(jPunya) return jPunya;
+  let jOrangSifat = jawabOrangSifat(q);
+  if(jOrangSifat) return jOrangSifat;
   for(let s of (DB.sinonim||[])){
     let utama = norm(s.kata_utama);
     let list = String(s.daftar_sinonim||'').toLowerCase().split(/[,|]/).map(x=>norm(x));
